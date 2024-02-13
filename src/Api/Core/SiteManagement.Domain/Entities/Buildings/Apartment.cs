@@ -1,4 +1,6 @@
 ﻿using SiteManagement.Domain.Entities.Commons;
+using SiteManagement.Domain.Entities.Invoices;
+using SiteManagement.Domain.Entities.Residents;
 using SiteManagement.Domain.Enumarations.Buildings;
 
 namespace SiteManagement.Domain.Entities.Buildings;
@@ -13,4 +15,6 @@ public class Apartment : BaseEntity
     public bool IsTenant { get; set; }
 
     public virtual Block Block { get; set; }
+    public virtual ICollection<Bill> Bills { get; set; }
+    public virtual ICollection<Resident> Residents{ get; set; }
 }
