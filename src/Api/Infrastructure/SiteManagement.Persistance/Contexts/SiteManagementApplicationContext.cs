@@ -33,6 +33,18 @@ public class SiteManagementApplicationContext : DbContext
         
     }
     //TODO -Add IsConfiguring
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        //TODO - write password before running
+        if (!optionsBuilder.IsConfigured)
+        {
+            var connStr = "Data Source=localhost;Initial Catalog=SiteManagement;Persist Security Info=True;TrustServerCertificate=true;User ID=SA;Password=";
+            optionsBuilder.UseSqlServer(connStr, opt =>
+            {
+                opt.EnableRetryOnFailure();
+            });
+        }
+    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
