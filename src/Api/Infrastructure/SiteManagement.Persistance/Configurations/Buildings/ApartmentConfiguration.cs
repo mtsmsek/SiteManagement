@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SiteManagement.Domain.Entities.Buildings;
+using SiteManagement.Domain.Enumarations.Buildings;
 using SiteManagement.Persistance.Configurations.Commons;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,9 @@ namespace SiteManagement.Persistance.Configurations.Buildings
         {
             builder.Property(apartment => apartment.BlockId).IsRequired();
             builder.Property(apartment => apartment.Status).IsRequired();
-            builder.OwnsOne(apartment => apartment.ApartmentType);
+            builder.Property(apartment => apartment.ApartmentType).HasConversion(
+                apartmentType => apartmentType.Value,
+                value => ApartmentType.FromValue(value)!);
             builder.Property(apartment => apartment.ApartmentNumber).IsRequired();
             builder.Property(apartment => apartment.FloorNumber).IsRequired();
             builder.Property(apartment => apartment.IsTenant).IsRequired();

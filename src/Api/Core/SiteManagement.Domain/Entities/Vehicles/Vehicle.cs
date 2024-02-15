@@ -8,5 +8,5 @@ public class Vehicle : BaseEntity
 {
     public string VehicleRegistrationPlate { get; set; }
     public VehicleType VehicleType { get; set; }
-    public virtual ICollection<Resident> Residents { get; set; }
+    public virtual ICollection<ResidentVehicle> Residents { get; set; }
 }

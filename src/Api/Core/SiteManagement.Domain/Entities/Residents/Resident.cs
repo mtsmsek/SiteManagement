@@ -13,6 +13,6 @@ public class Resident : BaseEntity
     public string PhoneNumber { get; set; }
     public string Email { get; set; }
     public virtual Apartment Apartment { get; set; }
-    public virtual ICollection<Vehicle> Vehicles { get; set; }
+    public virtual ICollection<ResidentVehicle> Vehicles { get; set; }
 
 }
