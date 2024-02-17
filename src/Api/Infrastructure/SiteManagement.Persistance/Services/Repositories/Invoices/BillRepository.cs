@@ -1,7 +1,7 @@
 ﻿using SiteManagement.Domain.Entities.Invoices;
 using SiteManagement.Persistance.Contexts;
 using SiteManagement.Persistance.Services.Repositories.Commons;
-using SiteManagemnt.Application.Services.Repositories.Invoices;
+using SiteManagement.Application.Services.Repositories.Invoices;
 using System;
 using System.Collections.Generic;
 using System.Linq;

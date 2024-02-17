@@ -12,8 +12,8 @@ using SiteManagement.Persistance.Contexts;
 namespace SiteManagement.Persistance.Migrations
 {
     [DbContext(typeof(SiteManagementApplicationContext))]
-    [Migration("20240215205223_mig1")]
-    partial class mig1
+    [Migration("20240217003138_mig2")]
+    partial class mig2
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,7 +52,7 @@ namespace SiteManagement.Persistance.Migrations
                     b.Property<bool>("Status")
                         .HasColumnType("bit");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -75,7 +75,7 @@ namespace SiteManagement.Persistance.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -104,7 +104,7 @@ namespace SiteManagement.Persistance.Migrations
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -146,7 +146,7 @@ namespace SiteManagement.Persistance.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
@@ -168,7 +168,7 @@ namespace SiteManagement.Persistance.Migrations
                     b.Property<Guid>("ResidentId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("VehicleId")
@@ -178,7 +178,8 @@ namespace SiteManagement.Persistance.Migrations
 
                     b.HasIndex("VehicleId");
 
-                    b.HasIndex("ResidentId", "VehicleId");
+                    b.HasIndex("ResidentId", "VehicleId")
+                        .IsUnique();
 
                     b.ToTable("ResidentVehicles");
                 });
@@ -192,7 +193,7 @@ namespace SiteManagement.Persistance.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("VehicleRegistrationPlate")

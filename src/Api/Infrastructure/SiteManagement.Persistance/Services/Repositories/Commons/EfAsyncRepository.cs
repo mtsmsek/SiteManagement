@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using SiteManagement.Domain.Entities.Commons;
-using SiteManagemnt.Application.Services.Repositories.Commons;
+using SiteManagement.Application.Services.Repositories.Commons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +22,15 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
         public async Task<int> AddAsync(TEntity entity)
         {
             await _dbContext.AddAsync(entity);
+            return await _dbContext.SaveChangesAsync();
+        }
+
+        public async Task<int> AddRangeAsync(IEnumerable<TEntity> entities)
+        {
+            if (entities is null && !entities.Any())
+                return 0;
+            
+            await _dbContext.AddRangeAsync(entities);
             return await _dbContext.SaveChangesAsync();
         }
     }

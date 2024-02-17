@@ -1,7 +1,7 @@
 ﻿using SiteManagement.Domain.Entities.Vehicles;
-using SiteManagemnt.Application.Services.Repositories.Commons;
+using SiteManagement.Application.Services.Repositories.Commons;
 
-namespace SiteManagemnt.Application.Services.Repositories.Vehicles;
+namespace SiteManagement.Application.Services.Repositories.Vehicles;
 
 public interface IVehicleRepository : IAsyncRepository<Vehicle>
 {

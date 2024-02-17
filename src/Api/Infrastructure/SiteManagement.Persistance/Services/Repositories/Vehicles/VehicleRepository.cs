@@ -1,7 +1,7 @@
 ﻿using SiteManagement.Domain.Entities.Vehicles;
 using SiteManagement.Persistance.Contexts;
 using SiteManagement.Persistance.Services.Repositories.Commons;
-using SiteManagemnt.Application.Services.Repositories.Vehicles;
+using SiteManagement.Application.Services.Repositories.Vehicles;
 using System;
 using System.Collections.Generic;
 using System.Linq;

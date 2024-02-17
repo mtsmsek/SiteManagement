@@ -1,15 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SiteManagemnt.Application.Extensions
+namespace SiteManagement.Application.Extensions
 {
     public static class ApplicationRegistration
     {
-        public static IServiceCollection AddApplicationRegistration(IServiceCollection services)
+        public static IServiceCollection AddApplicationRegistration(this IServiceCollection services)
         {
             //TODO - Add mediatr dependency injection
             return services;    

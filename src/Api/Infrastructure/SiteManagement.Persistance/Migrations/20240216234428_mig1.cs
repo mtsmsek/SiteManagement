@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SiteManagement.Persistance.Migrations
 {
     /// <inheritdoc />
-    public partial class mig1 : Migration
+    /// Initial migration
+    public partial class mig1 : Migration 
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -158,7 +159,8 @@ namespace SiteManagement.Persistance.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_ResidentVehicles_ResidentId_VehicleId",
                 table: "ResidentVehicles",
-                columns: new[] { "ResidentId", "VehicleId" });
+                columns: new[] { "ResidentId", "VehicleId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_ResidentVehicles_VehicleId",

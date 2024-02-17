@@ -2,19 +2,15 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SiteManagement.Persistance.Contexts;
+using SiteManagement.Persistance.Contexts.SeedDatas;
 using SiteManagement.Persistance.Services.Repositories.Buildings;
 using SiteManagement.Persistance.Services.Repositories.Invoices;
 using SiteManagement.Persistance.Services.Repositories.Residents;
 using SiteManagement.Persistance.Services.Repositories.Vehicles;
-using SiteManagemnt.Application.Services.Repositories.Buildings;
-using SiteManagemnt.Application.Services.Repositories.Invoices;
-using SiteManagemnt.Application.Services.Repositories.Residents;
-using SiteManagemnt.Application.Services.Repositories.Vehicles;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SiteManagement.Application.Services.Repositories.Buildings;
+using SiteManagement.Application.Services.Repositories.Invoices;
+using SiteManagement.Application.Services.Repositories.Residents;
+using SiteManagement.Application.Services.Repositories.Vehicles;
 
 namespace SiteManagement.Persistance.Extensions
 {
@@ -31,6 +27,11 @@ namespace SiteManagement.Persistance.Extensions
                 });
                 
             });
+
+            #region SeedData
+            var seedData = new SiteManagementSeedData();
+            seedData.SeedAsync(configuration).GetAwaiter().GetResult();
+            #endregion
             #region Buildings 
             services.AddScoped<IApartmentRepository, ApartmentRepository>();
             services.AddScoped<IBlockRepository, BlockRepository>();

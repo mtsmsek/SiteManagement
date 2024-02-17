@@ -8,9 +8,15 @@ public class ResidentVehicleConfiguration : BaseEntityConfiguration<ResidentVehi
 {
     public override void Configure(EntityTypeBuilder<ResidentVehicle> builder)
     {
-        
-        builder.Property(residentVehicle => residentVehicle.ResidentId).IsRequired();
-        builder.Property(residentVehicle => residentVehicle.VehicleId).IsRequired();
+
+        builder.HasIndex(residentVehicle => new
+        {
+            residentVehicle.ResidentId,
+            residentVehicle.VehicleId
+        }).IsUnique();
+
+        //builder.Property(residentVehicle => residentVehicle.ResidentId).IsRequired();
+        //builder.Property(residentVehicle => residentVehicle.VehicleId).IsRequired();
 
         builder.HasOne(residentVehicle => residentVehicle.Vehicle)
                 .WithMany(resident => resident.Residents)
@@ -20,11 +26,7 @@ public class ResidentVehicleConfiguration : BaseEntityConfiguration<ResidentVehi
                 .WithMany(resident => resident.Vehicles)
                 .HasForeignKey(residentVehicle => residentVehicle.ResidentId);
 
-        builder.HasIndex(residentVehicle => new
-        {
-            residentVehicle.ResidentId,
-            residentVehicle.VehicleId
-        });
+      
 
     }
 }
