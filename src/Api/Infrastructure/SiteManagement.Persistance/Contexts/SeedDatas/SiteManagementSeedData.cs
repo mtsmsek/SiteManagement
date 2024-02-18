@@ -36,7 +36,7 @@ internal class SiteManagementSeedData
     #region Buildings
     private List<Apartment> GetApartments(IEnumerable<Guid> blockIds)
     {
-        //TODO make apartment numbers and floor numbers unuqie for apartment in the same block
+
         var apartments = new Faker<Apartment>("tr")
             .RuleFor(apartments => apartments.Id, faker => Guid.NewGuid())
             .RuleFor(apartments => apartments.CreatedDate, faker => faker.PickRandom(DateTime.Now.AddDays(-500), DateTime.Now))

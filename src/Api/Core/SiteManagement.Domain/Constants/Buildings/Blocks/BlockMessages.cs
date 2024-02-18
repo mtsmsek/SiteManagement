@@ -1,0 +1,26 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SiteManagement.Domain.Constants.Buildings.Blocks
+{
+    public static class BlockMessages
+    {
+        public static class CacheKeys
+        {
+            public const string CacheKey = "GetBlocks";
+        }
+        public static class RuleMessages
+        {
+            public const string BlockNameAlreadyExist = "Block name you want to add is already exist";
+
+        }
+        public static class ValidationMessages
+        {
+            public const string BlockNameCannotBeEmpty = "Block name must be filled";
+        }
+        
+    }
+}
