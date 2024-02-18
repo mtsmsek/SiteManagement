@@ -12,12 +12,12 @@ public interface IAsyncRepository<TEntity> where TEntity : BaseEntity
                        CancellationToken cancellationToken = default);
     Task<int> AddRangeAsync(IEnumerable<TEntity> entities,
                             CancellationToken cancellationToken = default);
-    Task<TEntity> GetSingleAsync(Expression<Func<TEntity, bool>> predicate, bool noTracking = true,
+    Task<TEntity> GetSingleAsync(Expression<Func<TEntity, bool>> predicate = null, bool noTracking = true,
                                  CancellationToken cancellationToken = default,
                                  params Expression<Func<TEntity, object>>[] includes);
-    Task<PagedViewModel<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate,
+    Task<PagedViewModel<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate = null,
                                                Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
-                                               int currentPAge = 1,
+                                               int currentPage = 1,
                                                int pageSize = 10,
                                                bool noTracking = true,
                                                CancellationToken cancellationToken = default,

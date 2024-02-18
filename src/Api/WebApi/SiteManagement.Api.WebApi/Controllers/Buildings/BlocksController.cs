@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SiteManagement.Api.WebApi.Controllers.Commons;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBlock;
+using SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks;
 
 namespace SiteManagement.Api.WebApi.Controllers.Buildings
 {
@@ -16,6 +17,12 @@ namespace SiteManagement.Api.WebApi.Controllers.Buildings
             var apartmentToAdd = await Mediator!.Send(createBlockCommand);
             
             return Ok(apartmentToAdd);
+        }
+        [HttpGet]
+        public async Task<IActionResult> GetAllBlocks(int currentPage, int PageSize)
+        {
+            var blocksList = await Mediator!.Send(new GetListAllBlockQuery { Page = currentPage, PageSize = PageSize});
+            return Ok(blocksList);  
         }
     }
 }

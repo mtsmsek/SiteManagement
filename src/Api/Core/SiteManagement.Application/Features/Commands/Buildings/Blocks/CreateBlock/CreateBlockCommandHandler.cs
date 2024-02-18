@@ -29,7 +29,8 @@ namespace SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBl
         {
            
             var dbBlock = await _blockRepository.GetSingleAsync(block => block.Name == request.Name);
-            Ensure.NotNull(dbBlock, new DatabaseValidationException(BlockMessages.RuleMessages.BlockNameAlreadyExist));
+            if(dbBlock is not null)
+                new DatabaseValidationException(BlockMessages.RuleMessages.BlockNameAlreadyExist);
 
             var blockToAdd = _mapper.Map<Block>(request);
             await _blockRepository.AddAsync(blockToAdd);

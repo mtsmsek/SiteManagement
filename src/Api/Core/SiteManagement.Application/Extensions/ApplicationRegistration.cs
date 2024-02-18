@@ -22,6 +22,7 @@ namespace SiteManagement.Application.Extensions
                 conf.AddOpenBehavior(typeof(CachingBehavior<,>));
                 conf.AddOpenBehavior(typeof(CacheRemovingBehavior<,>));
             });
+
             return services;    
         }
     }

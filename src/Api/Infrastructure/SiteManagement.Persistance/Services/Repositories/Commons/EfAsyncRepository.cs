@@ -38,7 +38,7 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
             return await _dbContext.SaveChangesAsync();
         }
         #region Get Methods
-        public async Task<TEntity> GetSingleAsync(Expression<Func<TEntity, bool>> predicate, bool noTracking = true,
+        public async Task<TEntity> GetSingleAsync(Expression<Func<TEntity, bool>> predicate = null, bool noTracking = true,
                                                   CancellationToken cancellationToken = default,
                                                   params Expression<Func<TEntity, object>>[] includes)
         {
@@ -46,8 +46,8 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
             if(predicate is not null)
                 query = query.Where(predicate);
 
-            if(includes is not null)
-                query = ApplyIncludes(query, includes);
+            
+             query = ApplyIncludes(query, includes);
 
             if(noTracking)
                 query = query.AsNoTracking();
@@ -62,8 +62,7 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
 
 
 
-        public Task<PagedViewModel<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate, Func<IQueryable<TEntity>,
-                                                          IOrderedQueryable<TEntity>>? orderBy = null,
+        public Task<PagedViewModel<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate = null,                                                                                              Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
                                                           int currentPage = 1, 
                                                           int pageSize = 10, 
                                                           bool noTracking = true,
@@ -79,8 +78,8 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
 
             if(noTracking)
               query =  query.AsNoTracking();
-            if (includes is not null)
-                query = ApplyIncludes(query, includes);
+          
+            query = ApplyIncludes(query, includes);
 
             return query.PaginateAsync(currentPage,pageSize,cancellationToken);
         }

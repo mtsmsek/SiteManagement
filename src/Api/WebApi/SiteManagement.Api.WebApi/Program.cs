@@ -14,6 +14,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddApplicationRegistration();
 
 builder.Services.AddPersistanceExtensions(builder.Configuration);
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddLogging(conf => conf.AddConsole());
+
 #endregion
 
 var app = builder.Build();

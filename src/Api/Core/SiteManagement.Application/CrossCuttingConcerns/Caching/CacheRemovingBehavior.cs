@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Caching.Distributed;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +13,12 @@ namespace SiteManagement.Application.CrossCuttingConcerns.Caching
         where TRequest : IRequest<TResponse>, ICacheRemoverRequest
     {
         private readonly IDistributedCache _cache;
+        private readonly ILogger<CacheRemovingBehavior<TRequest, TResponse>> _logger;
 
-        public CacheRemovingBehavior(IDistributedCache cache)
+        public CacheRemovingBehavior(IDistributedCache cache, ILogger<CacheRemovingBehavior<TRequest, TResponse>> logger)
         {
             _cache = cache;
+            _logger = logger;
         }
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
@@ -30,6 +33,8 @@ namespace SiteManagement.Application.CrossCuttingConcerns.Caching
             if(request.CacheKey is not null)
             {
                 await _cache.RemoveAsync(request.CacheKey, cancellationToken);
+                _logger.LogInformation($"Cache removed -> {request.CacheKey}");
+             
             }
 
             return response;

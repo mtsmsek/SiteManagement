@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBlock;
+using SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks;
+using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Domain.Entities.Buildings;
 using System;
 using System.Collections.Generic;
@@ -14,9 +16,13 @@ namespace SiteManagement.Application.Mappings
         public SiteManagementMapingProfile()
         {
             #region Blocks 
-                #region CreateBlock
+                #region Commands
                     CreateMap<Block, CreateBlockCommand>().ReverseMap();
-                #endregion
+            #endregion
+            #region Queries
+                    CreateMap<Block, GetListAllBlockResponse>().ReverseMap();
+                    CreateMap<PagedViewModel<Block>, PagedViewModel<GetListAllBlockResponse>>().ReverseMap();
+            #endregion
             #endregion
         }
     }
