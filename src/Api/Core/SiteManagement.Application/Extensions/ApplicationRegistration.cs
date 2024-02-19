@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using SiteManagement.Application.CrossCuttingConcerns.Caching;
 using SiteManagement.Application.Pipelines.Validation;
+using SiteManagement.Application.Rules.Commons;
 using System.Reflection;
 
 namespace SiteManagement.Application.Extensions
@@ -12,6 +13,8 @@ namespace SiteManagement.Application.Extensions
         {
             var assemblies = Assembly.GetExecutingAssembly();
             services.AddAutoMapper(assemblies);
+
+            services.addSubClassesOfType(assemblies, typeof(BaseBusinessRules));
             services.AddValidatorsFromAssembly(assemblies);
 
             services.AddMediatR(conf =>
@@ -24,6 +27,24 @@ namespace SiteManagement.Application.Extensions
             });
 
             return services;    
+        }
+
+        private static IServiceCollection addSubClassesOfType(this IServiceCollection services,
+                                                              Assembly assembly,
+                                                               Type type,
+                                                               Func<IServiceCollection, Type, IServiceCollection>? addWithLifeCycle = null) 
+        {
+            var types = assembly.GetTypes().Where(t => t.IsSubclassOf(type) && type != t).ToList();
+            foreach (var item in types)
+            {
+                if (addWithLifeCycle == null)
+                    services.AddScoped(item);
+
+                else
+                    addWithLifeCycle(services,item);
+
+            }
+            return services;
         }
     }
 }

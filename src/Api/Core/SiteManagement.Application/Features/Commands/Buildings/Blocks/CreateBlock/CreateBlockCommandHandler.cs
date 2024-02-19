@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using MediatR;
 using SiteManagement.Application.CrossCuttingConcerns.Caching;
+using SiteManagement.Application.CrossCuttingConcerns.Exceptions.Types;
+using SiteManagement.Application.Rules.Buildings.Blocks;
 using SiteManagement.Application.Services.Repositories.Buildings;
 using SiteManagement.Domain.Constants.Buildings.Blocks;
 using SiteManagement.Domain.Entities.Buildings;
@@ -18,25 +20,26 @@ namespace SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBl
     {
         private readonly IBlockRepository _blockRepository;
         private readonly IMapper _mapper;
+        private readonly BlockBusinessRules _blockBusinessRules;
 
-        public CreateBlockCommandHandler(IBlockRepository blockRepository, IMapper mapper)
+        public CreateBlockCommandHandler(IBlockRepository blockRepository, IMapper mapper, BlockBusinessRules brandBusinessRules)
         {
             _blockRepository = blockRepository;
             _mapper = mapper;
+            _blockBusinessRules = brandBusinessRules;
         }
 
         public async Task<Guid> Handle(CreateBlockCommand request, CancellationToken cancellationToken)
         {
-           
-            var dbBlock = await _blockRepository.GetSingleAsync(block => block.Name == request.Name);
-            if(dbBlock is not null)
-                new DatabaseValidationException(BlockMessages.RuleMessages.BlockNameAlreadyExist);
 
+            await _blockBusinessRules.BlockNameCannotBeDublicateWhenInserted(request.Name);
+           
             var blockToAdd = _mapper.Map<Block>(request);
             await _blockRepository.AddAsync(blockToAdd);
 
             return blockToAdd.Id;
 
         }
+       
     }
 }

@@ -11,7 +11,8 @@ namespace SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBl
 {
     public class CreateBlockCommand : IRequest<Guid>, ICacheRemoverRequest
     {
-        public string Name { get; set; }
+        private string _name;
+        public string Name { get { return _name; } set { _name = value.ToUpper(); } } 
 
         public string? CacheKey => BlockMessages.CacheKeys.CacheKey;
 

@@ -8,10 +8,13 @@ namespace SiteManagement.Application.Services.Repositories.Commons;
 public interface IAsyncRepository<TEntity> where TEntity : BaseEntity
                                                  
 {
+    #region Insert
     Task<int> AddAsync(TEntity entity,
                        CancellationToken cancellationToken = default);
     Task<int> AddRangeAsync(IEnumerable<TEntity> entities,
                             CancellationToken cancellationToken = default);
+    #endregion
+    #region Get
     Task<TEntity> GetSingleAsync(Expression<Func<TEntity, bool>> predicate = null, bool noTracking = true,
                                  CancellationToken cancellationToken = default,
                                  params Expression<Func<TEntity, object>>[] includes);
@@ -22,4 +25,11 @@ public interface IAsyncRepository<TEntity> where TEntity : BaseEntity
                                                bool noTracking = true,
                                                CancellationToken cancellationToken = default,
                                                params Expression<Func<TEntity, object>>[] includes);
+
+    Task<TEntity> GetByIdAsync(Guid id, bool noTracking = true, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes);
+    #endregion
+    #region Update
+    Task<int> UpdateAsync(TEntity entity,
+                         CancellationToken cancellationToken = default);
+    #endregion
 }

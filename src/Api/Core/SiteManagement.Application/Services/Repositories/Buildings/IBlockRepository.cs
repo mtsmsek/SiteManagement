@@ -5,4 +5,6 @@ namespace SiteManagement.Application.Services.Repositories.Buildings;
 
 public interface IBlockRepository : IAsyncRepository<Block>
 {
+    Task<bool> IsBlockNameUnique(string name);
+    Task<Block> IsBlockExist(Guid id);
 }

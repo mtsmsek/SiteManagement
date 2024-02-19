@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SiteManagement.Api.WebApi.Controllers.Commons;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBlock;
+using SiteManagement.Application.Features.Commands.Buildings.Blocks.UpdateBlock.UpdateBlockName;
 using SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks;
 
 namespace SiteManagement.Api.WebApi.Controllers.Buildings
@@ -23,6 +24,12 @@ namespace SiteManagement.Api.WebApi.Controllers.Buildings
         {
             var blocksList = await Mediator!.Send(new GetListAllBlockQuery { Page = currentPage, PageSize = PageSize});
             return Ok(blocksList);  
+        }
+        [HttpPut]
+        public async Task<IActionResult> UpdateBlockName(UpdateBlockNameCommand updateBlockNameCommand)
+        {
+            var updatedBlock = await Mediator.Send(updateBlockNameCommand);
+            return Ok(updatedBlock);
         }
     }
 }

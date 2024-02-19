@@ -15,6 +15,8 @@ namespace SiteManagement.Domain.Constants.Buildings.Blocks
         public static class RuleMessages
         {
             public const string BlockNameAlreadyExist = "Block name you want to add is already exist";
+            public const string BlocIsNotExist = "The block you try to update cannot found!";
+
 
         }
         public static class ValidationMessages

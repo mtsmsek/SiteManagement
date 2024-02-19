@@ -58,7 +58,6 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
 
 
         }
-        #endregion
 
 
 
@@ -83,6 +82,34 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
 
             return query.PaginateAsync(currentPage,pageSize,cancellationToken);
         }
+        public async Task<TEntity> GetByIdAsync(Guid id, bool noTracking = true, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes)
+        {
+            TEntity found = await _entity.FindAsync(id, cancellationToken);
+            
+            if (found == null)
+                return null;
+
+            if (noTracking)
+                _dbContext.Entry(found).State = EntityState.Detached;
+
+            foreach (Expression < Func<TEntity, object>> include in includes)
+            {
+                _dbContext.Entry(found).Reference(include).Load();
+            }
+
+            return found;
+        }
+        #endregion
+        #region Update
+        public async Task<int> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
+        {
+           _entity.Entry(entity).State = EntityState.Modified;
+            entity.UpdatedDate = DateTime.UtcNow;
+            _entity.Update(entity);
+
+            return await _dbContext.SaveChangesAsync();
+        }
+        #endregion
         private IQueryable<TEntity> ApplyIncludes(IQueryable<TEntity> query, params Expression<Func<TEntity, object>>[] includes)
         {
             if (includes is not null)
@@ -92,5 +119,7 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
             }
             return query;
         }
+
+       
     }
 }

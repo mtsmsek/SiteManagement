@@ -13,6 +13,7 @@ namespace SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBl
         public CreateBlockCommandValidator()
         {
             RuleFor(block => block.Name).NotEmpty().WithMessage(BlockMessages.ValidationMessages.BlockNameCannotBeEmpty);
+            
         }
     }
 }

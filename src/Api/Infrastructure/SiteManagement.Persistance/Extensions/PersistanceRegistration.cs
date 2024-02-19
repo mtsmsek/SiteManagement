@@ -29,8 +29,8 @@ namespace SiteManagement.Persistance.Extensions
             });
 
             #region SeedData
-            //var seedData = new SiteManagementSeedData();
-            //seedData.SeedAsync(configuration).GetAwaiter().GetResult();
+            var seedData = new SiteManagementSeedData();
+            seedData.SeedAsync(configuration).GetAwaiter().GetResult();
             #endregion
             #region Buildings 
             services.AddScoped<IApartmentRepository, ApartmentRepository>();

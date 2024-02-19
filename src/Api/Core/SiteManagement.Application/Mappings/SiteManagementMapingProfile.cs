@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBlock;
+using SiteManagement.Application.Features.Commands.Buildings.Blocks.UpdateBlock.UpdateBlockName;
 using SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Domain.Entities.Buildings;
@@ -18,8 +19,9 @@ namespace SiteManagement.Application.Mappings
             #region Blocks 
                 #region Commands
                     CreateMap<Block, CreateBlockCommand>().ReverseMap();
+                    CreateMap<Block, UpdateBlockNameCommand>().ReverseMap();
             #endregion
-            #region Queries
+                #region Queries
                     CreateMap<Block, GetListAllBlockResponse>().ReverseMap();
                     CreateMap<PagedViewModel<Block>, PagedViewModel<GetListAllBlockResponse>>().ReverseMap();
             #endregion

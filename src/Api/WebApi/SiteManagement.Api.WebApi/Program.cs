@@ -1,5 +1,6 @@
 using SiteManagement.Persistance.Extensions;
 using SiteManagement.Application.Extensions;
+using SiteManagement.Application.CrossCuttingConcerns.Exceptions.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,8 +29,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+if(app.Environment.IsProduction())
+    app.ConfigureCustomExcepitonMiddleware();
 
+app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
