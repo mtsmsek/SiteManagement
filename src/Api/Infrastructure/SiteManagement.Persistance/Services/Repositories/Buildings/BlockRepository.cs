@@ -16,6 +16,9 @@ namespace SiteManagement.Persistance.Services.Repositories.Buildings
         public async Task<Block> IsBlockExist(Guid id)
                 => await GetByIdAsync(id);
 
+        public async Task<Block> IsBlockExist(string name)
+                => await GetSingleAsync(block => block.Name == name);
+
         public async Task<bool> IsBlockNameUnique(string name)
              => await GetSingleAsync(block => block.Name == name) is null;
         

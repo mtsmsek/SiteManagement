@@ -26,7 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Commands\Buildings\Apartments\" />
     <Folder Include="Features\Commands\Invoices\" />
     <Folder Include="Features\Commands\Vehicles\" />
     <Folder Include="Features\Commands\Residents\" />

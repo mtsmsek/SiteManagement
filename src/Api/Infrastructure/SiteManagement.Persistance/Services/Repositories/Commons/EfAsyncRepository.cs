@@ -38,6 +38,19 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
             return await _dbContext.SaveChangesAsync();
         }
         #region Get Methods
+        public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate = null, bool noTracking = true, CancellationToken cancellationToken = default)
+        {
+            IQueryable<TEntity> query = _entity;
+
+            if (noTracking)
+                query = query.AsNoTracking();
+
+            if(predicate is not null)
+                query = query.Where(predicate);
+
+            return await query.AnyAsync(cancellationToken);
+
+        }
         public async Task<TEntity> GetSingleAsync(Expression<Func<TEntity, bool>> predicate = null, bool noTracking = true,
                                                   CancellationToken cancellationToken = default,
                                                   params Expression<Func<TEntity, object>>[] includes)
@@ -110,6 +123,27 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
             return await _dbContext.SaveChangesAsync();
         }
         #endregion
+        #region Delete
+        public async Task<int> DeleteAsync(TEntity entity, bool isPermenant = false, CancellationToken cancellationToken = default)
+        {
+            await SetEntityAsDeletedAsync(entity, isPermenant);
+            return await _dbContext.SaveChangesAsync();
+        }
+
+        #endregion
+        #region Helper Methods
+        protected async Task SetEntityAsDeletedAsync(TEntity entity, bool isPermenant)
+        {
+            if(!isPermenant)
+            {
+                //TODO -- Soft delete will create here!
+            }
+            else
+            {
+                _dbContext.Remove(entity);
+            }
+        }
+
         private IQueryable<TEntity> ApplyIncludes(IQueryable<TEntity> query, params Expression<Func<TEntity, object>>[] includes)
         {
             if (includes is not null)
@@ -120,6 +154,8 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
             return query;
         }
 
-       
+      
+        #endregion
+
     }
 }

@@ -21,23 +21,35 @@ namespace SiteManagement.Application.Rules.Buildings.Blocks
             _blockRepository = blockRepository;
         }
 
-        public async Task BlockNameCannotBeDublicateWhenInserted(string name)
+        public async Task BlockNameCannotBeDublicateWhenAddOrUpdate(string name,string message)
         {
            var isUnique =  await _blockRepository.IsBlockNameUnique(name);
 
             if (!isUnique)
-                throw new BusinessException(BlockMessages.RuleMessages.BlockNameAlreadyExist);
+                throw new BusinessException(message);
         }
 
-        public async Task<Block> BlockShouldBeExistInDatabase(Guid id)
+        public async Task<Block> BlockShouldBeExistInDatabase(Guid id,string message)
         {
            var block =  await _blockRepository.IsBlockExist(id);
             
             Ensure.NotNull(block,
-                            new BusinessException(BlockMessages.RuleMessages.BlocIsNotExist));
+                            new BusinessException(message));
 
             return block;
 
         }
+        public async Task<Block> BlockShouldBeExistInDatabase(string name, string message)
+        {
+            var block = await _blockRepository.IsBlockExist(name);
+
+            Ensure.NotNull(block,
+                            new BusinessException(message));
+
+            return block;
+
+        }
+
+     
     }
 }

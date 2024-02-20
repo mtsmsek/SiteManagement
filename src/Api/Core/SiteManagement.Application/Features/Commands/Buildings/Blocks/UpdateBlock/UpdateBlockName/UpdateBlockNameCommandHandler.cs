@@ -2,6 +2,7 @@
 using MediatR;
 using SiteManagement.Application.Rules.Buildings.Blocks;
 using SiteManagement.Application.Services.Repositories.Buildings;
+using SiteManagement.Domain.Constants.Buildings.Blocks;
 using SiteManagement.Domain.Entities.Buildings;
 using System;
 using System.Collections.Generic;
@@ -30,9 +31,10 @@ namespace SiteManagement.Application.Features.Commands.Buildings.Blocks.UpdateBl
 
         public async Task<UpdateBlockNameResponse> Handle(UpdateBlockNameCommand request, CancellationToken cancellationToken)
         {
-            var block = await _blockBusinessRules.BlockShouldBeExistInDatabase(request.Id);
+            //TODO -- existleri singleAsync ile çöz
+            Block block = await _blockBusinessRules.BlockShouldBeExistInDatabase(request.Id,BlockMessages.RuleMessages.BlocIsNotExist);
             
-            await _blockBusinessRules.BlockNameCannotBeDublicateWhenInserted(request.Name);
+            await _blockBusinessRules.BlockNameCannotBeDublicateWhenAddOrUpdate(request.Name, BlockMessages.RuleMessages.BlockNameAlreadyExist);
             
             var oldName = block.Name;
 

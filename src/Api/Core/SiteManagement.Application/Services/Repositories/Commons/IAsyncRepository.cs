@@ -27,9 +27,13 @@ public interface IAsyncRepository<TEntity> where TEntity : BaseEntity
                                                params Expression<Func<TEntity, object>>[] includes);
 
     Task<TEntity> GetByIdAsync(Guid id, bool noTracking = true, CancellationToken cancellationToken = default, params Expression<Func<TEntity, object>>[] includes);
+    Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate = null, bool noTracking = true, CancellationToken cancellationToken = default); 
     #endregion
     #region Update
     Task<int> UpdateAsync(TEntity entity,
                          CancellationToken cancellationToken = default);
+    #endregion
+    #region Delete
+    Task<int> DeleteAsync(TEntity entity, bool isPermenant = false, CancellationToken cancellationToken = default);
     #endregion
 }

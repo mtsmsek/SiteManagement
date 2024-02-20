@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace SiteManagement.Application.Rules.Commons
 {
-    public class BaseBusinessRules
+    public abstract class BaseBusinessRules
     {
+       
     }
 }
