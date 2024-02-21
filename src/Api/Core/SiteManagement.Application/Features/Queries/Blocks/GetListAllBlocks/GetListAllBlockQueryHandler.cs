@@ -24,11 +24,13 @@ namespace SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks
 
         public async Task<PagedViewModel<GetListAllBlockResponse>> Handle(GetListAllBlockQuery request, CancellationToken cancellationToken)
         {
-            
+
             PagedViewModel<Block> blocks = await _blockRepository.GetListAsync(currentPage: request.Page,
                                                                                pageSize: request.PageSize,
                                                                                cancellationToken: cancellationToken);
-          PagedViewModel<GetListAllBlockResponse> response = _mapper.Map<PagedViewModel<GetListAllBlockResponse>>(blocks);
+
+            PagedViewModel<GetListAllBlockResponse> response = _mapper.Map<PagedViewModel<GetListAllBlockResponse>>(blocks);
+
 
             return response;
         }

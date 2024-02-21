@@ -1,10 +1,15 @@
 ﻿using AutoMapper;
+using SiteManagement.Application.Features.Commands.Buildings.Apartments.CreateApartment;
+using SiteManagement.Application.Features.Commands.Buildings.Apartments.UpdateApartment.ChangeResidentStatus;
+using SiteManagement.Application.Features.Commands.Buildings.Apartments.UpdateApartment.ChangeTenantStatus;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBlock;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.UpdateBlock.UpdateBlockName;
+using SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlockId;
 using SiteManagement.Application.Features.Queries.Blocks.GetBlockDetailByName;
 using SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Domain.Entities.Buildings;
+using SiteManagement.Domain.Enumarations.Buildings;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +31,21 @@ public class SiteManagementMapingProfile : Profile
                 CreateMap<Block, GetListAllBlockResponse>().ReverseMap();
                 CreateMap<PagedViewModel<Block>, PagedViewModel<GetListAllBlockResponse>>().ReverseMap();
                 CreateMap<Block, GetBlockDetailByNameResponse>().ReverseMap();
+        #endregion
+        #endregion
+
+        #region Apartments
+        #region Commands
+        CreateMap<Apartment, CreateBlockCommand>().ReverseMap();
+        CreateMap<Apartment, CreateApartmentResponse>().ReverseMap();
+
+        CreateMap<Apartment, ChangeTenantStatusCommand>().ReverseMap();
+        CreateMap<Apartment, ChangeResidentStatusCommand>().ReverseMap();
+        #endregion
+        #region Queries
+        CreateMap<Apartment, GetListAllApartmentsByBlockResponse>()
+          .ForMember(destinationMember: x => x.BlockName, memberOptions: y => y.MapFrom(x => x.Block.Name)).ReverseMap();
+        CreateMap<PagedViewModel<Apartment>, PagedViewModel<GetListAllApartmentsByBlockResponse>>().ReverseMap();
         #endregion
         #endregion
     }

@@ -15,6 +15,7 @@ public interface IAsyncRepository<TEntity> where TEntity : BaseEntity
                             CancellationToken cancellationToken = default);
     #endregion
     #region Get
+    IQueryable<TEntity> AsQueryable();
     Task<TEntity> GetSingleAsync(Expression<Func<TEntity, bool>> predicate = null, bool noTracking = true,
                                  CancellationToken cancellationToken = default,
                                  params Expression<Func<TEntity, object>>[] includes);

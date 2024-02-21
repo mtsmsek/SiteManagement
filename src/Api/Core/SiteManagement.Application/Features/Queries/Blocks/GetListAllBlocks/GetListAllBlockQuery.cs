@@ -13,7 +13,7 @@ namespace SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks
 {
     public class GetListAllBlockQuery : PageRequest, IRequest<PagedViewModel<GetListAllBlockResponse>>, ICachableRequest
     {
-        public string CacheKey => $"GetListAllBlockQuery({Page},{PageSize})";
+        public string CacheKey => $"GetApartmentsByBlock:{Page},{PageSize}";
 
         public bool BypassCache { get; }
 

@@ -38,6 +38,7 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
             return await _dbContext.SaveChangesAsync();
         }
         #region Get Methods
+        public IQueryable<TEntity> AsQueryable() => _entity.AsQueryable();
         public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate = null, bool noTracking = true, CancellationToken cancellationToken = default)
         {
             IQueryable<TEntity> query = _entity;
@@ -74,7 +75,7 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
 
 
 
-        public Task<PagedViewModel<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate = null,                                                                                              Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
+        public Task<PagedViewModel<TEntity>> GetListAsync(Expression<Func<TEntity, bool>> predicate = null,                                                                                                        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>>? orderBy = null,
                                                           int currentPage = 1, 
                                                           int pageSize = 10, 
                                                           bool noTracking = true,
@@ -85,13 +86,15 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
             if(predicate is not null)
                 query = query.Where(predicate);
 
+            query = ApplyIncludes(query, includes);
+            
+            
             if (orderBy is not null)
                 orderBy(query);
 
             if(noTracking)
               query =  query.AsNoTracking();
           
-            query = ApplyIncludes(query, includes);
 
             return query.PaginateAsync(currentPage,pageSize,cancellationToken);
         }
@@ -150,11 +153,15 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
             {
                 foreach (var include in includes)
                     query = query.Include(include);
+
+                
             }
             return query;
         }
 
-      
+
+
+
         #endregion
 
     }
