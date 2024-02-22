@@ -83,17 +83,21 @@ namespace SiteManagement.Persistance.Services.Repositories.Commons
                                                           params Expression<Func<TEntity, object>>[] includes)
         {
             IQueryable<TEntity> query = _entity;
-            if(predicate is not null)
+            query = ApplyIncludes(query, includes);
+
+            if (noTracking)
+                query = query.AsNoTracking();
+
+            if (predicate is not null)
                 query = query.Where(predicate);
 
-            query = ApplyIncludes(query, includes);
             
             
             if (orderBy is not null)
-                orderBy(query);
+                query = orderBy(query);
 
-            if(noTracking)
-              query =  query.AsNoTracking();
+            
+           
           
 
             return query.PaginateAsync(currentPage,pageSize,cancellationToken);

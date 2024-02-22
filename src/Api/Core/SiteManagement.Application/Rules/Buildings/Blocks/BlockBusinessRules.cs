@@ -21,7 +21,7 @@ namespace SiteManagement.Application.Rules.Buildings.Blocks
             _blockRepository = blockRepository;
         }
 
-        public async Task BlockNameCannotBeDublicateWhenAddOrUpdate(string name,string message)
+        public virtual async Task BlockNameCannotBeDublicateWhenAddOrUpdate(string name,string message)
         {
            var isUnique =  await _blockRepository.IsBlockNameUnique(name);
 
@@ -29,7 +29,7 @@ namespace SiteManagement.Application.Rules.Buildings.Blocks
                 throw new BusinessException(message);
         }
 
-        public async Task<Block> BlockShouldBeExistInDatabase(Guid id,string message)
+        public virtual async Task<Block> BlockShouldBeExistInDatabase(Guid id,string message)
         {
            var block =  await _blockRepository.IsBlockExist(id);
             
