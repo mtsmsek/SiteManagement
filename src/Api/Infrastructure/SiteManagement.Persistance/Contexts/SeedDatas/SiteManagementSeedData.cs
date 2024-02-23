@@ -85,6 +85,7 @@ internal class SiteManagementSeedData
                                                                   BillType.NaturalGas,
                                                                   BillType.Electricity,
                                                                   BillType.WaterBill))
+            .RuleFor(bill => bill.Month, faker => Month.FromValue(faker.PickRandom<int>(Month.Enumarations.Keys)))
             .RuleFor(bill => bill.Fee, faker => faker.Rant.Random.Double(50, 3500))
             .RuleFor(bill => bill.IsPaid, faker => faker.PickRandom(true, false))
             .Generate(2000);

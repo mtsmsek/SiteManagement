@@ -4,6 +4,7 @@ using SiteManagement.Application.Features.Commands.Buildings.Apartments.UpdateAp
 using SiteManagement.Application.Features.Commands.Buildings.Apartments.UpdateApartment.ChangeTenantStatus;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBlock;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.UpdateBlock.UpdateBlockName;
+using SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBill;
 using SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlockId;
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsByStatus;
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsInBlockByStatus;
@@ -11,6 +12,7 @@ using SiteManagement.Application.Features.Queries.Blocks.GetBlockDetailByName;
 using SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Domain.Entities.Buildings;
+using SiteManagement.Domain.Entities.Invoices;
 using SiteManagement.Domain.Enumarations.Buildings;
 using System;
 using System.Collections.Generic;
@@ -59,6 +61,13 @@ public class SiteManagementMapingProfile : Profile
          .ForMember(destinationMember: x => x.BlockName, memberOptions: y => y.MapFrom(x => x.Block.Name))
          .ForMember(destinationMember: x => x.ApartmentType, memberOptions: y => y.MapFrom(x => x.ApartmentType.Name)).ReverseMap();
         CreateMap<PagedViewModel<Apartment>, PagedViewModel<GetListApartmentsInBlockByStatusResponse>>().ReverseMap();
+
+        #region Invoices
+        #region Bills
+        CreateMap<Bill, CreateBillCommand>().ReverseMap();
+            #endregion
+
+        #endregion
 
         #endregion
 

@@ -10,6 +10,9 @@ public class CreateBillValidation : AbstractValidator<Bill>
     {
         //TODO -- fix the messages
         RuleFor(i => i.Fee).GreaterThan(0).WithMessage("fatura ücreti eksi olamaz");
-
+        RuleFor(i => i.Year).NotEmpty().WithMessage("yıl alanı boş bırakılamaz");
+        RuleFor(i => i.Month).NotEmpty().WithMessage("ay alanı boş bırakılamaz");
     }
+
+    
 }

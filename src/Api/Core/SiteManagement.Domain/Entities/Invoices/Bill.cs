@@ -10,6 +10,9 @@ public class Bill : BaseEntity
     public BillType Type { get; set; }
     public double Fee { get; set; }
     public bool IsPaid { get; set;}
+    public Month Month { get; set; }
+    public int Year { get; set; }
+    public string Period => Month.Name + Year.ToString();
     public virtual Apartment Apartment { get; set; }
 
 }

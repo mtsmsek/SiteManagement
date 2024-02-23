@@ -5,7 +5,7 @@ namespace SiteManagement.Domain.Primitives;
 public abstract class Enumaration<TEnum> : IEquatable<Enumaration<TEnum>>
     where TEnum : Enumaration<TEnum>
 {
-    private static readonly Dictionary<int, TEnum> Enumarations = CreateEnumarations();
+    public static readonly Dictionary<int, TEnum> Enumarations = CreateEnumarations();
     protected Enumaration(int value, string name) 
     {
         Value = value;

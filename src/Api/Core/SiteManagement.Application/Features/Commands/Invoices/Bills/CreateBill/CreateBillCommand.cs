@@ -11,6 +11,8 @@ namespace SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBill
     public class CreateBillCommand : IRequest<Guid>
     {
         public BillType Type { get; set; }
+        public short Month { get; set; }
+        public int Year { get; set; }   
         public double Fee { get; set; }
     }
 }

@@ -12,9 +12,13 @@ public class BillConfiguration : BaseEntityConfiguration<Bill>
         builder.Property(bill => bill.ApartmentId).IsRequired();
         builder.Property(bill => bill.Type).HasConversion(billType =>
                                                           billType.Value,
-                                                          value => BillType.FromValue(value)!);
+                                                          value => BillType.FromValue(value)!).IsRequired();
         builder.Property(bill => bill.Fee).IsRequired();
         builder.Property(bill => bill.IsPaid).IsRequired();
+
+        builder.Property(bill => bill.Month).HasConversion(month => month.Value,
+                                                            value => Month.FromValue(value)!).IsRequired();
+        builder.Property(bill => bill.Year).IsRequired();
 
         builder.HasOne(bill => bill.Apartment)
                .WithMany(apartment => apartment.Bills)
