@@ -39,7 +39,7 @@ public class SiteManagementApplicationContext : DbContext
         if (!optionsBuilder.IsConfigured)
         {
             //var connStr = "Data Source=localhost;Initial Catalog=SiteManagement;Persist Security Info=True;TrustServerCertificate=true;User ID=SA;Password=";
-            var connStr = "Server = (localdb)\\MSSQLLocalDB;Initial Catalog=siteManagementDb;Integrated Security=False;Trusted_Connection=True;MultipleActiveResultSets=False;TrustServerCertificate=True";
+            var connStr = "Server =(localdb)\\MSSQLLocalDB;Initial Catalog=siteManagementDb;Integrated Security=False;Trusted_Connection=True;MultipleActiveResultSets=False;TrustServerCertificate=True";
             optionsBuilder.UseSqlServer(connStr, opt =>
             {
                 opt.EnableRetryOnFailure();

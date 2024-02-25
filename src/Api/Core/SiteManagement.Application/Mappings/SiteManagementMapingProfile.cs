@@ -62,11 +62,11 @@ public class SiteManagementMapingProfile : Profile
          .ForMember(destinationMember: x => x.ApartmentType, memberOptions: y => y.MapFrom(x => x.ApartmentType.Name)).ReverseMap();
         CreateMap<PagedViewModel<Apartment>, PagedViewModel<GetListApartmentsInBlockByStatusResponse>>().ReverseMap();
 
+
+        #endregion
         #region Invoices
         #region Bills
         CreateMap<Bill, CreateBillCommand>().ReverseMap();
-            #endregion
-
         #endregion
 
         #endregion

@@ -85,7 +85,19 @@ internal class SiteManagementSeedData
                                                                   BillType.NaturalGas,
                                                                   BillType.Electricity,
                                                                   BillType.WaterBill))
-            .RuleFor(bill => bill.Month, faker => Month.FromValue(faker.PickRandom<int>(Month.Enumarations.Keys)))
+            .RuleFor(bill => bill.Month, faker => faker.PickRandom(Month.January,
+                                                                   Month.February,
+                                                                   Month.March,
+                                                                   Month.April,
+                                                                   Month.May,
+                                                                   Month.June,
+                                                                   Month.July,
+                                                                   Month.August,
+                                                                   Month.September,
+                                                                   Month.October,
+                                                                   Month.November,
+                                                                   Month.December))
+            .RuleFor(bill => bill.Year, faker => faker.PickRandom<int>(DateTime.Now.AddDays(-500).Year, DateTime.Now.Year))
             .RuleFor(bill => bill.Fee, faker => faker.Rant.Random.Double(50, 3500))
             .RuleFor(bill => bill.IsPaid, faker => faker.PickRandom(true, false))
             .Generate(2000);

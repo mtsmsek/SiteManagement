@@ -18,7 +18,7 @@ public class ExceptionMiddleware
         _next = next;
         _httpExceptionHandler = new HttpExceptionHandler();
     }
-    public async Task Invoke(HttpContext context)
+    public virtual async Task Invoke(HttpContext context)
     {
         try
         {
