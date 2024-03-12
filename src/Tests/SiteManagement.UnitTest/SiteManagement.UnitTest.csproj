@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Api\Infrastructure\SiteManagement.Persistance\SiteManagement.Persistance.csproj" />
+    <ProjectReference Include="..\..\Api\WebApi\SiteManagement.Api.WebApi\SiteManagement.Api.WebApi.csproj" />
   </ItemGroup>
 
 </Project>

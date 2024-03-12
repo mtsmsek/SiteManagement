@@ -6,7 +6,7 @@ namespace SiteManagement.Application.CrossCuttingConcerns.Exceptions.Handlers;
 
 public abstract class ExceptionHandler
 {
-    public Task HandleExceptionAsync(Exception exception) =>
+    public virtual Task HandleExceptionAsync(Exception exception) =>
         exception switch
         {
             BusinessException businessException => HandleException(businessException),

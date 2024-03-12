@@ -10,4 +10,8 @@
     <Folder Include="Components\Pages\MainPages\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Radzen.Blazor" Version="4.26.1" />
+  </ItemGroup>
+
 </Project>

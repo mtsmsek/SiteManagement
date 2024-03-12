@@ -14,21 +14,18 @@ namespace SiteManagement.Application.Features.Commands.Buildings.Apartments.Dele
     public class HardDeleteApartmentCommandHandler : IRequestHandler<HardDeleteApartmentCommand, Guid>
     {
         private readonly IApartmentRepository _apartmentRepository;
-        private readonly IMapper _mapper;
+
         private readonly ApartmentBusinessRules _apartmentBusinessRules;
 
-        public HardDeleteApartmentCommandHandler(IApartmentRepository repository, IMapper mapper, ApartmentBusinessRules apartmentBusinessRules)
+        public HardDeleteApartmentCommandHandler(IApartmentRepository repository, ApartmentBusinessRules apartmentBusinessRules)
         {
             _apartmentRepository = repository;
-            _mapper = mapper;
             _apartmentBusinessRules = apartmentBusinessRules;
         }
 
         public async Task<Guid> Handle(HardDeleteApartmentCommand request, CancellationToken cancellationToken)
         {
             Apartment apartment = await _apartmentBusinessRules.ApartmentShouldExistInDatabase(request.Id);
-
-            _mapper.Map(apartment, request);
 
             await _apartmentRepository.DeleteAsync(entity: apartment,
                                              isPermenant: true,
