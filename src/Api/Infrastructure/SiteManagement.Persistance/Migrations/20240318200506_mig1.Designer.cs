@@ -12,8 +12,8 @@ using SiteManagement.Persistance.Contexts;
 namespace SiteManagement.Persistance.Migrations
 {
     [DbContext(typeof(SiteManagementApplicationContext))]
-    [Migration("20240217003138_mig2")]
-    partial class mig2
+    [Migration("20240318200506_mig1")]
+    partial class mig1
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -41,6 +41,9 @@ namespace SiteManagement.Persistance.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<int>("FloorNumber")
@@ -71,14 +74,20 @@ namespace SiteManagement.Persistance.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
 
                     b.ToTable("Blocks");
                 });
@@ -95,17 +104,26 @@ namespace SiteManagement.Persistance.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<double>("Fee")
                         .HasColumnType("float");
 
                     b.Property<bool>("IsPaid")
                         .HasColumnType("bit");
 
+                    b.Property<int>("Month")
+                        .HasColumnType("int");
+
                     b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
@@ -114,16 +132,74 @@ namespace SiteManagement.Persistance.Migrations
                     b.ToTable("Bills");
                 });
 
-            modelBuilder.Entity("SiteManagement.Domain.Entities.Residents.Resident", b =>
+            modelBuilder.Entity("SiteManagement.Domain.Entities.Security.EmailAuthenticator", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("ApartmentId")
+                    b.Property<string>("ActivationKey")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("EmailAuthenticators");
+                });
+
+            modelBuilder.Entity("SiteManagement.Domain.Entities.Security.OperationClaim", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OperationClaims");
+                });
+
+            modelBuilder.Entity("SiteManagement.Domain.Entities.Security.User", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("AuthenticatorType")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -134,26 +210,56 @@ namespace SiteManagement.Persistance.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("IdenticalNumber")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber")
+                    b.Property<byte[]>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("PasswordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
 
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApartmentId");
+                    b.ToTable("Users", (string)null);
 
-                    b.ToTable("Residents");
+                    b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("SiteManagement.Domain.Entities.Security.UserOperationClaim", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("OperationClaimId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OperationClaimId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserOperationClaims");
                 });
 
             modelBuilder.Entity("SiteManagement.Domain.Entities.Vehicles.ResidentVehicle", b =>
@@ -163,6 +269,9 @@ namespace SiteManagement.Persistance.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedDate")
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("ResidentId")
@@ -193,6 +302,9 @@ namespace SiteManagement.Persistance.Migrations
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("datetime2");
 
@@ -206,6 +318,26 @@ namespace SiteManagement.Persistance.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Vehicles");
+                });
+
+            modelBuilder.Entity("SiteManagement.Domain.Entities.Residents.Resident", b =>
+                {
+                    b.HasBaseType("SiteManagement.Domain.Entities.Security.User");
+
+                    b.Property<Guid>("ApartmentId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("IdenticalNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasIndex("ApartmentId");
+
+                    b.ToTable("Residents", (string)null);
                 });
 
             modelBuilder.Entity("SiteManagement.Domain.Entities.Buildings.Apartment", b =>
@@ -230,15 +362,34 @@ namespace SiteManagement.Persistance.Migrations
                     b.Navigation("Apartment");
                 });
 
-            modelBuilder.Entity("SiteManagement.Domain.Entities.Residents.Resident", b =>
+            modelBuilder.Entity("SiteManagement.Domain.Entities.Security.EmailAuthenticator", b =>
                 {
-                    b.HasOne("SiteManagement.Domain.Entities.Buildings.Apartment", "Apartment")
-                        .WithMany("Residents")
-                        .HasForeignKey("ApartmentId")
+                    b.HasOne("SiteManagement.Domain.Entities.Security.User", "User")
+                        .WithMany("EmailAuthenticators")
+                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Apartment");
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SiteManagement.Domain.Entities.Security.UserOperationClaim", b =>
+                {
+                    b.HasOne("SiteManagement.Domain.Entities.Security.OperationClaim", "OperationClaim")
+                        .WithMany("UserOperationClaims")
+                        .HasForeignKey("OperationClaimId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SiteManagement.Domain.Entities.Security.User", "User")
+                        .WithMany("UserOperationClaims")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("OperationClaim");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SiteManagement.Domain.Entities.Vehicles.ResidentVehicle", b =>
@@ -260,6 +411,23 @@ namespace SiteManagement.Persistance.Migrations
                     b.Navigation("Vehicle");
                 });
 
+            modelBuilder.Entity("SiteManagement.Domain.Entities.Residents.Resident", b =>
+                {
+                    b.HasOne("SiteManagement.Domain.Entities.Buildings.Apartment", "Apartment")
+                        .WithMany("Residents")
+                        .HasForeignKey("ApartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SiteManagement.Domain.Entities.Security.User", null)
+                        .WithOne()
+                        .HasForeignKey("SiteManagement.Domain.Entities.Residents.Resident", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Apartment");
+                });
+
             modelBuilder.Entity("SiteManagement.Domain.Entities.Buildings.Apartment", b =>
                 {
                     b.Navigation("Bills");
@@ -272,14 +440,26 @@ namespace SiteManagement.Persistance.Migrations
                     b.Navigation("Apartments");
                 });
 
-            modelBuilder.Entity("SiteManagement.Domain.Entities.Residents.Resident", b =>
+            modelBuilder.Entity("SiteManagement.Domain.Entities.Security.OperationClaim", b =>
                 {
-                    b.Navigation("Vehicles");
+                    b.Navigation("UserOperationClaims");
+                });
+
+            modelBuilder.Entity("SiteManagement.Domain.Entities.Security.User", b =>
+                {
+                    b.Navigation("EmailAuthenticators");
+
+                    b.Navigation("UserOperationClaims");
                 });
 
             modelBuilder.Entity("SiteManagement.Domain.Entities.Vehicles.Vehicle", b =>
                 {
                     b.Navigation("Residents");
+                });
+
+            modelBuilder.Entity("SiteManagement.Domain.Entities.Residents.Resident", b =>
+                {
+                    b.Navigation("Vehicles");
                 });
 #pragma warning restore 612, 618
         }

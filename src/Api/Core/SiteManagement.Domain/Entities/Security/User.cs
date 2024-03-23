@@ -10,7 +10,7 @@ public class User : BaseEntity
     public string Email { get; set; }
     public byte[] PasswordSalt { get; set; }
     public byte[] PasswordHash { get; set;}
-    public AuthenticatorType AuthenticatorType { get; set; }
+    public AuthenticatorType AuthenticatorType { get; set; } = AuthenticatorType.None;
 
     public virtual ICollection<UserOperationClaim> UserOperationClaims{ get; set; }
     public virtual ICollection<EmailAuthenticator> EmailAuthenticators{ get; set; }

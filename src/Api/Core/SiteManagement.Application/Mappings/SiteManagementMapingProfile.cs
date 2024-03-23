@@ -5,6 +5,7 @@ using SiteManagement.Application.Features.Commands.Buildings.Apartments.UpdateAp
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBlock;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.UpdateBlock.UpdateBlockName;
 using SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBill;
+using SiteManagement.Application.Features.Commands.Residents.CreateResident;
 using SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlockId;
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsByStatus;
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsInBlockByStatus;
@@ -13,6 +14,7 @@ using SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Domain.Entities.Buildings;
 using SiteManagement.Domain.Entities.Invoices;
+using SiteManagement.Domain.Entities.Residents;
 using SiteManagement.Domain.Enumarations.Buildings;
 using System;
 using System.Collections.Generic;
@@ -64,6 +66,8 @@ public class SiteManagementMapingProfile : Profile
 
 
         #endregion
+
+        #endregion
         #region Invoices
         #region Bills
         CreateMap<Bill, CreateBillCommand>().ReverseMap();
@@ -71,6 +75,9 @@ public class SiteManagementMapingProfile : Profile
 
         #endregion
 
+        #region Residents
+        CreateMap<CreateResidentCommand, Resident>().ReverseMap() ;
+        CreateMap<Resident, CreateResidentResponse>().ReverseMap() ;
         #endregion
     }
 }

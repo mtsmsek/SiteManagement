@@ -7,6 +7,7 @@ using SiteManagement.Application.Features.Commands.Buildings.Blocks.UpdateBlock.
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsByStatus;
 using SiteManagement.Application.Features.Queries.Blocks.GetBlockDetailByName;
 using SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks;
+using SiteManagement.Application.Security.Extensions;
 
 namespace SiteManagement.Api.WebApi.Controllers.Buildings;
 
@@ -18,8 +19,8 @@ public class BlocksController : BaseController
     public async Task<IActionResult> AddBlock(CreateBlockCommand createBlockCommand)
     {
         //TODO -- Create BadRequest
+        var a = HttpContext.User.ClaimRoles();
         var apartmentToAdd = await Mediator!.Send(createBlockCommand);
-
         return Ok(apartmentToAdd);
     }
 

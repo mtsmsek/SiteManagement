@@ -19,7 +19,7 @@ public class JwtHelper : ITokenHelper
     private readonly TokenOptions _tokenOptions;
     private DateTime _accessTokenExpiration;
     //TODO Add refresh token
-    public JwtHelper(IConfiguration configuration, TokenOptions tokenOptions, DateTime accessTokenExpiration)
+    public JwtHelper(IConfiguration configuration)
     {
         _configuration = configuration;
         const string configurationSection = "TokenOptions";
@@ -27,7 +27,7 @@ public class JwtHelper : ITokenHelper
                                         .Get<TokenOptions>()
                                         ?? throw new NullReferenceException($"\"{configurationSection}\" section cannot found in configuration");
 
-        _accessTokenExpiration = accessTokenExpiration;
+       
     }
 
     public AccessToken CreateToken(User user, IList<OperationClaim> operationClaims)
@@ -35,10 +35,16 @@ public class JwtHelper : ITokenHelper
         _accessTokenExpiration = DateTime.Now.AddMinutes(_tokenOptions.AccessTokenExpiration);
         SecurityKey securityKey = SecurityKeyHelper.CreateSecurityKey(_tokenOptions.SecurityKey);
         SigningCredentials signingCredentials = SigningCredentialsHelper.CreateSigningCredentials(securityKey);
-        JwtSecurityToken jwt = null;
+        JwtSecurityToken jwt = createJwtSecurityToken(_tokenOptions, user, signingCredentials, operationClaims);
+        JwtSecurityTokenHandler jwtSecurityTokenHandler = new();
+        string? token = jwtSecurityTokenHandler.WriteToken(jwt);
 
 
-        return new AccessToken();
+        return new AccessToken()
+        {
+            Token = token,
+            Expiration = _accessTokenExpiration
+        };
     }
 
     private JwtSecurityToken createJwtSecurityToken(TokenOptions tokenOptions,
@@ -46,8 +52,8 @@ public class JwtHelper : ITokenHelper
                                                     SigningCredentials signingCredentials,
                                                     IList<OperationClaim> operationClaims)
     {
-        JwtSecurityToken jwt = new(issuer: tokenOptions.Issuer,
-                                    audience: tokenOptions.Auidience,
+        JwtSecurityToken jwt = new( tokenOptions.Issuer,
+                                    tokenOptions.Auidience,
                                     expires: _accessTokenExpiration,
                                     notBefore: DateTime.Now,
                                     claims: SetClaims(user,operationClaims),

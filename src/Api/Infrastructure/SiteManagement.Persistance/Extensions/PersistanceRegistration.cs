@@ -11,42 +11,49 @@ using SiteManagement.Application.Services.Repositories.Buildings;
 using SiteManagement.Application.Services.Repositories.Invoices;
 using SiteManagement.Application.Services.Repositories.Residents;
 using SiteManagement.Application.Services.Repositories.Vehicles;
+using SiteManagement.Application.Services.Repositories.Security;
+using SiteManagement.Persistance.Services.Repositories.Security;
 
-namespace SiteManagement.Persistance.Extensions
+namespace SiteManagement.Persistance.Extensions;
+
+public static class PersistanceRegistration
 {
-    public static class PersistanceRegistration
+    public static IServiceCollection AddPersistanceExtensions(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddPersistanceExtensions(this IServiceCollection services, IConfiguration configuration)
+        services.AddDbContext<SiteManagementApplicationContext>(conf =>
         {
-            services.AddDbContext<SiteManagementApplicationContext>(conf =>
+            var connectionString = configuration.GetConnectionString("DefaultConnectionString");
+            conf.UseSqlServer(connectionString, opt =>
             {
-                var connectionString = configuration.GetConnectionString("DefaultConnectionString");
-                conf.UseSqlServer(connectionString, opt =>
-                {
-                    opt.EnableRetryOnFailure();
-                });
-                
+                opt.EnableRetryOnFailure();
             });
+            
+        });
 
-            #region SeedData
-            var seedData = new SiteManagementSeedData();
-            seedData.SeedAsync(configuration).GetAwaiter().GetResult();
-            #endregion
-            #region Buildings 
-            services.AddScoped<IApartmentRepository, ApartmentRepository>();
-            services.AddScoped<IBlockRepository, BlockRepository>();
-            #endregion
-            #region Invoices
-            services.AddScoped<IBillReposiotry, BillRepository>();
-            #endregion
-            #region Residents
-            services.AddScoped<IResidentRepository, ResidentRepository>();
-            #endregion
-            #region Vehicles
-            services.AddScoped<IVehicleRepository, VehicleRepository>();
-            services.AddScoped<IResidentVehicleRepository, ResidentVehicleRepository>();
-            #endregion
-            return services;
-        }
+        #region SeedData
+        var seedData = new SiteManagementSeedData();
+        seedData.SeedAsync(configuration).GetAwaiter().GetResult();
+        #endregion
+        #region Buildings 
+        services.AddScoped<IApartmentRepository, ApartmentRepository>();
+        services.AddScoped<IBlockRepository, BlockRepository>();
+        #endregion
+        #region Invoices
+        services.AddScoped<IBillReposiotry, BillRepository>();
+        #endregion
+        #region Residents
+        services.AddScoped<IResidentRepository, ResidentRepository>();
+        #endregion
+        #region Vehicles
+        services.AddScoped<IVehicleRepository, VehicleRepository>();
+        services.AddScoped<IResidentVehicleRepository, ResidentVehicleRepository>();
+        #endregion
+        #region Security
+        services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IUserOperationClaimRepository, UserOperationClaimRepository>();
+        services.AddScoped<IOperationClaimRepository, OperationClaimRepository>();
+        services.AddScoped<IEmailAuthenticatorRepository, EmailAuthenticatorRepository>();
+        #endregion
+        return services;
     }
 }

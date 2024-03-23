@@ -3,6 +3,7 @@ using SiteManagement.Domain.Entities.Buildings;
 using SiteManagement.Domain.Entities.Commons;
 using SiteManagement.Domain.Entities.Invoices;
 using SiteManagement.Domain.Entities.Residents;
+using SiteManagement.Domain.Entities.Security;
 using SiteManagement.Domain.Entities.Vehicles;
 using System.Reflection;
 
@@ -23,6 +24,14 @@ public class SiteManagementApplicationContext : DbContext
     #region Vehicles
     public DbSet<Vehicle> Vehicles { get; set; }
     public DbSet<ResidentVehicle> ResidentVehicles{ get; set; }
+    #endregion
+    #region Security
+    public DbSet<User> Users { get; set; }
+    public DbSet<OperationClaim> OperationClaims { get; set; }
+    public DbSet<UserOperationClaim> UserOperationClaims { get; set; }
+    public DbSet<EmailAuthenticator> EmailAuthenticators { get; set; }
+
+
     #endregion
     public SiteManagementApplicationContext()
     {

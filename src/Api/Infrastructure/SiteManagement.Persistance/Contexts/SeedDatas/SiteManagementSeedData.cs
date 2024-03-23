@@ -1,12 +1,14 @@
 ﻿using Bogus;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using SiteManagement.Application.Security.Hashing;
 using SiteManagement.Domain.Entities.Buildings;
 using SiteManagement.Domain.Entities.Invoices;
 using SiteManagement.Domain.Entities.Residents;
 using SiteManagement.Domain.Entities.Vehicles;
 using SiteManagement.Domain.Enumarations.Buildings;
 using SiteManagement.Domain.Enumarations.Invoices;
+using SiteManagement.Domain.Enumarations.Security;
 using SiteManagement.Domain.Enumarations.Vehicles;
 using System.Linq;
 
@@ -23,9 +25,15 @@ internal class SiteManagementSeedData
             .RuleFor(resident => resident.ApartmentId, faker => faker.PickRandom(apartmentIds))
             .RuleFor(resident => resident.FirstName, faker => faker.Person.FirstName)
             .RuleFor(resident => resident.LastName, faker => faker.Person.LastName)
+            .RuleFor(resident => resident.PasswordHash, faker => ReturnPasswordHash(faker.Internet.Password()))
+            .RuleFor(resident => resident.PasswordSalt, faker => ReturnPasswordSalt(faker.Internet.Password()))
+            .RuleFor(resident => resident.LastName, faker => faker.Person.LastName)
             .RuleFor(resident => resident.IdenticalNumber, faker => faker.Database.Random.AlphaNumeric(11))
             .RuleFor(resident => resident.PhoneNumber, faker => faker.Person.Phone)
             .RuleFor(resident => resident.Email, faker => faker.Internet.Email())
+            .RuleFor(resident => resident.AuthenticatorType, faker => faker.PickRandom( AuthenticatorType.None,
+                                                                                        AuthenticatorType.Otp,
+                                                                                        AuthenticatorType.Email))
             .Generate(500);
 
         return residents;
@@ -142,7 +150,18 @@ internal class SiteManagementSeedData
         return residentVehicles;
     }
     #endregion
+    public byte[] ReturnPasswordHash(string password)
+    {
+        HashingHelper.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+        return passwordHash;
+           
+    }
+    public byte[] ReturnPasswordSalt(string password)
+    {
+        HashingHelper.CreatePasswordHash(password, out byte[] passwordHash, out byte[] passwordSalt);
+        return passwordSalt;
 
+    }
     public async Task SeedAsync(IConfiguration configuration)
     {
         var dbContextBuilder = new DbContextOptionsBuilder();

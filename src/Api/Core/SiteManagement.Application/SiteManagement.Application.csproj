@@ -30,7 +30,6 @@
   <ItemGroup>
     <Folder Include="Features\Commands\Invoices\Bills\UpdateBill\" />
     <Folder Include="Features\Commands\Vehicles\" />
-    <Folder Include="Features\Commands\Residents\" />
     <Folder Include="Features\Queries\Vehicles\" />
     <Folder Include="Features\Queries\Residents\" />
   </ItemGroup>

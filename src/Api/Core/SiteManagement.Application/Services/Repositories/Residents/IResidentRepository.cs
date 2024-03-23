@@ -5,4 +5,5 @@ namespace SiteManagement.Application.Services.Repositories.Residents;
 
 public interface IResidentRepository : IAsyncRepository<Resident>
 {
+
 }
