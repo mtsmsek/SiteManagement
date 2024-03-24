@@ -2,6 +2,7 @@
 using SiteManagement.Application.Rules.Commons;
 using SiteManagement.Application.Services.Repositories.Security;
 using SiteManagement.Application.Services.Repositories.Vehicles;
+using SiteManagement.Domain.Entities.Vehicles;
 
 namespace SiteManagement.Application.Rules.Vehicles
 {
@@ -41,12 +42,14 @@ namespace SiteManagement.Application.Rules.Vehicles
             
         }
 
-        public async Task CheckIfVehiceExistById(Guid id, CancellationToken cancellationToken)
+        public async Task<Vehicle> CheckIfVehiceExistById(Guid id, CancellationToken cancellationToken)
         {
             var dbVehicle = await _vehicleRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
 
             if (dbVehicle is null)
                 throw new BusinessException("Vehicle cannot found");
+
+            return dbVehicle;
         }
     }
 }

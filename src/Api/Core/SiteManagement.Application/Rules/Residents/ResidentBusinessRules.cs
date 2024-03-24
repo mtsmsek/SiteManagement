@@ -60,12 +60,15 @@ public class ResidentBusinessRules : BaseBusinessRules
 
         return dbResident!;
     }
-    public async Task CheckIfResidentExistById(Guid id, CancellationToken cancellationToken)
+    public async Task<Resident> CheckIfResidentExistById(Guid id, CancellationToken cancellationToken)
     {
         var dbResident = await _residentRepository.GetByIdAsync(id,cancellationToken: cancellationToken);
         //TODO -- remove magic string
         if (dbResident is null)
             throw new BusinessException("Resident cannot found in system");
+
+
+        return dbResident!;
     }
     public void CheckIfPasswordIsTrue(string password, byte[] passwordHash, byte[] passwordSalt)
     {
@@ -77,5 +80,11 @@ public class ResidentBusinessRules : BaseBusinessRules
             throw new BusinessException("Hatalı Şifre");
         
         return;
+    }
+    public void EmailCannotBeSameWithOldEmail(string newEmail, string oldEmail)
+    {
+        if (newEmail == oldEmail)
+            throw new BusinessException("Emailiniz eski emailinizle aynı olamaz");
+
     }
 }

@@ -43,6 +43,7 @@ public static class PersistanceRegistration
         #endregion
         #region Residents
         services.AddScoped<IResidentRepository, ResidentRepository>();
+        services.AddScoped<IMessageRepository, MessageRepository>();
         #endregion
         #region Vehicles
         services.AddScoped<IVehicleRepository, VehicleRepository>();

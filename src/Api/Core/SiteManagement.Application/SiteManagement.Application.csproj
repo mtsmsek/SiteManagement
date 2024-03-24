@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Features\Commands\Invoices\Bills\UpdateBill\" />
     <Folder Include="Features\Queries\Vehicles\" />
     <Folder Include="Features\Queries\Residents\" />
   </ItemGroup>
