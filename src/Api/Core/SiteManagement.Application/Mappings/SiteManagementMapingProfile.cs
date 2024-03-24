@@ -5,6 +5,7 @@ using SiteManagement.Application.Features.Commands.Buildings.Apartments.UpdateAp
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBlock;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.UpdateBlock.UpdateBlockName;
 using SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBill;
+using SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBulkBills;
 using SiteManagement.Application.Features.Commands.Residents.CreateResident;
 using SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlockId;
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsByStatus;
@@ -15,12 +16,6 @@ using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Domain.Entities.Buildings;
 using SiteManagement.Domain.Entities.Invoices;
 using SiteManagement.Domain.Entities.Residents;
-using SiteManagement.Domain.Enumarations.Buildings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SiteManagement.Application.Mappings;
 
@@ -71,6 +66,7 @@ public class SiteManagementMapingProfile : Profile
         #region Invoices
         #region Bills
         CreateMap<Bill, CreateBillCommand>().ReverseMap();
+        CreateMap<IEnumerable<Bill>, PagedViewModel<CreateBulkBillsResponse>>().ReverseMap();
         #endregion
 
         #endregion

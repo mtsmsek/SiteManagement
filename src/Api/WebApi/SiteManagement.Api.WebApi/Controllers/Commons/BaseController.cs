@@ -10,7 +10,7 @@ namespace SiteManagement.Api.WebApi.Controllers.Commons
     [ApiController]
     public class BaseController : ControllerBase
     {
-        protected Guid getUserIdFromRequest() //todo authentication behavior?
+        protected Guid getUserIdFromRequest() //todo in authentication behavior?
         {
             Guid userId = HttpContext.User.GetUserId();
             return userId;

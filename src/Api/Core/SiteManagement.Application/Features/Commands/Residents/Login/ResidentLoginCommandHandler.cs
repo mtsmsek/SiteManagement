@@ -39,7 +39,7 @@ public class ResidentLoginCommandHandler : IRequestHandler<ResidentLoginCommand,
                                                                                     includes: uoc => uoc.OperationClaim,
                                                                                    cancellationToken: cancellationToken);
 
-        // var token =  _tokenHelper.CreateToken(resident, userOperationClaims.Results.Select(u => u.OperationClaim).ToList());
+      
         var token = _tokenHelper.CreateToken(resident, userOperationClaims.Results.Select(u => new OperationClaim
         {
             Id = u.Id,
@@ -56,7 +56,7 @@ public class ResidentLoginCommandHandler : IRequestHandler<ResidentLoginCommand,
             AccessToken = token
         };
     }
-    //"eyJhbGciOiJodHRwOi8vd3d3LnczLm9yZy8yMDAxLzA0L3htbGRzaWctbW9yZSNobWFjLXNoYTUxMiIsInR5cCI6IkpXVCJ9.eyJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjRkN2U2ZWVjLTYxMDktNDUxMy0zZTM1LTA4ZGM0ODZhNTcxNSIsImVtYWlsIjoiZW1pdkBnbWFpbC5jb20iLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1lIjoiZW1pdiBkdW1hbiIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkFkbWluIiwibmJmIjoxNzExMDM3MTcxLCJleHAiOjE3MTYyMjExNzEsImlzcyI6InlvdXJfaXNzdWVyX3ZhbHVlIn0.kGUN0VR7qkFGO2OwTJ-uZ7joUmvgxF2EW7ztzcqtFGSRxw237hvMKdLv6RPlZ2r1Yb-ZFIvPO0CF61g5jN1iXA"
+    
 
 
 

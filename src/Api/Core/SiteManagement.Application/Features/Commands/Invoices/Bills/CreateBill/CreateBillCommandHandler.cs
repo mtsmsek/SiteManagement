@@ -28,7 +28,7 @@ namespace SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBill
         public async Task<Guid> Handle(CreateBillCommand request, CancellationToken cancellationToken)
         {
             
-            await _billBusinessRules.ShouldBeOneBillTypeForSameApartmentForTheSamePeriod(request.ApartmentId,                                                                                                                                                                                          request.Type,
+            await _billBusinessRules.ShouldBeOneBillTypeForSameApartmentForTheSamePeriod(request.ApartmentId,                                                                                                                                                                                                                                                                  request.Type,
                                                                                          request.Month,
                                                                                          request.Year);
 

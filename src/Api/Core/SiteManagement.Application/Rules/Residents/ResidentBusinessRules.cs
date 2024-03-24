@@ -43,7 +43,7 @@ public class ResidentBusinessRules : BaseBusinessRules
 
         //TODO -- Remove magic string
         if(dbResident is null)
-            throw new BusinessException("Resident already exist in system");
+            throw new BusinessException("Resident cannot found!");
 
             
         return dbResident!;
@@ -55,10 +55,17 @@ public class ResidentBusinessRules : BaseBusinessRules
         //TODO -- Remove magic string
         //TODO -- Alter the exception with Authorization
         if (dbResident is null)
-            throw new BusinessException("Resident already exist in system");
+            throw new BusinessException("Resident cannot found!");
 
 
         return dbResident!;
+    }
+    public async Task CheckIfResidentExistById(Guid id, CancellationToken cancellationToken)
+    {
+        var dbResident = await _residentRepository.GetByIdAsync(id,cancellationToken: cancellationToken);
+        //TODO -- remove magic string
+        if (dbResident is null)
+            throw new BusinessException("Resident cannot found in system");
     }
     public void CheckIfPasswordIsTrue(string password, byte[] passwordHash, byte[] passwordSalt)
     {

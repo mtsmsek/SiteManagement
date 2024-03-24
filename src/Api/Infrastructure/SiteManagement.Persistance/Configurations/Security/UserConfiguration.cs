@@ -15,6 +15,7 @@ public class UserConfiguration : BaseEntityConfiguration<User>
         builder.Property(user => user.FirstName).IsRequired();
         builder.Property(user => user.LastName).IsRequired();
         builder.Property(user => user.Email).IsRequired();
+        builder.Property(user => user.BirthDate).IsRequired();
         builder.Property(user => user.PasswordSalt).IsRequired();
         builder.Property(user => user.PasswordHash).IsRequired();
         builder.Property(user => user.AuthenticatorType).HasConversion(userType =>
