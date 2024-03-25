@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace SiteManagement.Application.Features.Queries.Residents.GetListAllResidents
 {
-    public class GetListAllResidentCommand : IRequest<PagedViewModel<GetListAllResidentResponse>>
+    public class GetListAllResidentQuery : IRequest<PagedViewModel<GetListAllResidentResponse>>
     {
     }
 }

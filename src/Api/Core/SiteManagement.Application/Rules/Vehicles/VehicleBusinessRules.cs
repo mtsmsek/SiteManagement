@@ -51,5 +51,14 @@ namespace SiteManagement.Application.Rules.Vehicles
 
             return dbVehicle;
         }
+        public async Task<Vehicle> CheckIfVehicleExistByRegistrationPlate(string  registrationPlate, CancellationToken cancellationToken)
+        {
+            var dbVehicle = await _vehicleRepository.GetSingleAsync(predicate: vehicle => vehicle.VehicleRegistrationPlate == registrationPlate);
+
+            if (dbVehicle is null)
+                throw new BusinessException("Bu plakaya ait bir araç bulunamadı");
+
+            return dbVehicle;
+        }
     }
 }

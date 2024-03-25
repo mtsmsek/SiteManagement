@@ -13,8 +13,8 @@ namespace SiteManagement.Persistance.Configurations.Residents
     {
         public override void Configure(EntityTypeBuilder<Message> builder)
         {
-            builder.Property(message => message.Sender).IsRequired();
-            builder.Property(message => message.Receiver).IsRequired();
+            builder.Property(message => message.SenderId).IsRequired();
+            builder.Property(message => message.ReceiverId).IsRequired();
             builder.Property(message => message.Text).IsRequired();
             builder.Property(message => message.IsSeen).IsRequired();
 

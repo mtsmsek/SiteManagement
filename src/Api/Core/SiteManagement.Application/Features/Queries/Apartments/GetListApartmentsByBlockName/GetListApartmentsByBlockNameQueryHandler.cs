@@ -11,21 +11,21 @@ using System.Threading.Tasks;
 
 namespace SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsByBlockName
 {
-    public class GetListApartmentsByBlockNameCommandHandler : IRequestHandler<GetListApartmentsByBlockNameCommand,
+    public class GetListApartmentsByBlockNameQueryHandler : IRequestHandler<GetListApartmentsByBlockNameQuery,
                                                                                  PagedViewModel<GetListApartmentsByBlockNameResponse>>
     {
         private readonly IApartmentRepository _apartmentRepository;
         private readonly IMapper _mapper;
         private readonly BlockBusinessRules _blockBusinessRules;
 
-        public GetListApartmentsByBlockNameCommandHandler(IApartmentRepository apartmentRepository, IMapper mapper, BlockBusinessRules blockBusinessRules)
+        public GetListApartmentsByBlockNameQueryHandler(IApartmentRepository apartmentRepository, IMapper mapper, BlockBusinessRules blockBusinessRules)
         {
             _apartmentRepository = apartmentRepository;
             _mapper = mapper;
             _blockBusinessRules = blockBusinessRules;
         }
 
-        public async Task<PagedViewModel<GetListApartmentsByBlockNameResponse>> Handle(GetListApartmentsByBlockNameCommand request, CancellationToken cancellationToken)
+        public async Task<PagedViewModel<GetListApartmentsByBlockNameResponse>> Handle(GetListApartmentsByBlockNameQuery request, CancellationToken cancellationToken)
         {
             //TODO remove the message
             var block = await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName, "Block cannot find");

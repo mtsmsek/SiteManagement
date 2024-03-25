@@ -4,8 +4,8 @@ namespace SiteManagement.Domain.Entities.Residents
 {
     public class Message : BaseEntity
     {
-        public Guid Sender { get; set; }
-        public Guid Receiver { get; set; }
+        public Guid SenderId { get; set; }
+        public Guid ReceiverId { get; set; }
         public string Text { get; set; }
         public bool IsSeen { get; set; }
 
