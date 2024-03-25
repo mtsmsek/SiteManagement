@@ -8,7 +8,7 @@ using SiteManagement.Domain.Entities.Vehicles;
 
 namespace SiteManagement.Application.Features.Commands.VehicleResident.CreateVehicleResident;
 
-public class CreateVehicleResidentCommandHandler : IRequestHandler<CreateVehicleResidentCommand, int>
+public class CreateVehicleResidentCommandHandler : IRequestHandler<CreateResidentVehicleCommand, int>
 {
     private readonly IResidentVehicleRepository _residentVehicleRepository;
     private readonly ResidentBusinessRules _residentBusinessRules;
@@ -23,7 +23,7 @@ public class CreateVehicleResidentCommandHandler : IRequestHandler<CreateVehicle
         _mapper = mapper;
     }
 
-    public async Task<int> Handle(CreateVehicleResidentCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(CreateResidentVehicleCommand request, CancellationToken cancellationToken)
     {
 
         //TODO -- Create all controllers

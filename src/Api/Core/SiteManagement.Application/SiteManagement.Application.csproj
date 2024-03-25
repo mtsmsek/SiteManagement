@@ -28,8 +28,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Features\Queries\Residents\GetListResidentByBlockName\" />
+    <Folder Include="Features\Queries\Residents\GetListResidentByVehicle\" />
     <Folder Include="Features\Queries\Vehicles\" />
-    <Folder Include="Features\Queries\Residents\" />
   </ItemGroup>
 
 </Project>
