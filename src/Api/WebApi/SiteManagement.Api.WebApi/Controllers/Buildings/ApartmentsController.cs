@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using SiteManagement.Api.WebApi.Controllers.Commons;
 using SiteManagement.Application.Features.Commands.Buildings.Apartments.CreateApartment;
+using SiteManagement.Application.Features.Commands.Buildings.Apartments.DeleteApartment.HardDelete;
 using SiteManagement.Application.Features.Commands.Buildings.Apartments.UpdateApartment.ChangeResidentStatus;
 using SiteManagement.Application.Features.Commands.Buildings.Apartments.UpdateApartment.ChangeTenantStatus;
 using SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlockId;
@@ -16,13 +16,15 @@ public class ApartmentsController : BaseController
 {
     private const int _defaultCurrentPage = 1;
     private const int _defaultCurrentPageSize = 10;
-
+    #region Create
     [HttpPost("createApartment")]
     public async Task<IActionResult> CreateApartment(CreateApartmentCommand createApartmentCommand)
     {
         var response = await Mediator.Send(createApartmentCommand);
         return Ok(response);
     }
+    #endregion
+    #region Update
     [HttpPost("changeResidentStatus")]
     public async Task<IActionResult> ChangeResidentStatus(Guid id, bool status)
     {
@@ -35,6 +37,19 @@ public class ApartmentsController : BaseController
         var response = await Mediator.Send(new ChangeTenantStatusCommand { Id = id, IsTenant = isTenant});
         return Ok(response);
     }
+    #endregion
+    #region Delete
+    [HttpDelete("hardDeleteApartment")]
+    public async Task<IActionResult> HardDeleteApartment(Guid id)
+    {
+        var response = await Mediator!.Send(new HardDeleteApartmentCommand
+        {
+            Id = id
+        });
+        return Ok(response);
+    }
+    #endregion
+    #region Get
     [HttpGet("getApartments{name}Block")]
     public async Task<IActionResult> GetApartmentsByBlock(Guid? id, string? name, int currentPage = _defaultCurrentPage, int pageSize = _defaultCurrentPageSize)
     {
@@ -76,4 +91,5 @@ public class ApartmentsController : BaseController
         var blocksList = await Mediator!.Send(new GetListApartmentsByStatusQuery { Status = true, Page = currentPage, PageSize = pageSize });
         return Ok(blocksList);
     }
+    #endregion
 }

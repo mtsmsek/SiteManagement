@@ -27,7 +27,8 @@ namespace SiteManagement.Application.Rules.Buildings.Apartments
             var block = await _blockRepository.GetByIdAsync(blockId);
             Ensure.NotNull(block, new BusinessException("Geçersiz blok bilgisi. Lütfen blok ismini kontrol ediniz."));
 
-            var apartmentsInBLock = await _apartmentRepository.GetListAsync(predicate: predicate => predicate.BlockId == blockId);
+            var apartmentsInBLock = await _apartmentRepository.GetListAsync(predicate: predicate => predicate.BlockId == blockId,
+                                                                            includes: a => a.Block);
 
             bool isApartmentNumberExist =  apartmentsInBLock.Results.Select(apartment => apartment.ApartmentNumber)
                                                                     .Contains(apartmentNumber);

@@ -15,6 +15,7 @@ namespace SiteManagement.Api.WebApi.Controllers.Buildings;
 [ApiController]
 public class BlocksController : BaseController
 {
+    #region Create
     [HttpPost]
     public async Task<IActionResult> AddBlock(CreateBlockCommand createBlockCommand)
     {
@@ -23,19 +24,24 @@ public class BlocksController : BaseController
         var apartmentToAdd = await Mediator!.Send(createBlockCommand);
         return Ok(apartmentToAdd);
     }
-
-    [HttpPut]
+    #endregion
+    #region Update
+    [HttpPut("updateBlockName")]
     public async Task<IActionResult> UpdateBlockName(UpdateBlockNameCommand updateBlockNameCommand)
     {
-        var updatedBlock = await Mediator.Send(updateBlockNameCommand);
+        var updatedBlock = await Mediator!.Send(updateBlockNameCommand);
         return Ok(updatedBlock);
     }
-    [HttpDelete]
+    #endregion
+    #region Delete
+    [HttpDelete("deleteBlockPermenantly")]
     public async Task<IActionResult> DeleteBlockPermenantly(Guid id)
     {
-        var blockToDelete = await Mediator.Send(new HardDeleteBlockCommand { Id = id });
+        var blockToDelete = await Mediator!.Send(new HardDeleteBlockCommand { Id = id });
         return Ok(blockToDelete);
     }
+    #endregion
+    #region Get 
     [HttpGet("blocks")]
     public async Task<IActionResult> GetAllBlocks(int currentPage, int PageSize)
     {
@@ -48,6 +54,7 @@ public class BlocksController : BaseController
         var blocksList = await Mediator!.Send(new GetBlockDetailByNameQuery { Name = name });
         return Ok(blocksList);
     }
+    #endregion
 
 }
 

@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
 using SiteManagement.Domain.Entities.Invoices;
-using SiteManagement.Domain.Enumarations.Invoices;
 
 namespace SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBill;
 

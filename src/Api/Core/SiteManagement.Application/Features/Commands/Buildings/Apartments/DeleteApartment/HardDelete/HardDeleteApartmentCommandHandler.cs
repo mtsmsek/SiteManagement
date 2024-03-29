@@ -1,38 +1,31 @@
-﻿using AutoMapper;
-using MediatR;
+﻿using MediatR;
 using SiteManagement.Application.Rules.Buildings.Apartments;
 using SiteManagement.Application.Services.Repositories.Buildings;
 using SiteManagement.Domain.Entities.Buildings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace SiteManagement.Application.Features.Commands.Buildings.Apartments.DeleteApartment.HardDelete
+namespace SiteManagement.Application.Features.Commands.Buildings.Apartments.DeleteApartment.HardDelete;
+
+public class HardDeleteApartmentCommandHandler : IRequestHandler<HardDeleteApartmentCommand, Guid>
 {
-    public class HardDeleteApartmentCommandHandler : IRequestHandler<HardDeleteApartmentCommand, Guid>
+    private readonly IApartmentRepository _apartmentRepository;
+
+    private readonly ApartmentBusinessRules _apartmentBusinessRules;
+
+    public HardDeleteApartmentCommandHandler(IApartmentRepository repository, ApartmentBusinessRules apartmentBusinessRules)
     {
-        private readonly IApartmentRepository _apartmentRepository;
+        _apartmentRepository = repository;
+        _apartmentBusinessRules = apartmentBusinessRules;
+    }
 
-        private readonly ApartmentBusinessRules _apartmentBusinessRules;
+    public async Task<Guid> Handle(HardDeleteApartmentCommand request, CancellationToken cancellationToken)
+    {
+        Apartment apartment = await _apartmentBusinessRules.ApartmentShouldExistInDatabase(request.Id);
 
-        public HardDeleteApartmentCommandHandler(IApartmentRepository repository, ApartmentBusinessRules apartmentBusinessRules)
-        {
-            _apartmentRepository = repository;
-            _apartmentBusinessRules = apartmentBusinessRules;
-        }
+        await _apartmentRepository.DeleteAsync(entity: apartment,
+                                         isPermenant: true,
+                                         cancellationToken: cancellationToken);
+        return request.Id;
 
-        public async Task<Guid> Handle(HardDeleteApartmentCommand request, CancellationToken cancellationToken)
-        {
-            Apartment apartment = await _apartmentBusinessRules.ApartmentShouldExistInDatabase(request.Id);
-
-            await _apartmentRepository.DeleteAsync(entity: apartment,
-                                             isPermenant: true,
-                                             cancellationToken: cancellationToken);
-            return request.Id;
-
-            
-        }
+        
     }
 }
