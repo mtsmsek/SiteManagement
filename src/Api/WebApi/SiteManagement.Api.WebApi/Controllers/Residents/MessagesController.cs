@@ -7,7 +7,7 @@ namespace SiteManagement.Api.WebApi.Controllers.Residents;
 
 [Route("api/[controller]")]
 [ApiController]
-public class MessagessController : BaseController
+public class MessagesController : BaseController
 {
     //todo -- test it after migration
     #region Create

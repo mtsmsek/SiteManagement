@@ -28,9 +28,9 @@ public class UpdateResidentCommandHandler : IRequestHandler<UpdateResidentComman
     {
         Resident residentToUpdate = await _residentBusinessRules.CheckIfResidentExistById(request.Id, cancellationToken);
 
-        residentToUpdate = _mapper.Map(request, residentToUpdate);
+        residentToUpdate = _mapper.Map(request,residentToUpdate);
 
-        await _residentRepository.AddAsync(residentToUpdate, cancellationToken);
+        await _residentRepository.UpdateAsync(residentToUpdate, cancellationToken);
         return _mapper.Map<UpdateResidentResponse>(residentToUpdate);
 
     }

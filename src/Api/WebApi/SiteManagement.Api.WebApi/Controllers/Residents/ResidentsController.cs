@@ -30,6 +30,7 @@ public class ResidentsController : BaseController
     }
     #endregion
     #region Delete
+    [HttpDelete("hardDeleteResident")]
     public async Task<IActionResult> HardDeleteResident(Guid id)
     {
         var response = await Mediator!.Send(new HardDeleteResidentCommand { Id = id });
@@ -44,13 +45,13 @@ public class ResidentsController : BaseController
          await Mediator!.Send(updateResidentPasswordCommand);
          return Ok("Başarı ile gerçekleşti");
     }
-    [HttpPost("updateInformation")]
+    [HttpPut("updateInformation")]
     public async Task<IActionResult> UpdateInformation(UpdateResidentCommand updateResidentCommand)
     {
        var result =  await Mediator!.Send(updateResidentCommand);
         return Ok(result);
     }
-    [HttpPost("updateEmail")]
+    [HttpPut("updateEmail")]
     public async Task<IActionResult> UpdateEmail(UpdateResidentEmailCommand updateResidentEmailCommand)
     {
         var result = await Mediator!.Send(updateResidentEmailCommand);

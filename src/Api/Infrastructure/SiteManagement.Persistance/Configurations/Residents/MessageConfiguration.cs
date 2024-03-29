@@ -13,13 +13,23 @@ namespace SiteManagement.Persistance.Configurations.Residents
     {
         public override void Configure(EntityTypeBuilder<Message> builder)
         {
+
             builder.Property(message => message.SenderId).IsRequired();
             builder.Property(message => message.ReceiverId).IsRequired();
             builder.Property(message => message.Text).IsRequired();
             builder.Property(message => message.IsSeen).IsRequired();
 
             builder.HasOne(message => message.Resident)
-                    .WithMany(user => user.Messages);
+                    .WithMany(user => user.Messages)
+                    .HasForeignKey(message => message.SenderId);
+
+            builder.HasOne(message => message.Resident)
+                    .WithMany(user => user.Messages)
+                    .HasForeignKey(message => message.ReceiverId);
+
+
+
+
         }
     }
 }

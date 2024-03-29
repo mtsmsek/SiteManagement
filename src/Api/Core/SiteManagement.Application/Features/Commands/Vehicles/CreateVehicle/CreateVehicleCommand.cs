@@ -9,5 +9,5 @@ public class CreateVehicleCommand : IRequest<CreateVehicleResponse>
     //To add vehicle to all partner of apartment
     public Guid ApartmentId { get; set; }
     public string VehicleRegistrationPlate { get; set; }
-    public VehicleType VehicleType { get; set; }
+    public int VehicleType { get; set; }
 }

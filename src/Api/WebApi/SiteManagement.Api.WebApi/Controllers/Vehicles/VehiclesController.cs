@@ -12,7 +12,7 @@ namespace SiteManagement.Api.WebApi.Controllers.Vehicles
     public class VehiclesController : BaseController
     {
         #region Create
-        [HttpPost]
+        [HttpPost("createVehicle")]
         public async Task<IActionResult> CreateVehicle(CreateVehicleCommand createVehicleCommand)
         {
             var result = await Mediator!.Send(createVehicleCommand);
@@ -20,7 +20,7 @@ namespace SiteManagement.Api.WebApi.Controllers.Vehicles
         }
         #endregion
         #region Delete
-        [HttpPut("deleteVehicle")]
+        [HttpDelete("hardDeleteVehicle")]
         public async Task<IActionResult> HardDeleteVehicle(HardDeleteVehicleCommand hardDeleteVehicleCommand)
         {
             //todo -- both guid id can be taken from query string

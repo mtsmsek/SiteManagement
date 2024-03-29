@@ -11,9 +11,10 @@ namespace SiteManagement.Application.Rules.Vehicles
         private readonly IVehicleRepository _vehicleRepository;
         private readonly IUserRepository _userRepository;
 
-        public VehicleBusinessRules(IVehicleRepository vehicleRepository)
+        public VehicleBusinessRules(IVehicleRepository vehicleRepository, IUserRepository userRepository)
         {
             _vehicleRepository = vehicleRepository;
+            _userRepository = userRepository;
         }
 
         public async Task VehiclePlateRegisterCannotDuplicateWhenInsert(string vehiclePlateRegister, CancellationToken cancellationToken)

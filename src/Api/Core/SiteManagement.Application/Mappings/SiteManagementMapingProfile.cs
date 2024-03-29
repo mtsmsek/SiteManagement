@@ -27,6 +27,7 @@ using SiteManagement.Domain.Entities.Invoices;
 using SiteManagement.Domain.Entities.Residents;
 using SiteManagement.Domain.Entities.Vehicles;
 using SiteManagement.Domain.Enumarations.Invoices;
+using SiteManagement.Domain.Enumarations.Vehicles;
 
 namespace SiteManagement.Application.Mappings;
 
@@ -108,7 +109,10 @@ public class SiteManagementMapingProfile : Profile
         #region Residents
         #region Commands
         //Create Resident
-        CreateMap<CreateResidentCommand, Resident>().ReverseMap();
+        CreateMap<CreateResidentCommand, Resident>().ForMember(dest => dest.BirthDate, source =>
+        {
+            source.MapFrom(x => new DateTime(x.BirthYear, x.BirthMonth, x.BirthDay));
+        });
         CreateMap<Resident, CreateResidentResponse>().ReverseMap();
 
         //Login
@@ -131,12 +135,14 @@ public class SiteManagementMapingProfile : Profile
         #region Vehicles
         #region Commands
         //Create
-        CreateMap<Vehicle, CreateVehicleCommand>().ReverseMap();
+        CreateMap<CreateVehicleCommand, Vehicle>().ForMember(dest => dest.VehicleType, source => 
+        source.MapFrom(x => VehicleType.FromValue(x.VehicleType)!));
         CreateMap<Vehicle, CreateVehicleResponse>().ReverseMap();
 
         //Update
-        CreateMap<Vehicle, UpdateVehicleCommand>().ReverseMap();
-        CreateMap<Vehicle, UpdateVehicleCommandResponse>().ReverseMap();
+        CreateMap<UpdateVehicleCommand, Vehicle>().ForMember(dest => dest.VehicleType, source => source.MapFrom(x => VehicleType.FromValue(x.VehicleType)!));
+            
+        CreateMap<Vehicle, UpdateVehicleCommandResponse>().ForMember(dest => dest.VehicleType, source => source.MapFrom(x => x.VehicleType.Name));
 
         #endregion
 

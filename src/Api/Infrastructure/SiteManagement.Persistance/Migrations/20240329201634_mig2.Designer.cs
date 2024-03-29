@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SiteManagement.Persistance.Contexts;
 
@@ -11,9 +12,11 @@ using SiteManagement.Persistance.Contexts;
 namespace SiteManagement.Persistance.Migrations
 {
     [DbContext(typeof(SiteManagementApplicationContext))]
-    partial class SiteManagementApplicationContextModelSnapshot : ModelSnapshot
+    [Migration("20240329201634_mig2")]
+    partial class mig2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,6 +150,9 @@ namespace SiteManagement.Persistance.Migrations
                     b.Property<Guid>("ReceiverId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid>("ResidentId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("SenderId")
                         .HasColumnType("uniqueidentifier");
 
@@ -159,7 +165,7 @@ namespace SiteManagement.Persistance.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ReceiverId");
+                    b.HasIndex("ResidentId");
 
                     b.ToTable("Message");
                 });
@@ -404,7 +410,7 @@ namespace SiteManagement.Persistance.Migrations
                 {
                     b.HasOne("SiteManagement.Domain.Entities.Residents.Resident", "Resident")
                         .WithMany("Messages")
-                        .HasForeignKey("ReceiverId")
+                        .HasForeignKey("ResidentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
