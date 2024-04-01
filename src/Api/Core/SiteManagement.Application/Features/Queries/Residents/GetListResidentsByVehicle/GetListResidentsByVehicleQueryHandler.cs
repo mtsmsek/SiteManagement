@@ -6,6 +6,7 @@ using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Application.Rules.Vehicles;
 using SiteManagement.Application.Services.Repositories.Residents;
 using SiteManagement.Application.Services.Repositories.Vehicles;
+using SiteManagement.Domain.Entities.Residents;
 using SiteManagement.Domain.Entities.Vehicles;
 
 namespace SiteManagement.Application.Features.Queries.Residents.GetListResidentsByVehicle;
@@ -28,28 +29,18 @@ public class GetListResidentsByVehicleQueryHandler : IRequestHandler<GetListResi
 
     public async Task<PagedViewModel<GetListResidentsByVehicleResponse>> Handle(GetListResidentsByVehicleQuery request, CancellationToken cancellationToken)
     {
-        var vehicle = await _vehicleBusinessRules.CheckIfVehicleExistByRegistrationPlate(request.VehicleRegistrationPlate, cancellationToken);
+
+        //TODO make comprasion between this algorithm and (first find vehicle and then use the resident vehicle id)
         
-        var residentVehicles = await _residentVehicleRepository.GetListAsync(predicate: residentVehicle => residentVehicle.VehicleId == vehicle.Id,
-                                                                        includes: residentVehicle => residentVehicle.Resident);
+
+       await _vehicleBusinessRules.CheckIfVehicleExistByRegistrationPlate(request.VehicleRegistrationPlate, cancellationToken);
 
 
-        //TODo -- check if working and how to do this with automapper
-        var results = residentVehicles.Results.Select(residentVehicle => new GetListResidentsByVehicleResponse
-        {
-            FirstName = residentVehicle.Resident.FirstName,
-            LastName = residentVehicle.Resident.LastName,
-            ApartmentNumber = residentVehicle.Resident.Apartment.ApartmentNumber,
-            BlockName = residentVehicle.Resident.Apartment.Block.Name,
-            FloorNumber = residentVehicle.Resident.Apartment.FloorNumber,
-            IdenticalNumber = residentVehicle.Resident.IdenticalNumber,
-            PhoneNumber = residentVehicle.Resident.PhoneNumber
-        });
-
-        //todo -- refactor here
-        return new PagedViewModel<GetListResidentsByVehicleResponse>
-        {
-            Results = results.ToArray()
-        };
+        var residents = await _residentRepository.GetListAsync(predicate: resident => resident.Vehicles.Any(x => x.Vehicle.VehicleRegistrationPlate ==                                                                      request.VehicleRegistrationPlate),
+                                                                    includes: [resident => resident.Vehicles,
+                                                                    resident => resident.Apartment,
+                                                                    resident => resident.Apartment.Block]);
+       return  _mapper.Map<PagedViewModel<GetListResidentsByVehicleResponse>>(residents);
+       
     }
 }

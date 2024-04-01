@@ -9,6 +9,7 @@ namespace SiteManagement.Domain.Entities.Residents
         public string Text { get; set; }
         public bool IsSeen { get; set; }
 
-        public virtual Resident Resident{ get; set; }
+        public virtual Resident Receiver{ get; set; }
+        public virtual Resident Sender{ get; set; }
     }
 }

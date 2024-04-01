@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using MediatR;
 using SiteManagement.Application.Pagination.Responses;
+using SiteManagement.Application.Rules.Residents;
 using SiteManagement.Application.Services.Repositories.Residents;
 
 namespace SiteManagement.Application.Features.Queries.Messaages.GetResidentMessages;
@@ -9,21 +10,24 @@ public class GetResidentMessagesQueryHandler : IRequestHandler<GetResidentMessag
 {
     private readonly IMessageRepository _messageRepository;
     private readonly IMapper _mapper;
+    private readonly ResidentBusinessRules _residentBusinessRules;
 
-    public GetResidentMessagesQueryHandler(IMessageRepository messageRepository, IMapper mapper)
+    public GetResidentMessagesQueryHandler(IMessageRepository messageRepository, IMapper mapper, ResidentBusinessRules residentBusinessRules)
     {
         _messageRepository = messageRepository;
         _mapper = mapper;
+        _residentBusinessRules = residentBusinessRules;
     }
 
     public async Task<PagedViewModel<GetResidentMessagesResponse>> Handle(GetResidentMessagesQuery request, CancellationToken cancellationToken)
     {
-        var  adminConversationMessages = await _messageRepository.GetListAsync(predicate: message => message.SenderId == request.UserId || 
-                                                                                     message.ReceiverId == request.UserId,
+        await _residentBusinessRules.CheckIfResidentExistById(request.UserId, cancellationToken);
+        var adminConversationMessages = await _messageRepository.GetListAsync(predicate: message => message.SenderId == request.UserId ||
+                                                                           message.ReceiverId == request.UserId,
                                                                            orderBy: messages => messages.OrderBy(message => message.CreatedDate),
                                                                            cancellationToken: cancellationToken,
-                                                                           includes: message => message.Resident);
-
+                                                                           includes: [message => message.Receiver, message => message.Sender]);
+        
 
         return _mapper.Map<PagedViewModel<GetResidentMessagesResponse>>(adminConversationMessages);
     }

@@ -11,10 +11,9 @@ namespace SiteManagement.Application.Features.Queries.Invoices.GetListApartmentB
 {
     public class GetListApartmentBillsByMonthQuery : IRequest<PagedViewModel<GetListApartmentBillsByMonthResponse>>
     {
-        public BillType Type { get; set; }
-        public double Fee { get; set; }
-        public bool IsPaid { get; set; }
-        public Month Month { get; set; }
-        public int Year { get; set; }
+        public Guid ApartmentId { get; set; }
+        public int? BillType { get; set; }
+        public int? Month { get; set; }
+        public int? Year { get; set; }
     }
 }

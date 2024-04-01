@@ -12,7 +12,7 @@ public class Bill : BaseEntity
     public bool IsPaid { get; set;}
     public Month Month { get; set; }
     public int Year { get; set; }
-    public string Period => Month.Name + Year.ToString();
+    public string Period => $"{Month.Name} - {Year}";
     public virtual Apartment Apartment { get; set; }
 
 }

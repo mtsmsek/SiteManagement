@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using SiteManagement.Domain.Entities.Residents;
 using SiteManagement.Persistance.Configurations.Commons;
 using System;
@@ -19,13 +20,17 @@ namespace SiteManagement.Persistance.Configurations.Residents
             builder.Property(message => message.Text).IsRequired();
             builder.Property(message => message.IsSeen).IsRequired();
 
-            builder.HasOne(message => message.Resident)
-                    .WithMany(user => user.Messages)
-                    .HasForeignKey(message => message.SenderId);
+            builder.HasOne(message => message.Sender)
+                    .WithMany(message => message.SentMessages)
+                    .HasForeignKey(message => message.SenderId)
+                    .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(message => message.Resident)
-                    .WithMany(user => user.Messages)
-                    .HasForeignKey(message => message.ReceiverId);
+            builder.HasOne(message => message.Receiver)
+                    .WithMany(user => user.ReceivedMessages)
+                    .HasForeignKey(message => message.ReceiverId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+
 
 
 

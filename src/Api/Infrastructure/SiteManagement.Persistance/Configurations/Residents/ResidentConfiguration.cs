@@ -17,8 +17,8 @@ public class ResidentConfiguration : BaseEntityConfiguration<Resident>
         builder.Property(resident => resident.IdenticalNumber).IsRequired();
         builder.Property(resident => resident.PhoneNumber).IsRequired();
 
-        
-        
+
+
         builder.HasOne(resident => resident.Apartment)
                .WithMany(apartment => apartment.Residents)
                .HasForeignKey(resident => resident.ApartmentId);

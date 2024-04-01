@@ -10,23 +10,23 @@ using System.Threading.Tasks;
 
 namespace SiteManagement.Application.Features.Queries.Residents.GetListAllResidents
 {
-    public class GetListAllResidentQueryHandler : IRequestHandler<GetListAllResidentQuery,
-                                                                     PagedViewModel<GetListAllResidentResponse>>
+    public class GetListAllResidentsQueryHandler : IRequestHandler<GetListAllResidentsQuery,
+                                                                     PagedViewModel<GetListAllResidentsResponse>>
     {
         private readonly IResidentRepository _residentRepository;
         private readonly IMapper _mapper;
 
-        public GetListAllResidentQueryHandler(IResidentRepository residentRepository, IMapper mapper)
+        public GetListAllResidentsQueryHandler(IResidentRepository residentRepository, IMapper mapper)
         {
             _residentRepository = residentRepository;
             _mapper = mapper;
         }
 
-        public async Task<PagedViewModel<GetListAllResidentResponse>> Handle(GetListAllResidentQuery request, CancellationToken cancellationToken)
+        public async Task<PagedViewModel<GetListAllResidentsResponse>> Handle(GetListAllResidentsQuery request, CancellationToken cancellationToken)
         {
             var residents = await _residentRepository.GetListAsync(includes: include => include.Apartment);
 
-            var residentsResponse = _mapper.Map<PagedViewModel<GetListAllResidentResponse>>(residents);
+            var residentsResponse = _mapper.Map<PagedViewModel<GetListAllResidentsResponse>>(residents);
 
             return residentsResponse;
         }

@@ -2,6 +2,7 @@
 using SiteManagement.Api.WebApi.Controllers.Commons;
 using SiteManagement.Application.Features.Commands.Messages.DeleteMessage.HardDelete;
 using SiteManagement.Application.Features.Commands.Messages.SendMessage;
+using SiteManagement.Application.Features.Queries.Messaages.GetResidentMessages;
 
 namespace SiteManagement.Api.WebApi.Controllers.Residents;
 
@@ -30,5 +31,17 @@ public class MessagesController : BaseController
         return Ok(result);
     }
     #endregion
+    #region Get
+    [HttpGet("getResidentMessages")]
+    public async Task<IActionResult> GetResidentMessages(Guid userId)
+    {
+        var result = await Mediator!.Send(new GetResidentMessagesQuery
+        {
+            UserId = userId
+        });
+
+        return Ok(result);
+    }
+    #endregion 
 
 }

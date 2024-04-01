@@ -12,7 +12,8 @@ public class Resident : User
     
     public virtual Apartment Apartment { get; set; }
 
-    public virtual ICollection<Message > Messages { get; set; }
+    public virtual ICollection<Message> SentMessages { get; set; }
+    public virtual ICollection<Message> ReceivedMessages { get; set; }
     public virtual ICollection<ResidentVehicle> Vehicles { get; set; }
 
 }

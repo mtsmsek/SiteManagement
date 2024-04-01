@@ -1,6 +1,12 @@
-﻿namespace SiteManagement.Application.Features.Queries.Residents.GetListResidentByApartmentNumberAndBlockName
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace SiteManagement.Application.Features.Queries.Residents.GetListAllResidents
 {
-    public class GetListResidentByApartmentNumberAndBlockNameResponse
+    public class GetListAllResidentsResponse
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }
@@ -10,5 +16,4 @@
         public string IdenticalNumber { get; set; }
         public string PhoneNumber { get; set; }
     }
-
 }

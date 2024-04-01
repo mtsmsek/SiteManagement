@@ -8,5 +8,9 @@ namespace SiteManagement.Application.Features.Queries.Messaages.GetResidentMessa
 {
     public class GetResidentMessagesResponse
     {
+        public string SenderName { get; set; }
+        public string Message { get; set; }
+        public string CreatedDate { get; set; }
+        public bool IsSeen { get; set; }
     }
 }

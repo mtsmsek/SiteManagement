@@ -4,6 +4,7 @@ using SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBill;
 using SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBulkBills;
 using SiteManagement.Application.Features.Commands.Invoices.Bills.DeleteBill.HardDelete;
 using SiteManagement.Application.Features.Commands.Invoices.Bills.UpdateBill;
+using SiteManagement.Application.Features.Queries.Invoices.GetListApartmentBillsByMonth;
 
 namespace SiteManagement.Api.WebApi.Controllers.Invoices;
 
@@ -39,6 +40,20 @@ public class BillsController : BaseController
     public async Task<IActionResult> UpdateBill(UpdateBillCommand updateBillCommand)
     {
         var result = await Mediator!.Send(updateBillCommand);
+        return Ok(result);
+    }
+    #endregion
+    #region Get
+    [HttpGet("getApartmentBills")]
+    public async Task<IActionResult> GetApartmentBillsByMonth(Guid apartmentId, int? month, int? year, int? billType)
+    {
+        var result = await Mediator!.Send(new GetListApartmentBillsByMonthQuery
+        {
+            ApartmentId = apartmentId,
+            Month = month.HasValue ? month : null,
+            Year = year.HasValue ? year : null,
+            BillType = billType.HasValue ? billType : null
+        }); 
         return Ok(result);
     }
     #endregion

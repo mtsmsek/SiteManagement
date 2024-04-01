@@ -43,15 +43,15 @@ public class BlocksController : BaseController
     #endregion
     #region Get 
     [HttpGet("blocks")]
-    public async Task<IActionResult> GetAllBlocks(int currentPage, int PageSize)
+    public async Task<IActionResult> GetAllBlocks(int currentPage, int pageSize)
     {
-        var blocksList = await Mediator!.Send(new GetListAllBlockQuery { Page = currentPage, PageSize = PageSize });
+        var blocksList = await Mediator!.Send(new GetListAllBlockQuery { Page = currentPage, PageSize = pageSize });
         return Ok(blocksList);
     }
     [HttpGet("blockDetail")]
-    public async Task<IActionResult> GetBlockDetailByName(string name)
+    public async Task<IActionResult> GetBlockDetailByName(string name, int currentPage, int pageSize)
     {
-        var blocksList = await Mediator!.Send(new GetBlockDetailByNameQuery { Name = name });
+        var blocksList = await Mediator!.Send(new GetBlockDetailByNameQuery { Name = name,  Page = currentPage, PageSize = pageSize});
         return Ok(blocksList);
     }
     #endregion

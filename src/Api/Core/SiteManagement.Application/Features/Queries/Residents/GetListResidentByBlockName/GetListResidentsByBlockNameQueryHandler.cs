@@ -2,6 +2,7 @@
 using MediatR;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Application.Rules.Buildings.Blocks;
+using SiteManagement.Application.Services.Repositories.Buildings;
 using SiteManagement.Application.Services.Repositories.Residents;
 
 namespace SiteManagement.Application.Features.Queries.Residents.GetListResidentByBlockName;
@@ -23,13 +24,12 @@ public class GetListResidentsByBlockNameQueryHandler : IRequestHandler<GetListRe
     public async Task<PagedViewModel<GetListResidentsByBlockNameResponse>> Handle(GetListResidentsByBlockNameQuery request, CancellationToken cancellationToken)
     {
         //TODO -- remove the message from business rules
-        //TODO -- check if includes and algorthm true
-        var blockToSearch = await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName, "Block cannot be found");
+        await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName,"Block cannot be found!");
 
-        var residents = _residentRepository.GetListAsync(predicate: resident => blockToSearch.Apartments.Contains(resident.Apartment),
-                                                         cancellationToken: cancellationToken,
-                                                         includes: [resident => resident.Apartment, resident => resident.Apartment.Block]);
-
+        var residents = await _residentRepository.GetListAsync(predicate: resident => resident.Apartment.Block.Name == request.BlockName,
+                                                  cancellationToken: cancellationToken,
+                                                  includes: [resident => resident.Apartment, resident => resident.Apartment.Block]);
+        
         return _mapper.Map<PagedViewModel<GetListResidentsByBlockNameResponse>>(residents);
 
         

@@ -20,6 +20,12 @@ using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsBy
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsInBlockByStatus;
 using SiteManagement.Application.Features.Queries.Blocks.GetBlockDetailByName;
 using SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks;
+using SiteManagement.Application.Features.Queries.Invoices.GetListApartmentBillsByMonth;
+using SiteManagement.Application.Features.Queries.Messaages.GetResidentMessages;
+using SiteManagement.Application.Features.Queries.Residents.GetListAllResidents;
+using SiteManagement.Application.Features.Queries.Residents.GetListResidentByApartmentNumberAndBlockName;
+using SiteManagement.Application.Features.Queries.Residents.GetListResidentByBlockName;
+using SiteManagement.Application.Features.Queries.Residents.GetListResidentsByVehicle;
 using SiteManagement.Application.Mappings.Resolvers;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Domain.Entities.Buildings;
@@ -94,7 +100,14 @@ public class SiteManagementMapingProfile : Profile
                                             .ForMember(dest => dest.Month, source => source.MapFrom<Month>(x => x.Month));
         CreateMap<Bill, UpdateBillResponse>().ReverseMap();
         #endregion
-
+        #region Queries
+        CreateMap<PagedViewModel<Bill>, PagedViewModel<GetListApartmentBillsByMonthResponse>>();
+        CreateMap<Bill, GetListApartmentBillsByMonthResponse>()
+            .ForMember(dest => dest.Period, source => source.MapFrom(x => x.Period))
+            .ForMember(dest => dest.BillType, source => source.MapFrom(x => x.Type.Name))
+            .ForMember(dest => dest.BlockName, source => source.MapFrom(x => x.Apartment.Block.Name))
+            .ForMember(dest => dest.ApartmentNumber, source => source.MapFrom(x => x.Apartment.ApartmentNumber));
+        #endregion
         #endregion
 
         #endregion
@@ -104,6 +117,13 @@ public class SiteManagementMapingProfile : Profile
         CreateMap<Message, SendMessageResponse>().ReverseMap();
         #endregion
         #region Queries
+        CreateMap<Message, GetResidentMessagesResponse>()
+            .ForMember(dest => dest.SenderName, source => source.MapFrom(x => x.Sender.FirstName + x.Sender.LastName))
+            .ForMember(dest => dest.Message, source => source.MapFrom(x => x.Text));
+
+        CreateMap<PagedViewModel<Message>, PagedViewModel<GetResidentMessagesResponse>>();
+
+
         #endregion
         #endregion
         #region Residents
@@ -128,6 +148,40 @@ public class SiteManagementMapingProfile : Profile
         CreateMap<Resident, UpdateResidentEmailResponse>().ReverseMap();
         #endregion
         #region Queries
+
+        //GetListAllResidents
+        CreateMap<Resident, GetListAllResidentsResponse>()
+            .ForMember(dest => dest.BlockName, source => source.MapFrom(x => x.Apartment.Block.Name))
+            .ForMember(dest => dest.ApartmentNumber, source => source.MapFrom(x => x.Apartment.ApartmentNumber))
+            .ForMember(dest => dest.FloorNumber, source => source.MapFrom(x => x.Apartment.FloorNumber));
+
+        CreateMap<PagedViewModel<Resident>, PagedViewModel<GetListAllResidentsResponse>>();
+
+        //GetListResidentsByApartmentNumberAndBlockName
+
+        CreateMap<Resident, GetListResidentsByApartmentNumberAndBlockNameResponse>()
+            .ForMember(dest => dest.FloorNumber, source => source.MapFrom(x => x.Apartment.FloorNumber))
+            .ForMember(dest => dest.ApartmentNumber, source => source.MapFrom(x => x.Apartment.ApartmentNumber))
+            .ForMember(dest => dest.BlockName, source => source.MapFrom(x => x.Apartment.Block.Name));
+
+        CreateMap<PagedViewModel<Resident>, PagedViewModel<GetListResidentsByApartmentNumberAndBlockNameResponse>>();
+
+        //GetListResidentByBlockName
+        CreateMap<Resident, GetListResidentsByBlockNameResponse>()
+            .ForMember(dest => dest.BlockName, source => source.MapFrom(x => x.Apartment.Block.Name))
+            .ForMember(dest => dest.FloorNumber, source => source.MapFrom(x => x.Apartment.FloorNumber))
+            .ForMember(dest => dest.ApartmentNumber, source => source.MapFrom(x => x.Apartment.ApartmentNumber));
+
+        CreateMap<PagedViewModel<Resident>, PagedViewModel<GetListResidentsByBlockNameResponse>>();
+
+        //GetListResidentByVehicleRegistrationPlate
+        CreateMap<Resident, GetListResidentsByVehicleResponse>()
+            .ForMember(dest => dest.BlockName, source => source.MapFrom(x => x.Apartment.Block.Name))
+            .ForMember(dest => dest.ApartmentNumber, source => source.MapFrom(x => x.Apartment.ApartmentNumber))
+            .ForMember(dest => dest.FloorNumber, source => source.MapFrom(x => x.Apartment.FloorNumber));
+
+        CreateMap<PagedViewModel<Resident>, PagedViewModel<GetListResidentsByVehicleResponse>>();
+
 
         #endregion
 
@@ -158,3 +212,4 @@ public class SiteManagementMapingProfile : Profile
         #endregion
     }
 }
+
