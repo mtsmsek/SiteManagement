@@ -19,7 +19,7 @@ public class GetListResidentVehiclesQueryHandler : IRequestHandler<GetListReside
 
     public async Task<PagedViewModel<GetListResidentVehiclesResponse>> Handle(GetListResidentVehiclesQuery request, CancellationToken cancellationToken)
     {
-        var residentVehicles = await _residentVehicleRepository.GetSingleAsync(predicate: residentVehicle => residentVehicle.ResidentId == request.ResidentId,
+        var residentVehicles = await _residentVehicleRepository.GetListAsync(predicate: residentVehicle => residentVehicle.ResidentId ==                                                                                                                            request.ResidentId,
                                                                                  includes: [residentVehicle => residentVehicle.Vehicle,
                                                                                             residentVehicle => residentVehicle.Resident]);
         //todo remove it ??

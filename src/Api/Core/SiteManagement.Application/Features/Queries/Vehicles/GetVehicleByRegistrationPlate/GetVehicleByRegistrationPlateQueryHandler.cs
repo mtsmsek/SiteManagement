@@ -9,6 +9,13 @@ namespace SiteManagement.Application.Features.Queries.Vehicles.GetVehicleByRegis
     {
         private readonly IVehicleRepository _vehicleRepository;
         private readonly IMapper _mapper;
+
+        public GetVehicleByRegistrationPlateQueryHandler(IVehicleRepository vehicleRepository, IMapper mapper)
+        {
+            _vehicleRepository = vehicleRepository;
+            _mapper = mapper;
+        }
+
         public async Task<GetVehicleByRegistrationPlateResponse> Handle(GetVehicleByRegistrationPlateQuery request, CancellationToken cancellationToken)
         {
             var vehicle = await _vehicleRepository.GetSingleAsync(predicate: vehicle => vehicle.VehicleRegistrationPlate == request.VehicleRegistrationPlate);

@@ -10,6 +10,9 @@ using SiteManagement.Application.Features.Queries.Residents.GetListAllResidents;
 using SiteManagement.Application.Features.Queries.Residents.GetListResidentByApartmentNumberAndBlockName;
 using SiteManagement.Application.Features.Queries.Residents.GetListResidentByBlockName;
 using SiteManagement.Application.Features.Queries.Residents.GetListResidentsByVehicle;
+using SiteManagement.Application.Features.Queries.Residents.GetResidentByIdenticalNumber;
+using SiteManagement.Application.Features.Queries.Residents.GetResidentsByFullName;
+using SiteManagement.Application.Features.Queries.ResidentVehicles.GetListResidentVehicles;
 
 namespace SiteManagement.Api.WebApi.Controllers.Residents;
 
@@ -102,6 +105,40 @@ public class ResidentsController : BaseController
             VehicleRegistrationPlate = vehicleRegistrationPlate
 
         });
+        return Ok(result);
+    }
+
+    [HttpGet("residentsByIdenticalNumber")]
+    public async Task<IActionResult> GetResidentByFullName(string identicalNumber)
+    {
+        var result = await Mediator!.Send(new GetResidentByIdenticalNumberQuery
+        {
+            IdenticalNumber = identicalNumber
+
+        });
+        return Ok(result);
+    }
+    [HttpGet("residentsByName-{firstName}--{lastName}")]
+    public async Task<IActionResult> GetResidentByFullName(string firstName, string lastName)
+    {
+        var result = await Mediator!.Send(new GetResidentsByFullNameQuery
+        {
+            FirstName = firstName,
+            LastName = lastName
+
+        });
+        return Ok(result);
+    }
+    #endregion
+    #region Get ResidentVehicles
+    [HttpGet("getResidentVehicles")]
+    public async Task<IActionResult> GetResidentVehicles(Guid residentId)
+    {
+        var result = await Mediator!.Send(new GetListResidentVehiclesQuery
+        {
+            ResidentId = residentId
+        });
+
         return Ok(result);
     }
     #endregion

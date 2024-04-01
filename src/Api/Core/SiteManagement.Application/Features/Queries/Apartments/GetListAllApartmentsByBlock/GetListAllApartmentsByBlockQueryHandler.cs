@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using MediatR;
+using SiteManagement.Application.Extensions;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Application.Rules.Buildings.Blocks;
 using SiteManagement.Application.Services.Repositories.Buildings;
+using SiteManagement.Domain.Entities.Buildings;
+using System.Linq.Expressions;
 
-namespace SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlockId
+namespace SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlock
 {
     public class GetListAllApartmentsByBlockQueryHandler : IRequestHandler<GetListAllApartmentsByBlockQuery, PagedViewModel<GetListAllApartmentsByBlockResponse>>
     {
@@ -21,23 +24,28 @@ namespace SiteManagement.Application.Features.Queries.Apartments.GetListAllApart
 
         public async Task<PagedViewModel<GetListAllApartmentsByBlockResponse>> Handle(GetListAllApartmentsByBlockQuery request, CancellationToken cancellationToken)
         {
-           
-            if (request.BlockId == Guid.Empty)
+            //TODO - add validation to  control both value is null or not
+            Expression<Func<Apartment, bool>> predicate;
+
+            if (request.BlockId.HasValue)
+                predicate = apartment => apartment.Block.Id == request.BlockId.Value;
+
+            else
             {
-                var block = await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName, "Aradığınız blok bulunamadı.");
-                request.BlockId = block.Id;
+                await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName!, "Aradığınız blok bulunamadı.");
+
+                predicate = apartment => apartment.Block.Name == request.BlockName;
             }
 
-            var apartmentsInBlock = await _apartmentRepository.GetListAsync(predicate: x => x.BlockId == request.BlockId,
+            var apartmentsInBlock = await _apartmentRepository.GetListAsync(predicate: predicate,
                                              orderBy: apartment => apartment.OrderBy(x => x.ApartmentNumber),
                                              includes: x => x.Block,
                                              cancellationToken: cancellationToken);
 
-            var response = _mapper.Map<PagedViewModel<GetListAllApartmentsByBlockResponse>>(apartmentsInBlock);
+            return _mapper.Map<PagedViewModel<GetListAllApartmentsByBlockResponse>>(apartmentsInBlock);
 
 
-            return response;
-
+      
 
         }
        

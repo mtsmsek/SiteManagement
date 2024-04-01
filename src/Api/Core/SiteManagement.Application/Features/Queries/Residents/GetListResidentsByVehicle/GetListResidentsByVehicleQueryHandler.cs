@@ -36,10 +36,11 @@ public class GetListResidentsByVehicleQueryHandler : IRequestHandler<GetListResi
        await _vehicleBusinessRules.CheckIfVehicleExistByRegistrationPlate(request.VehicleRegistrationPlate, cancellationToken);
 
 
-        var residents = await _residentRepository.GetListAsync(predicate: resident => resident.Vehicles.Any(x => x.Vehicle.VehicleRegistrationPlate ==                                                                      request.VehicleRegistrationPlate),
+        var residents = await _residentRepository.GetListAsync(predicate: resident => resident.Vehicles.Any(x => x.Vehicle.VehicleRegistrationPlate ==                                                                request.VehicleRegistrationPlate),
                                                                     includes: [resident => resident.Vehicles,
                                                                     resident => resident.Apartment,
                                                                     resident => resident.Apartment.Block]);
+
        return  _mapper.Map<PagedViewModel<GetListResidentsByVehicleResponse>>(residents);
        
     }

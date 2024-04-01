@@ -4,6 +4,8 @@ using SiteManagement.Api.WebApi.Controllers.Commons;
 using SiteManagement.Application.Features.Commands.Vehicles.CreateVehicle;
 using SiteManagement.Application.Features.Commands.Vehicles.DeleteCehicle.HardDelete;
 using SiteManagement.Application.Features.Commands.Vehicles.UpdateVehicle;
+using SiteManagement.Application.Features.Queries.Vehicles.GetListVehicles;
+using SiteManagement.Application.Features.Queries.Vehicles.GetVehicleByRegistrationPlate;
 
 namespace SiteManagement.Api.WebApi.Controllers.Vehicles
 {
@@ -36,5 +38,23 @@ namespace SiteManagement.Api.WebApi.Controllers.Vehicles
             return Ok(result);  
         }
         #endregion
+        #region Get
+        [HttpGet("allVehicles")]
+        public async Task<IActionResult> GetAllVehicles()
+        {
+            var result = await Mediator!.Send(new GetListAllVehiclesQuery());
+            return Ok(result);
+        }
+        [HttpGet("getVehicleByRegistrationPlate")]
+        public async Task<IActionResult> GetAllVehicles(string registrationPlate)
+        {
+            var result = await Mediator!.Send(new GetVehicleByRegistrationPlateQuery
+            {
+                VehicleRegistrationPlate = registrationPlate
+            });
+            return Ok(result);
+        }
+        #endregion
+
     }
 }

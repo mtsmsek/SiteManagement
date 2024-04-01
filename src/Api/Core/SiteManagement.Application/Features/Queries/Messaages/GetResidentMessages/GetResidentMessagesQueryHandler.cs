@@ -21,6 +21,8 @@ public class GetResidentMessagesQueryHandler : IRequestHandler<GetResidentMessag
 
     public async Task<PagedViewModel<GetResidentMessagesResponse>> Handle(GetResidentMessagesQuery request, CancellationToken cancellationToken)
     {
+        //TODO -- resident can only send message to admin but also admin can send all residents
+        //TODO -- control that business rules is required or not may be we can control of count of get list method result
         await _residentBusinessRules.CheckIfResidentExistById(request.UserId, cancellationToken);
         var adminConversationMessages = await _messageRepository.GetListAsync(predicate: message => message.SenderId == request.UserId ||
                                                                            message.ReceiverId == request.UserId,

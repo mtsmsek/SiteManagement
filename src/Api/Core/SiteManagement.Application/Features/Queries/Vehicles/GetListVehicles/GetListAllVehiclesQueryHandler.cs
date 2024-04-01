@@ -19,7 +19,7 @@ public class GetListAllVehiclesQueryHandler : IRequestHandler<GetListAllVehicles
 
     public async Task<PagedViewModel<GetListAllVehiclesResponse>> Handle(GetListAllVehiclesQuery request, CancellationToken cancellationToken)
     {
-        //todo check if there will be an include or not
+       
         var vehicles = await _vehicleRepository.GetListAsync();
 
         return _mapper.Map<PagedViewModel<GetListAllVehiclesResponse>>(vehicles);

@@ -15,7 +15,7 @@ using SiteManagement.Application.Features.Commands.Residents.UpdateResident.Upda
 using SiteManagement.Application.Features.Commands.VehicleResident.CreateVehicleResident;
 using SiteManagement.Application.Features.Commands.Vehicles.CreateVehicle;
 using SiteManagement.Application.Features.Commands.Vehicles.UpdateVehicle;
-using SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlockId;
+using SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlock;
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsByStatus;
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsInBlockByStatus;
 using SiteManagement.Application.Features.Queries.Blocks.GetBlockDetailByName;
@@ -26,6 +26,11 @@ using SiteManagement.Application.Features.Queries.Residents.GetListAllResidents;
 using SiteManagement.Application.Features.Queries.Residents.GetListResidentByApartmentNumberAndBlockName;
 using SiteManagement.Application.Features.Queries.Residents.GetListResidentByBlockName;
 using SiteManagement.Application.Features.Queries.Residents.GetListResidentsByVehicle;
+using SiteManagement.Application.Features.Queries.Residents.GetResidentByIdenticalNumber;
+using SiteManagement.Application.Features.Queries.Residents.GetResidentsByFullName;
+using SiteManagement.Application.Features.Queries.ResidentVehicles.GetListResidentVehicles;
+using SiteManagement.Application.Features.Queries.Vehicles.GetListVehicles;
+using SiteManagement.Application.Features.Queries.Vehicles.GetVehicleByRegistrationPlate;
 using SiteManagement.Application.Mappings.Resolvers;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Domain.Entities.Buildings;
@@ -52,8 +57,8 @@ public class SiteManagementMapingProfile : Profile
         #endregion  
         #region Queries 
         CreateMap<Apartment, GetListAllApartmentsByBlockResponse>()
-          .ForMember(destinationMember: x => x.BlockName, memberOptions: y => y.MapFrom(x => x.Block.Name)).ReverseMap();
-        CreateMap<PagedViewModel<Apartment>, PagedViewModel<GetListAllApartmentsByBlockResponse>>().ReverseMap();
+          .ForMember(destinationMember: x => x.BlockName, memberOptions: y => y.MapFrom(x => x.Block.Name));
+        CreateMap<PagedViewModel<Apartment>, PagedViewModel<GetListAllApartmentsByBlockResponse>>();
 
 
         CreateMap<Apartment, GetListApartmentsByStatusResponse>()
@@ -183,6 +188,20 @@ public class SiteManagementMapingProfile : Profile
         CreateMap<PagedViewModel<Resident>, PagedViewModel<GetListResidentsByVehicleResponse>>();
 
 
+        //GetResidentByIdencticalNumber
+        CreateMap<Resident, GetResidentByIdenticalNumberResponse>()
+            .ForMember(dest => dest.BlockName, source => source.MapFrom(x => x.Apartment.Block.Name))
+            .ForMember(dest => dest.ApartmentNumber, source => source.MapFrom(x => x.Apartment.ApartmentNumber))
+            .ForMember(dest => dest.FloorNumber, source => source.MapFrom(x => x.Apartment.FloorNumber));
+
+        //GetResidentsByFullName
+        CreateMap<Resident, GetResidentsByFullNameResponse>()
+            .ForMember(dest => dest.BlockName, source => source.MapFrom(x => x.Apartment.Block.Name))
+            .ForMember(dest => dest.ApartmentNumber, source => source.MapFrom(x => x.Apartment.ApartmentNumber))
+            .ForMember(dest => dest.FloorNumber, source => source.MapFrom(x => x.Apartment.FloorNumber));
+
+        CreateMap<PagedViewModel<Resident>, PagedViewModel<GetResidentsByFullNameResponse>>();
+
         #endregion
 
         #endregion
@@ -201,13 +220,26 @@ public class SiteManagementMapingProfile : Profile
         #endregion
 
         #region Queries
+        //GetListVehicleResponse
+        CreateMap<Vehicle, GetListAllVehiclesResponse>();
+        CreateMap<PagedViewModel<Vehicle>, PagedViewModel<GetListAllVehiclesResponse>>();
+
+
+        //GetVehicleByRegistrationPlate
+        CreateMap<Vehicle, GetVehicleByRegistrationPlateResponse>();
+
         #endregion
         #endregion
-        #region VehicleResident
+        #region ResidentVehicle
         #region Commands
         CreateMap<ResidentVehicle, CreateResidentVehicleCommand>().ReverseMap();
         #endregion
         #region Queries
+        CreateMap<ResidentVehicle, GetListResidentVehiclesResponse>()
+            .ForMember(dest => dest.VehicleRegistrationPlate, source => source.MapFrom(x => x.Vehicle.VehicleRegistrationPlate))
+            .ForMember(dest => dest.VehicleType, source => source.MapFrom(x => x.Vehicle.VehicleType));
+        CreateMap<PagedViewModel<ResidentVehicle>, PagedViewModel<GetListResidentVehiclesResponse>>();
+
         #endregion
         #endregion
     }

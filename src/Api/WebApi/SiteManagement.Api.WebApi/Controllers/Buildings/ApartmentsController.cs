@@ -4,7 +4,7 @@ using SiteManagement.Application.Features.Commands.Buildings.Apartments.CreateAp
 using SiteManagement.Application.Features.Commands.Buildings.Apartments.DeleteApartment.HardDelete;
 using SiteManagement.Application.Features.Commands.Buildings.Apartments.UpdateApartment.ChangeResidentStatus;
 using SiteManagement.Application.Features.Commands.Buildings.Apartments.UpdateApartment.ChangeTenantStatus;
-using SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlockId;
+using SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlock;
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsByStatus;
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsInBlockByStatus;
 
@@ -50,15 +50,15 @@ public class ApartmentsController : BaseController
     }
     #endregion
     #region Get
-    [HttpGet("getApartments{name}Block")]
+    [HttpGet("getApartmentsBlock")]
     public async Task<IActionResult> GetApartmentsByBlock(Guid? id, string? name, int currentPage = _defaultCurrentPage, int pageSize = _defaultCurrentPageSize)
     {
-        if(!id.HasValue)
-            id = Guid.Empty;
-        if(string.IsNullOrEmpty(name))
-            name = string.Empty;
+        //if(!id.HasValue)
+        //    id = Guid.Empty;
+        //if(string.IsNullOrEmpty(name))
+        //    name = string.Empty;
 
-        var response = await Mediator.Send(new GetListAllApartmentsByBlockQuery { BlockId = id.Value, BlockName = name, Page = currentPage, PageSize = pageSize });
+        var response = await Mediator!.Send(new GetListAllApartmentsByBlockQuery { BlockId = id, BlockName = name, Page = currentPage, PageSize = pageSize });
         return Ok(response);    
     }
     [HttpGet("getEmptyApartmentsIn{name}Block")]

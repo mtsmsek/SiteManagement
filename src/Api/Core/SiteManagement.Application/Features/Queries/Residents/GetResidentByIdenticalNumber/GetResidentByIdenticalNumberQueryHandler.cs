@@ -19,10 +19,8 @@ public class GetResidentByIdenticalNumberQueryHandler : IRequestHandler<GetResid
     public async Task<GetResidentByIdenticalNumberResponse> Handle(GetResidentByIdenticalNumberQuery request, CancellationToken cancellationToken)
     {
         var resident = await _residenttRepository.GetSingleAsync(predicate: resident => resident.IdenticalNumber == request.IdenticalNumber,
-                                                           includes: [resident => resident.Apartment,
+                                                                    includes: [resident => resident.Apartment,
                                                                       resident => resident.Apartment.Block]);
-
-
         //todo remove magic string
         //todo -- move it to business rules ??
         if (resident is null)

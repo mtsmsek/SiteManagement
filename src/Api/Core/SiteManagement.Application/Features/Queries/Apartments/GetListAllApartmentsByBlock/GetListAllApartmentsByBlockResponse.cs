@@ -1,12 +1,6 @@
-﻿using SiteManagement.Domain.Entities.Buildings;
-using SiteManagement.Domain.Enumarations.Buildings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using SiteManagement.Domain.Enumarations.Buildings;
 
-namespace SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlockId
+namespace SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlock
 {
     public class GetListAllApartmentsByBlockResponse 
     {

@@ -8,13 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlockId
+namespace SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlock
 {
     public class GetListAllApartmentsByBlockQuery : PageRequest, IRequest<PagedViewModel<GetListAllApartmentsByBlockResponse>>, ICachableRequest
     {
-        private string _name;
-        public Guid BlockId { get; set; }
-        public string? BlockName { get => _name; set => _name = value.ToUpper() ?? string.Empty; }
+        public Guid? BlockId { get; set; }
+        public string? BlockName { get; set; }
 
         public string CacheKey => $"GetAllApartments";
 

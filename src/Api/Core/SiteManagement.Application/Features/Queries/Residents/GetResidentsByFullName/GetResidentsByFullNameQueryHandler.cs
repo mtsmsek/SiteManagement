@@ -1,20 +1,29 @@
 ﻿using AutoMapper;
 using MediatR;
 using SiteManagement.Application.CrossCuttingConcerns.Exceptions.Types;
+using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Application.Services.Repositories.Residents;
 
-namespace SiteManagement.Application.Features.Queries.Residents.GetResidentByFullName
+namespace SiteManagement.Application.Features.Queries.Residents.GetResidentsByFullName
 {
-    public class GetResidentByFullNameQueryHandler : IRequestHandler<GetResidentByFullNameQuery, GetResidentByFullNameResponse>
+    public class GetResidentsByFullNameQueryHandler : IRequestHandler<GetResidentsByFullNameQuery, PagedViewModel<GetResidentsByFullNameResponse>>
     {
         private readonly IResidentRepository _residentRepository;
         private readonly IMapper _mapper;
-        public async Task<GetResidentByFullNameResponse> Handle(GetResidentByFullNameQuery request, CancellationToken cancellationToken)
+
+        public GetResidentsByFullNameQueryHandler(IResidentRepository residentRepository, IMapper mapper)
+        {
+            _residentRepository = residentRepository;
+            _mapper = mapper;
+        }
+
+        public async Task<PagedViewModel<GetResidentsByFullNameResponse>> Handle(GetResidentsByFullNameQuery request, CancellationToken cancellationToken)
         {
             //TODO make it and ??
             //TODO take one property named 'name' then process it here ??
-            var resident = await _residentRepository.GetSingleAsync(predicate: resident => resident.FirstName == request.FirstName ||
+            var resident = await _residentRepository.GetListAsync(predicate: resident => resident.FirstName == request.FirstName &&
                                                                       resident.LastName == request.LastName,
+                                                                      cancellationToken: cancellationToken,
                                                                       includes: [resident => resident.Apartment,
                                                                                  resident => resident.Apartment.Block]);
             //todo -- remove magic string
@@ -23,7 +32,7 @@ namespace SiteManagement.Application.Features.Queries.Residents.GetResidentByFul
 
 
             //todo -- investigater how to map includes
-            return _mapper.Map<GetResidentByFullNameResponse>(resident);
+            return _mapper.Map<PagedViewModel<GetResidentsByFullNameResponse>>(resident);
         }
 
 
