@@ -1,13 +1,14 @@
 ﻿using FluentValidation;
-using SiteManagement.Domain.Entities.Invoices;
+using SiteManagement.Domain.Enumarations.Invoices;
 
-namespace SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBill;
+namespace SiteManagement.Application.Features.Commands.Invoices.Bills.UpdateBill;
 
-public class CreateBillValidation : AbstractValidator<CreateBillCommand>
+public class UpdateBillValidation : AbstractValidator<UpdateBillCommand>
 {
-    public CreateBillValidation()
+    public UpdateBillValidation()
     {
-        //TODO -- fix the messages
+        //todo -- remove magic string
+        //todo-- you did repeat yourself(ook at createBill validation). check that how can you write it once
         RuleFor(i => i.Fee).GreaterThan(0).WithMessage("fatura ücreti eksi olamaz");
 
         RuleFor(i => i.Month).NotEmpty().WithMessage("ay alanı boş bırakılamaz")
@@ -17,7 +18,12 @@ public class CreateBillValidation : AbstractValidator<CreateBillCommand>
         RuleFor(i => i.Year).NotEmpty().WithMessage("yıl alanı boş bırakılamaz")
             .LessThanOrEqualTo(DateTime.Now.Year).WithMessage("Gelecek yıla ait fatura kesemezsiniz");
 
-       
+        RuleFor(i => i.Type).NotEmpty().WithMessage("Fatura tipi boş bırakılamaz")
+            .Must(BillTypeShouldBeExist).WithMessage("Geçersiz fatura türü");
+    }
+    private bool BillTypeShouldBeExist(int type)
+    {
+        return BillType.Enumarations.Keys.Contains(type);
     }
     private bool MonthValueMustBeBetweenOneAndTwelve(int month)
     {

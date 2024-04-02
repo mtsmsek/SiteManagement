@@ -14,7 +14,10 @@ namespace SiteManagement.Application.Features.Commands.Residents.Login
         {
             //TODO -- remove magic strings
             RuleFor(x => x.Email).NotEmpty().When(x => string.IsNullOrEmpty(x.IdenticalNumber)).WithMessage("Lütfen email ya da TC numaranızı giriniz");
-            RuleFor(x => x.IdenticalNumber).NotEmpty().When(x => string.IsNullOrEmpty(x.Email)).WithMessage("Lütfen email ya da TC numaranızı giriniz");
+           
+            RuleFor(x => x.IdenticalNumber).NotEmpty().When(x => string.IsNullOrEmpty(x.Email)).WithMessage("Lütfen email ya da TC numaranızı giriniz")
+             .EmailAddress(FluentValidation.Validators.EmailValidationMode.AspNetCoreCompatible)
+             .WithMessage("Geçersiz email");
         }
     }
 }
