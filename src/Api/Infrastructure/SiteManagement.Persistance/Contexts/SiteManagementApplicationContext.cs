@@ -47,8 +47,8 @@ public class SiteManagementApplicationContext : DbContext
         //TODO - write password before running
         if (!optionsBuilder.IsConfigured)
         {
-            var connStr = "Data Source=localhost;Initial Catalog=SiteManagement;Persist Security Info=True;TrustServerCertificate=true;User ID=SA;Password=Kelt.232323";
-            //var connStr = "Server =(localdb)\\MSSQLLocalDB;Initial Catalog=siteManagementDb;Integrated Security=False;Trusted_Connection=True;MultipleActiveResultSets=False;TrustServerCertificate=True";
+            //var connStr = "Data Source=localhost;Initial Catalog=SiteManagement;Persist Security Info=True;TrustServerCertificate=true;User ID=SA;Password=Kelt.232323";
+            var connStr = "Server =(localdb)\\MSSQLLocalDB;Initial Catalog=siteManagementDb;Integrated Security=False;Trusted_Connection=True;MultipleActiveResultSets=False;TrustServerCertificate=True";
             optionsBuilder.UseSqlServer(connStr, opt =>
             {
                 opt.EnableRetryOnFailure();

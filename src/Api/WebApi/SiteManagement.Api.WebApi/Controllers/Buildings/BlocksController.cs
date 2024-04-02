@@ -20,7 +20,6 @@ public class BlocksController : BaseController
     public async Task<IActionResult> AddBlock(CreateBlockCommand createBlockCommand)
     {
         //TODO -- Create BadRequest
-        var a = HttpContext.User.ClaimRoles();
         var apartmentToAdd = await Mediator!.Send(createBlockCommand);
         return Ok(apartmentToAdd);
     }

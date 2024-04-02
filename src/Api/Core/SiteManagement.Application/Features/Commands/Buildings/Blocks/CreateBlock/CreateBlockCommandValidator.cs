@@ -7,7 +7,17 @@ public class CreateBlockCommandValidator : AbstractValidator<CreateBlockCommand>
 {
     public CreateBlockCommandValidator()
     {
-        RuleFor(block => block.Name).NotEmpty().WithMessage(BlockMessages.ValidationMessages.BlockNameCannotBeEmpty);
+       
+        RuleFor(block => DeleteSpaces(block.Name))
+            .NotEmpty().WithMessage(BlockMessages.ValidationMessages.BlockNameCannotBeEmpty)
+            .Must(StartWithLetter).WithMessage("Block ismi bir harf ile başlamalıdır")
+            .Length(1, 2).WithMessage("Block ismi en fazla iki karakterden oluşabilir");
+
 
     }
+    private bool StartWithLetter(string name) =>  char.IsLetter(name.FirstOrDefault());
+    private static string DeleteSpaces(string name) => name.TrimStart().TrimEnd();
+
+
+
 }
