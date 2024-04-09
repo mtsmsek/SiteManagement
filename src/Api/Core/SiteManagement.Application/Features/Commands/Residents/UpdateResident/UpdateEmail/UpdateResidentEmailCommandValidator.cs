@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace SiteManagement.Application.Features.Commands.Residents.UpdateResident.UpdateEmail
 {
-    public class UpdateEmailCommandValidation : AbstractValidator<UpdateResidentEmailCommand>
+    public class UpdateResidentEmailCommandValidator : AbstractValidator<UpdateResidentEmailCommand>
     {
-        public UpdateEmailCommandValidation()
+        public UpdateResidentEmailCommandValidator()
         {
             RuleFor(x => x.Email).NotEmpty().WithMessage("Lütfen email giriniz")
                                             .EmailAddress(FluentValidation.Validators.EmailValidationMode.AspNetCoreCompatible)

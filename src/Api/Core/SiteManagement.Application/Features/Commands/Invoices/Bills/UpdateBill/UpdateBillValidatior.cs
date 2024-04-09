@@ -3,9 +3,9 @@ using SiteManagement.Domain.Enumarations.Invoices;
 
 namespace SiteManagement.Application.Features.Commands.Invoices.Bills.UpdateBill;
 
-public class UpdateBillValidation : AbstractValidator<UpdateBillCommand>
+public class UpdateBillValidatior : AbstractValidator<UpdateBillCommand>
 {
-    public UpdateBillValidation()
+    public UpdateBillValidatior()
     {
         //todo -- remove magic string
         //todo-- you did repeat yourself(ook at createBill validation). check that how can you write it once

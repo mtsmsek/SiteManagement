@@ -2,9 +2,9 @@
 
 namespace SiteManagement.Application.Features.Commands.Residents.CreateResident;
 
-public class CreateResidentValidation : AbstractValidator<CreateResidentCommand>
+public class CreateResidentValidator : AbstractValidator<CreateResidentCommand>
 {
-    public CreateResidentValidation()
+    public CreateResidentValidator()
     {
         var currentTime = DateTime.Now;
         RuleFor(resident => resident.FirstName).NotEmpty().WithMessage("Ad alanı boş bırakılamaz");

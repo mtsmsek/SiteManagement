@@ -145,7 +145,9 @@ public class SiteManagementMapingProfile : Profile
         CreateMap<Resident, ResidentLoginCommandResponse>().ReverseMap();
 
         //Update Information
-        CreateMap<Resident, UpdateResidentCommand>().ReverseMap();
+        CreateMap<UpdateResidentCommand, Resident>()
+            .ForMember(dest => dest.BirthDate, source => source.MapFrom(x => new DateTime(x.BirthYear, x.BirthMonth, x.BirthDay)));
+           
         CreateMap<Resident, UpdateResidentResponse>().ReverseMap();
 
         //Update Email

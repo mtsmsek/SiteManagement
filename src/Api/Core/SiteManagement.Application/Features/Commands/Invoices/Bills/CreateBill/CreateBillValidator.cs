@@ -3,9 +3,9 @@ using SiteManagement.Domain.Entities.Invoices;
 
 namespace SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBill;
 
-public class CreateBillValidation : AbstractValidator<CreateBillCommand>
+public class CreateBillValidator : AbstractValidator<CreateBillCommand>
 {
-    public CreateBillValidation()
+    public CreateBillValidator()
     {
         //TODO -- fix the messages
         RuleFor(i => i.Fee).GreaterThan(0).WithMessage("fatura ücreti eksi olamaz");

@@ -33,6 +33,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Blazor", "Blazor", "{70460A
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SiteManagement.WebApp", "src\Clients\BlazorWeb\SiteManagement.WebApp\SiteManagement.WebApp.csproj", "{98EDD5B9-01AE-4BB2-AFB0-14CFF4BE5293}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SiteManagement.Projections.SendMessageService", "src\Projections\SiteManagement.Projections.SendMessageService\SiteManagement.Projections.SendMessageService.csproj", "{ACD2E17E-6C17-4F45-881C-2D03537C08F7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -63,6 +65,10 @@ Global
 		{98EDD5B9-01AE-4BB2-AFB0-14CFF4BE5293}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{98EDD5B9-01AE-4BB2-AFB0-14CFF4BE5293}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{98EDD5B9-01AE-4BB2-AFB0-14CFF4BE5293}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ACD2E17E-6C17-4F45-881C-2D03537C08F7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ACD2E17E-6C17-4F45-881C-2D03537C08F7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ACD2E17E-6C17-4F45-881C-2D03537C08F7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ACD2E17E-6C17-4F45-881C-2D03537C08F7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -82,6 +88,7 @@ Global
 		{CDFBC4C0-AA2E-4EB4-A72B-A9D5EFA195D4} = {8292C812-AA16-44A7-9606-D11DCDD5F25F}
 		{70460A3E-0852-496F-B98F-B2E64CC2592A} = {F441853A-1F57-4D7D-83A8-933559F0E446}
 		{98EDD5B9-01AE-4BB2-AFB0-14CFF4BE5293} = {70460A3E-0852-496F-B98F-B2E64CC2592A}
+		{ACD2E17E-6C17-4F45-881C-2D03537C08F7} = {0B7F2CF6-C621-4306-82A2-01B582072805}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C8940320-C227-42EC-9417-77727D3E8F7B}

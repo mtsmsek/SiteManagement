@@ -12,7 +12,9 @@ public class UpdateResidentCommand : IRequest<UpdateResidentResponse>
     public Guid Id { get; set; }
     public string FirstName { get; set; }
     public string LastName { get; set; }
-    public DateTime BirthDate { get; set; }
+    public int BirthYear { get; set; }
+    public int BirthMonth { get; set; }
+    public int BirthDay { get; set; }
     public Guid ApartmentId { get; set; }
     public string IdenticalNumber { get; set; }
     public string PhoneNumber { get; set; }
