@@ -1,55 +1,77 @@
 ﻿using AutoMapper;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using SiteManagement.Application.CrossCuttingConcerns.Exceptions.Types;
 using SiteManagement.Application.Messaging;
+using SiteManagement.Application.Pipelines.Authorization;
 using SiteManagement.Application.Security.Extensions;
 using SiteManagement.Application.Services.Repositories.Residents;
-using SiteManagement.Domain.Entities.Residents;
+using SiteManagement.Application.Services.Repositories.Security;
+using SiteManagement.Domain.Constants.Security;
 using SiteManagement.Domain.Events.Messages;
+using static SiteManagement.Domain.Constants.Security.UsersOperationClaims;
+
 
 namespace SiteManagement.Application.Features.Commands.Messages.SendMessage
 {
-    public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, SendMessageResponse>
+    public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, SendMessageResponse> , ISecuredRequest
     {
         private readonly IMessageRepository _messageRepository;
         private readonly IMapper _mapper;
+        private readonly IUserOperationClaimRepository _userOperationClaimRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public SendMessageCommandHandler(IMessageRepository messageRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public SendMessageCommandHandler(IMessageRepository messageRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IUserOperationClaimRepository userOperationClaimRepository)
         {
             _messageRepository = messageRepository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _userOperationClaimRepository = userOperationClaimRepository;
         }
+
+        public string[] Roles => [Admin,User];
 
         public async Task<SendMessageResponse> Handle(SendMessageCommand request, CancellationToken cancellationToken)
         {
+            //todo --remove magic strings
+            var senderId = _httpContextAccessor.HttpContext.User.GetUserId();
             
-            //todo-- check that => 1) take id with queryString   2) take the id command class => set it in controller 3) this solution
-           // var senderId = _httpContextAccessor.HttpContext.User.GetUserId();
-           
-            //TODO -- Add validation
-           // var messageToSend = _mapper.Map<Message>(request);
-            //messageToSend.SenderId = senderId;7
-            
-            //todo -- remove magic string
+            var operationClaims = _httpContextAccessor.HttpContext.User.ClaimRoles();
+
+            if (request.SenderId == request.ReceiverId)
+                throw new BusinessException("Kendinize mesaj gönderemezsiniz");
+
+            if (!operationClaims!.Contains(Admin))
+            {
+                var receiverOperationClaims = await _userOperationClaimRepository.GetListAsync(predicate: u => u.UserId == request.ReceiverId,
+                                                                                cancellationToken: cancellationToken,
+                                                                                includes: [u => u.OperationClaim, u => u.User]);
+
+               var isAdmin =  receiverOperationClaims.Results.Any(u => u.OperationClaim.Name == Admin);
+
+                if (!isAdmin)
+                    throw new BusinessException("Yalnızca yöneticiye mesaj gönderebilirsiniz");
+            }
+
+
             QueueFactory.SendMessageToExchange(exchangeName: "MessageExchange",
                                                 exchangeType: "direct",
                                                 queueName: "SendMessageQueue",
                                                 obj:new SendMessageEvent
                                                 {
-                                                    SenderId = request.SenderId,
+                                                    SenderId = senderId,
                                                     Message = request.Text,
                                                     SendedTime = DateTime.Now,
                                                     ReceiverId = request.ReceiverId
                                                     
                                                 });
 
-            //todo -- remove ???
-            // await _messageRepository.AddAsync(messageToSend, cancellationToken);
 
-            // return _mapper.Map<SendMessageResponse>(messageToSend);
-            return new SendMessageResponse();
+            return new SendMessageResponse()
+            {
+                SendingTime = DateTime.Now,
+                Text = request.Text
+            };
 
         }
     }

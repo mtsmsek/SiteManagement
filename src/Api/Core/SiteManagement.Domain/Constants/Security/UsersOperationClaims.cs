@@ -10,5 +10,6 @@ namespace SiteManagement.Domain.Constants.Security
     {
         public const string Admin = "Admin";
         public const string Add = "users.add";
+        public const string User = "user";
     }
 }

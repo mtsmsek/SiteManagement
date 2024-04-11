@@ -3,12 +3,11 @@ using MediatR;
 using SiteManagement.Application.Rules.Residents;
 using SiteManagement.Application.Security.Hashing;
 using SiteManagement.Application.Services.Repositories.Residents;
+using SiteManagement.Application.Services.Repositories.Security;
+using SiteManagement.Application.Services.Security;
+using SiteManagement.Domain.Constants.Security;
 using SiteManagement.Domain.Entities.Residents;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SiteManagement.Domain.Entities.Security;
 
 namespace SiteManagement.Application.Features.Commands.Residents.CreateResident
 {
@@ -19,12 +18,15 @@ namespace SiteManagement.Application.Features.Commands.Residents.CreateResident
         private readonly IResidentRepository _residentRepository;
         private readonly ResidentBusinessRules _residentBusinessRules;
         private readonly IMapper _mapper;
+        private readonly IUserOperationClaimService _userOperationClaimService;
 
-        public CreateResidentCommandHandler(IResidentRepository residentRepository, ResidentBusinessRules residentBusinessRules, IMapper mapper)
+
+        public CreateResidentCommandHandler(IResidentRepository residentRepository, ResidentBusinessRules residentBusinessRules, IMapper mapper, IUserOperationClaimService userOperationClaimService)
         {
             _residentRepository = residentRepository;
             _residentBusinessRules = residentBusinessRules;
             _mapper = mapper;
+            _userOperationClaimService = userOperationClaimService;
         }
 
         public async Task<CreateResidentResponse> Handle(CreateResidentCommand request, CancellationToken cancellationToken)
@@ -39,21 +41,19 @@ namespace SiteManagement.Application.Features.Commands.Residents.CreateResident
             residentToAdd.PasswordSalt = passwordSalt;
 
             await _residentRepository.AddAsync(residentToAdd);
-            //TODO - add validation for adding resident command
 
+            await _userOperationClaimService.AddUserWithOperationClaim(residentToAdd.Id, UsersOperationClaims.User);
+            //todo - make this class transactional
 
-            //TODO - investigate how to do it in automapper
-            return new CreateResidentResponse
-            {
-                FirstName = request.FirstName,
-                LastName = request.LastName,
-                Password = firstPassword
-            };
-           //return _mapper.Map<CreateResidentResponse>(residentToAdd);
+            var response = _mapper.Map<CreateResidentResponse>(residentToAdd);
+            response.Password = firstPassword;
+
+            return response;
         }
+
         private string generateRandomPassword(int length)
         {
-            Random random = new Random();
+            Random random = new();
             return new string(Enumerable.Repeat(passwordChars, length)
               .Select(s => s[random.Next(s.Length)]).ToArray());
         }
