@@ -12,6 +12,8 @@ using SiteManagement.Application.Features.Commands.Residents.CreateResident;
 using SiteManagement.Application.Features.Commands.Residents.Login;
 using SiteManagement.Application.Features.Commands.Residents.UpdateResident.UpdateEmail;
 using SiteManagement.Application.Features.Commands.Residents.UpdateResident.UpdateInformation;
+using SiteManagement.Application.Features.Commands.Security.OperationClaims.CreateOperationClaim;
+using SiteManagement.Application.Features.Commands.Security.OperationClaims.UpdateOperationClaim;
 using SiteManagement.Application.Features.Commands.VehicleResident.CreateVehicleResident;
 using SiteManagement.Application.Features.Commands.Vehicles.CreateVehicle;
 using SiteManagement.Application.Features.Commands.Vehicles.UpdateVehicle;
@@ -29,6 +31,7 @@ using SiteManagement.Application.Features.Queries.Residents.GetListResidentsByVe
 using SiteManagement.Application.Features.Queries.Residents.GetResidentByIdenticalNumber;
 using SiteManagement.Application.Features.Queries.Residents.GetResidentsByFullName;
 using SiteManagement.Application.Features.Queries.ResidentVehicles.GetListResidentVehicles;
+using SiteManagement.Application.Features.Queries.Security.OperationClaims.GetListAllOperationClaims;
 using SiteManagement.Application.Features.Queries.Vehicles.GetListVehicles;
 using SiteManagement.Application.Features.Queries.Vehicles.GetVehicleByRegistrationPlate;
 using SiteManagement.Application.Mappings.Resolvers;
@@ -36,6 +39,7 @@ using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Domain.Entities.Buildings;
 using SiteManagement.Domain.Entities.Invoices;
 using SiteManagement.Domain.Entities.Residents;
+using SiteManagement.Domain.Entities.Security;
 using SiteManagement.Domain.Entities.Vehicles;
 using SiteManagement.Domain.Enumarations.Invoices;
 using SiteManagement.Domain.Enumarations.Vehicles;
@@ -138,7 +142,7 @@ public class SiteManagementMapingProfile : Profile
         {
             source.MapFrom(x => new DateTime(x.BirthYear, x.BirthMonth, x.BirthDay));
         });
-        CreateMap<Resident, CreateResidentResponse>().ReverseMap();
+        CreateMap<Resident, CreateResidentResponse>().ForMember(dest => dest.Password, source => source.Ignore());
 
         //Login
         CreateMap<Resident, ResidentLoginCommand>().ReverseMap();
@@ -242,6 +246,25 @@ public class SiteManagementMapingProfile : Profile
             .ForMember(dest => dest.VehicleType, source => source.MapFrom(x => x.Vehicle.VehicleType));
         CreateMap<PagedViewModel<ResidentVehicle>, PagedViewModel<GetListResidentVehiclesResponse>>();
 
+        #endregion
+        #endregion
+        #region OperationClaim
+        #region Commands
+        //Create
+        CreateMap<CreateOperationClaimCommand, OperationClaim>();
+        CreateMap<OperationClaim, CreateOperationClaimResponse>();
+
+        //Update
+        CreateMap<UpdateOperationClaimCommand, OperationClaim>();
+        CreateMap<OperationClaim, UpdateOperationClaimResponse>();
+        #endregion
+        #region Queries
+        //GetListAllOperationClaims
+        CreateMap<PagedViewModel<OperationClaim>, PagedViewModel<GetListAllOperationClaimsResponse>>();
+        CreateMap<OperationClaim, GetListAllOperationClaimsResponse>();
+
+        //GetOperationClaimByName
+        CreateMap<OperationClaim, GetListAllOperationClaimsResponse>();
         #endregion
         #endregion
     }

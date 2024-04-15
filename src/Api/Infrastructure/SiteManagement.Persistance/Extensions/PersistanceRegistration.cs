@@ -15,6 +15,8 @@ using SiteManagement.Application.Services.Repositories.Security;
 using SiteManagement.Persistance.Services.Repositories.Security;
 using SiteManagement.Application.Services.Messages;
 using SiteManagement.Persistance.Services.Messages;
+using SiteManagement.Application.Services.Security;
+using SiteManagement.Persistance.Services.Security;
 
 
 namespace SiteManagement.Persistance.Extensions;
@@ -61,12 +63,12 @@ public static class PersistanceRegistration
         services.AddScoped<IUserOperationClaimRepository, UserOperationClaimRepository>();
         services.AddScoped<IOperationClaimRepository, OperationClaimRepository>();
         services.AddScoped<IEmailAuthenticatorRepository, EmailAuthenticatorRepository>();
+
+        //Services
+
+        services.AddScoped<IUserOperationClaimService, UserOperationClaimManager>();
         #endregion
         return services;
     }
-    public static IServiceCollection AddPersistanceManager(this IServiceCollection services)
-    {
-        services.AddScoped<IMessageService, MessageManager>();
-        return services;
-    }
+
 }
