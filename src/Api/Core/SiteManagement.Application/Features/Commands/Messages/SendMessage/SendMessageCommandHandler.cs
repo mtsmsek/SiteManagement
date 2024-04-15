@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using SiteManagement.Application.Messaging;
+using SiteManagement.Application.Pipelines.Transaction;
 using SiteManagement.Application.Security.Extensions;
 using SiteManagement.Application.Services.Repositories.Residents;
 using SiteManagement.Domain.Entities.Residents;
@@ -9,15 +10,13 @@ using SiteManagement.Domain.Events.Messages;
 
 namespace SiteManagement.Application.Features.Commands.Messages.SendMessage
 {
-    public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, SendMessageResponse>
+    public class SendMessageCommandHandler : IRequestHandler<SendMessageCommand, SendMessageResponse>, ITransactionalRequest
     {
-        private readonly IMessageRepository _messageRepository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public SendMessageCommandHandler(IMessageRepository messageRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
-            _messageRepository = messageRepository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
         }
