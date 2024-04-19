@@ -29,9 +29,10 @@ namespace SiteManagement.Persistance.Contexts
             if (!optionsBuilder.IsConfigured)
             {
                 //var connStr = "Data Source=localhost;Initial Catalog=SiteManagement;Persist Security Info=True;TrustServerCertificate=true;User ID=SA;Password=Kelt.232323";
-                var connStr = "User ID=postgres;Password=123456;Host=localhost;Port=5432;Database= PaymentsDb";
+                // var connStr = "User ID=postgres;Password=123456;Host=localhost;Port=5432;Database= PaymentsDb";
+                var connStr = "Host=localhost;Port=5432;Database=YourDatabaseName;Username=postgres;Password=123456;Pooling=true;";
 
-                optionsBuilder.UseSqlServer(connStr, opt =>
+                optionsBuilder.UseNpgsql(connStr, opt =>
                 {
                     opt.EnableRetryOnFailure();
                 });

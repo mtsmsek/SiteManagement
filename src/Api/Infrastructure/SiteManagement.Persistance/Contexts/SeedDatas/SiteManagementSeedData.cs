@@ -16,6 +16,7 @@ namespace SiteManagement.Persistance.Contexts.SeedDatas;
 
 internal class SiteManagementSeedData
 {
+    internal static SiteManagementApplicationContext context;
     #region Residents
     private List<Resident> GetResidents(IEnumerable<Guid> apartmentIds)
     {
@@ -35,7 +36,6 @@ internal class SiteManagementSeedData
                                                                                         AuthenticatorType.Otp,
                                                                                         AuthenticatorType.Email))
             .Generate(500);
-
         return residents;
 
 
@@ -164,10 +164,10 @@ internal class SiteManagementSeedData
     }
     public async Task SeedAsync(IConfiguration configuration)
     {
-        var dbContextBuilder = new DbContextOptionsBuilder();
+       var dbContextBuilder = new DbContextOptionsBuilder();
         dbContextBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
 
-        var context = new SiteManagementApplicationContext(dbContextBuilder.Options);
+         context = new SiteManagementApplicationContext(dbContextBuilder.Options);
 
         if (context.Residents.Any())
         {
