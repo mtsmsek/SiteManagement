@@ -1,4 +1,8 @@
-﻿using SiteManagement.Domain.Entities.Commons;
+﻿using SiteManagement.Domain.Entities.Buildings;
+using SiteManagement.Domain.Entities.Commons;
+using SiteManagement.Domain.Entities.Invoices;
+using SiteManagement.Domain.Entities.Residents;
+using SiteManagement.Domain.Entities.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,9 +13,11 @@ namespace SiteManagement.Domain.Entities.Payments
 {
     public class Payment : BaseEntity
     {
-        public Guid UserId { get; set; }
-        public Guid ApartmentId { get; set; }
+        public Guid ResidentId { get; set; }
         public Guid BillId { get; set; }
+        public virtual Resident Resident { get; set; }
+        public virtual Bill Bill { get; set; }
+
 
     }
 }

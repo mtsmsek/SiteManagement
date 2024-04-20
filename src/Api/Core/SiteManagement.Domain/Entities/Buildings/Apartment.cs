@@ -1,5 +1,6 @@
 ﻿using SiteManagement.Domain.Entities.Commons;
 using SiteManagement.Domain.Entities.Invoices;
+using SiteManagement.Domain.Entities.Payments;
 using SiteManagement.Domain.Entities.Residents;
 using SiteManagement.Domain.Enumarations.Buildings;
 

@@ -1,4 +1,5 @@
 ﻿using SiteManagement.Domain.Entities.Buildings;
+using SiteManagement.Domain.Entities.Payments;
 using SiteManagement.Domain.Entities.Security;
 using SiteManagement.Domain.Entities.Vehicles;
 
@@ -15,5 +16,6 @@ public class Resident : User
     public virtual ICollection<Message> SentMessages { get; set; }
     public virtual ICollection<Message> ReceivedMessages { get; set; }
     public virtual ICollection<ResidentVehicle> Vehicles { get; set; }
+    public virtual ICollection<Payment> Payments { get; set; }
 
 }
