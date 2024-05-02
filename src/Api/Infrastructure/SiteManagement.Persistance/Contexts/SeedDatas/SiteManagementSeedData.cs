@@ -164,7 +164,7 @@ internal class SiteManagementSeedData
     }
     public async Task SeedAsync(IConfiguration configuration)
     {
-       var dbContextBuilder = new DbContextOptionsBuilder();
+       var dbContextBuilder = new DbContextOptionsBuilder<SiteManagementApplicationContext>();
         dbContextBuilder.UseSqlServer(configuration.GetConnectionString("DefaultConnectionString"));
 
          context = new SiteManagementApplicationContext(dbContextBuilder.Options);

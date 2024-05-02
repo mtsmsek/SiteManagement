@@ -8,6 +8,7 @@ namespace SiteManagement.Application.Features.Commands.Payments.CreatePayment;
 
 public class CreatePaymentResponse
 {
-    public int BillType { get; set; }
+    public string BillType { get; set; }
+    public string Period { get; set; }
     public double Fee { get; set; }
 }

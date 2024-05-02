@@ -35,12 +35,10 @@ public static class PersistanceRegistration
             });
 
         });
-        services.AddDbContext<SiteManagementPaymentsContext>(conf =>
-        {
-            var connectionString = configuration.GetConnectionString("PostgreConnectionString");
-            services.AddDbContext<SiteManagementPaymentsContext>(options => options.UseNpgsql(connectionString), ServiceLifetime.Singleton);
-        });
-        
+
+        services.AddDbContext<SiteManagementPaymentsContext>(
+            options => options.UseNpgsql(configuration.GetConnectionString("PostgreConnectionString"))
+            );
         #region SeedData
         var seedData = new SiteManagementSeedData();
         seedData.SeedAsync(configuration).GetAwaiter().GetResult();

@@ -25,4 +25,8 @@
     <ProjectReference Include="..\..\Api\WebApi\SiteManagement.Api.WebApi\SiteManagement.Api.WebApi.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Buildings\Blocks\Queries\" />
+  </ItemGroup>
+
 </Project>

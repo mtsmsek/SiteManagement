@@ -15,6 +15,6 @@ public class Bill : BaseEntity
     public int Year { get; set; }
     public string Period => $"{Month.Name} - {Year}";
     public virtual Apartment Apartment { get; set; }
-    public virtual ICollection<Payment> Payments { get; set; }
+    public virtual Payment Payment { get; set; }
 
 }

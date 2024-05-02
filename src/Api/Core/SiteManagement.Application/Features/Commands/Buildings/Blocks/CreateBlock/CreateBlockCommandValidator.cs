@@ -7,11 +7,11 @@ public class CreateBlockCommandValidator : AbstractValidator<CreateBlockCommand>
 {
     public CreateBlockCommandValidator()
     {
-       
+
         RuleFor(block => DeleteSpaces(block.Name))
             .NotEmpty().WithMessage(BlockMessages.ValidationMessages.BlockNameCannotBeEmpty)
-            .Must(StartWithLetter).WithMessage("Block ismi bir harf ile başlamalıdır")
-            .Length(1, 2).WithMessage("Block ismi en fazla iki karakterden oluşabilir");
+            .Must(StartWithLetter).WithMessage(BlockMessages.ValidationMessages.BlockNameMustStartWithALetter)
+            .Length(1, 2).WithMessage(BlockMessages.ValidationMessages.BlockNameCannotBeLongerThanTwoCharacters);
 
 
     }

@@ -8,6 +8,8 @@ using SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBill;
 using SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBulkBills;
 using SiteManagement.Application.Features.Commands.Invoices.Bills.UpdateBill;
 using SiteManagement.Application.Features.Commands.Messages.SendMessage;
+using SiteManagement.Application.Features.Commands.Payments.CreatePayment;
+using SiteManagement.Application.Features.Commands.Payments.UpdatePayment;
 using SiteManagement.Application.Features.Commands.Residents.CreateResident;
 using SiteManagement.Application.Features.Commands.Residents.Login;
 using SiteManagement.Application.Features.Commands.Residents.UpdateResident.UpdateEmail;
@@ -24,6 +26,7 @@ using SiteManagement.Application.Features.Queries.Blocks.GetBlockDetailByName;
 using SiteManagement.Application.Features.Queries.Blocks.GetListAllBlocks;
 using SiteManagement.Application.Features.Queries.Invoices.GetListApartmentBillsByMonth;
 using SiteManagement.Application.Features.Queries.Messaages.GetResidentMessages;
+using SiteManagement.Application.Features.Queries.Payments.GetListResidentPayments;
 using SiteManagement.Application.Features.Queries.Residents.GetListAllResidents;
 using SiteManagement.Application.Features.Queries.Residents.GetListResidentByApartmentNumberAndBlockName;
 using SiteManagement.Application.Features.Queries.Residents.GetListResidentByBlockName;
@@ -38,6 +41,7 @@ using SiteManagement.Application.Mappings.Resolvers;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Domain.Entities.Buildings;
 using SiteManagement.Domain.Entities.Invoices;
+using SiteManagement.Domain.Entities.Payments;
 using SiteManagement.Domain.Entities.Residents;
 using SiteManagement.Domain.Entities.Security;
 using SiteManagement.Domain.Entities.Vehicles;
@@ -267,6 +271,24 @@ public class SiteManagementMapingProfile : Profile
         CreateMap<OperationClaim, GetListAllOperationClaimsResponse>();
         #endregion
         #endregion
+        #region Payments
+        //Create
+        CreateMap<CreatePaymentCommand, Payment>();
+
+        //Update
+        CreateMap<UpdatePaymentCommand, Payment>();
+        CreateMap<Payment, UpdatePaymentResponse>();
+
+        //GetListResidentPayments
+        CreateMap<Payment, GetListResidentPaymentsResponse>().
+            ForMember(dest => dest.BillType, source => source.MapFrom(x => x.Bill.Type.Name))
+            .ForMember(dest => dest.Fee, source => source.MapFrom(x => x.Bill.Fee))
+            .ForMember(dest => dest.PersonWhoPaid, source => source.MapFrom(x => $"{x.Resident.FirstName} {x.Resident.LastName}"));
+
+
+        #endregion
+
+       
     }
 }
 

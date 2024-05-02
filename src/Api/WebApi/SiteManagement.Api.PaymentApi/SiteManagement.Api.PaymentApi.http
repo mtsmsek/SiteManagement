@@ -1,0 +1,6 @@
+@SiteManagement.Api.PaymentApi_HostAddress = http://localhost:5146
+
+GET {{SiteManagement.Api.PaymentApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

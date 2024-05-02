@@ -13,7 +13,13 @@ namespace SiteManagement.Application.Rules.Payments
     public class PaymentBusinessRules : BaseBusinessRules
     {
         private readonly ICreditCardRepository _creditCardRepository;
-        public async Task AreCardInformationAndBalanceValid(CreditCard creditCard, double billAmount)
+
+        public PaymentBusinessRules(ICreditCardRepository creditCardRepository)
+        {
+            _creditCardRepository = creditCardRepository;
+        }
+
+        public async Task<CreditCard> AreCardInformationAndBalanceValid(CreditCard creditCard, decimal billAmount)
         {
             var dbCreditCard = await _creditCardRepository.GetSingleAsync(predicate: card => card.NameOnCard == creditCard.NameOnCard &&
                                                                     card.CardNumber == creditCard.CardNumber &&
@@ -25,6 +31,8 @@ namespace SiteManagement.Application.Rules.Payments
 
             if (dbCreditCard.Amount < billAmount)
                 throw new BusinessException("Yetersiz bakiye");
+
+            return dbCreditCard;
         }
 
     }

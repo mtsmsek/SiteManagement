@@ -17,7 +17,5 @@ namespace SiteManagement.Domain.Entities.Payments
         public Guid BillId { get; set; }
         public virtual Resident Resident { get; set; }
         public virtual Bill Bill { get; set; }
-
-
     }
 }

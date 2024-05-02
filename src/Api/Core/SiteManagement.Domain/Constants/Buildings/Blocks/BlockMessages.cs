@@ -22,6 +22,8 @@ namespace SiteManagement.Domain.Constants.Buildings.Blocks
         public static class ValidationMessages
         {
             public const string BlockNameCannotBeEmpty = "Block name must be filled";
+            public const string BlockNameCannotBeLongerThanTwoCharacters = "Block ismi en fazla iki karakterden oluşabilir";
+            public const string BlockNameMustStartWithALetter = "Block ismi bir harf ile başlamalıdır";
         }
         
     }

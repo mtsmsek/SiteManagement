@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 
 namespace SiteManagement.Persistance.Services.Repositories.Payments
 {
-    public class PaymentRepository : EfAsyncRepository<Payment, SiteManagementPaymentsContext>
+    public class PaymentRepository : EfAsyncRepository<Payment, SiteManagementApplicationContext>
     {
-        public PaymentRepository(SiteManagementPaymentsContext dbContext) : base(dbContext)
+        public PaymentRepository(SiteManagementApplicationContext dbContext) : base(dbContext)
         {
         }
     }

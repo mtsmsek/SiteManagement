@@ -24,7 +24,7 @@ public class PaymentsSeedData
            .RuleFor(card => card.CardNumber, faker => faker.Finance.CreditCardNumber())
            .RuleFor(card => card.CVCNumber, faker => faker.Finance.CreditCardCvv())
            .RuleFor(card => card.ExpireDate, faker => faker.Date.FutureDateOnly().Month.ToString().PadLeft(2, '0') + faker.Date.FutureDateOnly().Year.ToString().TakeLast(2))
-           .RuleFor(card => card.Amount, faker => faker.Finance.Amount(0, 450000))
+           .RuleFor(card => card.Amount, faker => faker.Finance.Amount(0,450000,2))
            .Generate(1500);
         return creditCards;
 
@@ -34,9 +34,8 @@ public class PaymentsSeedData
         var payments = new Faker<Payment>("tr")
             .RuleFor(payment => payment.Id, faker => Guid.NewGuid())
             .RuleFor(payment => payment.CreatedDate, faker => faker.PickRandom(DateTime.Now.AddDays(-500), DateTime.Now))
-            .RuleFor(payment => payment.UserId, faker => faker.PickRandom(userGuids))
+            .RuleFor(payment => payment.ResidentId, faker => faker.PickRandom(userGuids))
             .RuleFor(payment => payment.BillId, faker => faker.PickRandom(billGuids))
-            .RuleFor(payment => payment.ApartmentId, faker => faker.PickRandom(apartmentGuids))
             .Generate(1500);
         return payments;
     }
@@ -44,7 +43,7 @@ public class PaymentsSeedData
     #endregion
     public async Task SeedAsync(IConfiguration configuration)
     {
-        var dbContextBuilder = new DbContextOptionsBuilder();
+        var dbContextBuilder = new DbContextOptionsBuilder<SiteManagementPaymentsContext>();
         dbContextBuilder.UseNpgsql(configuration.GetConnectionString("PostgreConnectionString"));
 
         var context = new SiteManagementPaymentsContext(dbContextBuilder.Options);

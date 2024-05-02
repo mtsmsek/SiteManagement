@@ -13,7 +13,7 @@ namespace SiteManagement.Domain.Entities.Payments
         public string CardNumber { get; set; }
         public string ExpireDate { get; set; }
         public string CVCNumber { get; set; }
-        public double Amount { get; set; }
+        public decimal Amount { get; set; }
 
     }
 }

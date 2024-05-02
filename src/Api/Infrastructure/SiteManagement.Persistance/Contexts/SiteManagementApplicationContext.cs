@@ -2,6 +2,7 @@
 using SiteManagement.Domain.Entities.Buildings;
 using SiteManagement.Domain.Entities.Commons;
 using SiteManagement.Domain.Entities.Invoices;
+using SiteManagement.Domain.Entities.Payments;
 using SiteManagement.Domain.Entities.Residents;
 using SiteManagement.Domain.Entities.Security;
 using SiteManagement.Domain.Entities.Vehicles;
@@ -33,11 +34,15 @@ public class SiteManagementApplicationContext : DbContext
 
 
     #endregion
+    #region Payments
+    public DbSet<Payment> Payments { get; set; }
+
+    #endregion
     public SiteManagementApplicationContext()
     {
         
     }
-    public SiteManagementApplicationContext(DbContextOptions options): base(options)
+    public SiteManagementApplicationContext(DbContextOptions<SiteManagementApplicationContext> options): base(options)
     {
         
     }

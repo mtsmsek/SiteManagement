@@ -28,4 +28,9 @@
     <ProjectReference Include="..\SiteManagement.Domain\SiteManagement.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\Commands\CreditCards\DeleteCreditCard\" />
+    <Folder Include="Features\Commands\CreditCards\UpdateCreditCard\" />
+  </ItemGroup>
+
 </Project>
