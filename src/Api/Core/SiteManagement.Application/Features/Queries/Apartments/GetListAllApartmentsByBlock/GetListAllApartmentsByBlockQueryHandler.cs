@@ -32,7 +32,7 @@ namespace SiteManagement.Application.Features.Queries.Apartments.GetListAllApart
 
             else
             {
-                await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName!, "Aradığınız blok bulunamadı.");
+                await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName!);
 
                 predicate = apartment => apartment.Block.Name == request.BlockName;
             }

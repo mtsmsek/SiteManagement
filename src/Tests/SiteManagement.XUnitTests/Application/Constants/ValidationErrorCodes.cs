@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SiteManagement.XUnitTests.Constants
+namespace SiteManagement.XUnitTests.Application.Constants
 {
     public static class ValidationErrorCodes
     {

@@ -2,10 +2,9 @@
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Application.Services.Repositories.Commons;
 using SiteManagement.Domain.Entities.Commons;
-using SiteManagement.Domain.Entities.Security;
 using System.Linq.Expressions;
 
-namespace SiteManagement.XUnitTests.Helpers
+namespace SiteManagement.XUnitTests.Application.Helpers
 {
     public static class MockRepositoryHelper
     {
@@ -25,6 +24,46 @@ namespace SiteManagement.XUnitTests.Helpers
             SetupGetListAsync(mockRepository, list);
             SetupAddAsync(mockRepository, list);
             SetUpGetSingleAsync(mockRepository, list);
+            SetUpDeleteAsync(mockRepository, list);
+            SetUpUpdateAsync(mockRepository, list);
+        }
+
+        private static void SetUpUpdateAsync<TRepository, TEntity>(Mock<TRepository> mockRepository, List<TEntity> list)
+            where TRepository : class, IAsyncRepository<TEntity>
+            where TEntity : BaseEntity
+        {
+            mockRepository
+                .Setup(
+                s =>
+                s.UpdateAsync(It.IsAny<TEntity>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((TEntity entity, CancellationToken cancellationToken) =>
+                {
+                    entity.UpdatedDate = DateTime.Now;
+                    return 1;
+                });
+        }
+
+        private static void SetUpDeleteAsync<TRepository, TEntity>(Mock<TRepository> mockRepository, List<TEntity> list)
+            where TRepository : class, IAsyncRepository<TEntity>
+            where TEntity : BaseEntity
+        {
+            mockRepository
+                .Setup(
+                s =>
+                s.DeleteAsync(It.IsAny<TEntity>(),
+                               It.IsAny<bool>(),
+                               It.IsAny<CancellationToken>()))
+                .ReturnsAsync((TEntity entity, bool permenant, CancellationToken cancellationToken) =>
+                {
+                    if (!permenant)
+                        entity.DeletedDate = DateTime.Now;
+
+                    else
+                        list.Remove(entity);
+
+                    return 1;
+                }
+                );
         }
 
         public static void SetUpGetSingleAsync<TRepository, TEntity>(Mock<TRepository> mockRepository, List<TEntity> entityList)
@@ -64,13 +103,7 @@ namespace SiteManagement.XUnitTests.Helpers
         {
             mockRepository
                 .Setup(r => r.AddAsync(It.IsAny<TEntity>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(1
-                    //(TEntity entity) =>
-                    //{
-                    //    entityList.Add(entity);
-                    //    return 1;
-                    //}
-                );
+                .ReturnsAsync(1);                    
 
         }
 
@@ -88,18 +121,18 @@ namespace SiteManagement.XUnitTests.Helpers
                        It.IsAny<int>(),
                        It.IsAny<bool>(),
                        It.IsAny<CancellationToken>(),
-                       It.IsAny < Expression<Func<TEntity, object>>[]>()
+                       It.IsAny<Expression<Func<TEntity, object>>[]>()
                    )
            )
            .ReturnsAsync(
                (
                    Expression<Func<TEntity, bool>> expression,
                    Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> orderBy,
-                   Expression<Func<TEntity, object>> include,
                    int index,
                    int size,
                    bool enableTracking,
-                   CancellationToken cancellationToken
+                   CancellationToken cancellationToken,
+                   Expression<Func<TEntity, object>>[] include
                ) =>
                {
                    IList<TEntity> list = new List<TEntity>();

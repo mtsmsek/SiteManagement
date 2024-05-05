@@ -3,21 +3,16 @@ using Moq;
 using SiteManagement.Application.Rules.Commons;
 using SiteManagement.Application.Services.Repositories.Commons;
 using SiteManagement.Domain.Entities.Commons;
-using SiteManagement.XUnitTests.Helpers;
-using SiteManagement.XUnitTests.Mock.FakeDatas.Commons;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using SiteManagement.XUnitTests.Application.Helpers;
+using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Commons;
 
-namespace SiteManagement.XUnitTests.Mock.Repositories.Commons
+namespace SiteManagement.XUnitTests.Application.Mock.Repositories.Commons
 {
-    public abstract class BaseMockRepository<TRepository,TEntity,TMappingProfile,TBusinessRules,TFakeData> 
-        where TRepository: class, IAsyncRepository<TEntity>
+    public abstract class BaseMockRepository<TRepository, TEntity, TMappingProfile, TBusinessRules, TFakeData>
+        where TRepository : class, IAsyncRepository<TEntity>
         where TEntity : BaseEntity
         where TMappingProfile : Profile, new()
-        where TBusinessRules: BaseBusinessRules
+        where TBusinessRules : BaseBusinessRules
         where TFakeData : BaseFakeData<TEntity>
     {
         public IMapper Mapper;

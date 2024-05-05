@@ -26,7 +26,7 @@ public class CreateApartmentCommandHandler : IRequestHandler<CreateApartmentComm
     public async Task<CreateApartmentResponse> Handle(CreateApartmentCommand request, CancellationToken cancellationToken)
     {
 
-        var block = await _blokcBusinessRules.BlockShouldBeExistInDatabase(request.BlockId,"Block does not exist in db");
+        var block = await _blokcBusinessRules.BlockShouldBeExistInDatabase(request.BlockId);
         await _apartmentBusinessRules.ApartmentNumberCannotBeDuplicateForSameBlock(request.BlockId, request.ApartmentNumber);
         var apartmentToAdd = _mapper.Map<Apartment>(request);
 

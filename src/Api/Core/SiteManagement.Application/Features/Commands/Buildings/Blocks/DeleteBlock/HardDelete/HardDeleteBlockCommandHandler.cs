@@ -25,7 +25,7 @@ public class HardDeleteBlockCommandHandler : IRequestHandler<HardDeleteBlockComm
 
     public async Task<Guid> Handle(HardDeleteBlockCommand request, CancellationToken cancellationToken)
     {
-        Block block = await _blockBusinessRules.BlockShouldBeExistInDatabase(request.Id, BlockMessages.RuleMessages.BlocIsNotExist);
+        Block block = await _blockBusinessRules.BlockShouldBeExistInDatabase(request.Id);
         
         await _blockRepository.DeleteAsync(block, true, cancellationToken);
 

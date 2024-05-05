@@ -24,7 +24,7 @@ public class GetListResidentsByBlockNameQueryHandler : IRequestHandler<GetListRe
     public async Task<PagedViewModel<GetListResidentsByBlockNameResponse>> Handle(GetListResidentsByBlockNameQuery request, CancellationToken cancellationToken)
     {
         //TODO -- remove the message from business rules
-        await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName,"Block cannot be found!");
+        await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName);
 
         var residents = await _residentRepository.GetListAsync(predicate: resident => resident.Apartment.Block.Name == request.BlockName,
                                                   cancellationToken: cancellationToken,

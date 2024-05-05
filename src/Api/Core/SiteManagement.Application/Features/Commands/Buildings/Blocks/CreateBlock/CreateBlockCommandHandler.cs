@@ -23,7 +23,7 @@ namespace SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBl
         public async Task<Guid> Handle(CreateBlockCommand request, CancellationToken cancellationToken)
         {
 
-            await _blockBusinessRules.BlockNameCannotBeDublicateWhenAddOrUpdate(request.Name, BlockMessages.RuleMessages.BlockNameAlreadyExist);
+            await _blockBusinessRules.BlockNameCannotBeDublicateWhenAddOrUpdate(request.Name);
            
             var blockToAdd = _mapper.Map<Block>(request);
             await _blockRepository.AddAsync(blockToAdd);

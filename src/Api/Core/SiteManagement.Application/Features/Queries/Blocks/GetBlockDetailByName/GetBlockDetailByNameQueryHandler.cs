@@ -27,7 +27,7 @@ namespace SiteManagement.Application.Features.Queries.Blocks.GetBlockDetailByNam
 
         public async Task<GetBlockDetailByNameResponse> Handle(GetBlockDetailByNameQuery request, CancellationToken cancellationToken)
         {
-           Block block = await _blockBusinessRules.BlockShouldBeExistInDatabase(request.Name, BlockMessages.RuleMessages.BlocIsNotExist);
+            Block block = await _blockBusinessRules.BlockShouldBeExistInDatabase(request.Name);
 
             return _mapper.Map<GetBlockDetailByNameResponse>(block);
 

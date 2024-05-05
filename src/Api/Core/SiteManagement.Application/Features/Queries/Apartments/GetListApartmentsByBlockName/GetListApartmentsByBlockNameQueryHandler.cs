@@ -28,7 +28,7 @@ namespace SiteManagement.Application.Features.Queries.Apartments.GetListApartmen
         public async Task<PagedViewModel<GetListApartmentsByBlockNameResponse>> Handle(GetListApartmentsByBlockNameQuery request, CancellationToken cancellationToken)
         {
             //TODO remove the message
-            var block = await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName, "Block cannot find");
+            var block = await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName);
 
             var apartmentList = await _apartmentRepository.GetListAsync(predicate: apartment => apartment.BlockId == block.Id,
                                                     includes: include => include.Block);

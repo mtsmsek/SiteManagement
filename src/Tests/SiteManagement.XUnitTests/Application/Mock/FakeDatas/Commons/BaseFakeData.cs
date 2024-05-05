@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SiteManagement.XUnitTests.Mock.FakeDatas.Commons
+namespace SiteManagement.XUnitTests.Application.Mock.FakeDatas.Commons
 {
     public abstract class BaseFakeData<TEntity>
         where TEntity : BaseEntity

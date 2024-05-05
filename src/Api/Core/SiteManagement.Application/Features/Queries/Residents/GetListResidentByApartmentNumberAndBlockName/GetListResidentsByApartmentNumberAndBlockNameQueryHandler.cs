@@ -33,7 +33,7 @@ public class GetListResidentsByApartmentNumberAndBlockNameQueryHandler : IReques
         //TODO -- remove message
         //TODO -- refactor
 
-        await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName, "Block cannot found!");
+        await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName);
 
         var residents = await _residentRepository.GetListAsync(predicate: resident => resident.Apartment.Block.Name == request.BlockName &&
                                                                resident.Apartment.ApartmentNumber == request.ApartmentNumber,
