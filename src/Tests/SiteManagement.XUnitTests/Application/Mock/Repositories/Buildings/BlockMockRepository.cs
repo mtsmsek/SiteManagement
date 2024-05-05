@@ -12,6 +12,7 @@ public class BlockMockRepository : BaseMockRepository<IBlockRepository, Block, S
 {
     public BlockMockRepository(BlockFakeDatas fakeData) : base(fakeData)
     {
+        BusinessRules = SetBusinessRules();
 
         MockRepository
             .Setup(s =>
@@ -53,4 +54,8 @@ public class BlockMockRepository : BaseMockRepository<IBlockRepository, Block, S
 
     }
 
+    public override BlockBusinessRules SetBusinessRules()
+    {
+        return new BlockBusinessRules(MockRepository.Object);
+    }
 }

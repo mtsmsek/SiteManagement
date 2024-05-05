@@ -21,6 +21,7 @@ namespace SiteManagement.XUnitTests
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddBlockServices();
+            services.AddApartmentServices();
 
         }
     }

@@ -18,7 +18,7 @@ namespace SiteManagement.XUnitTests.Application.Mock.Repositories.Commons
         public IMapper Mapper;
         public Mock<TRepository> MockRepository;
         public TBusinessRules BusinessRules;
-
+        public abstract TBusinessRules SetBusinessRules();
         public BaseMockRepository(TFakeData fakeData)
         {
             MapperConfiguration mapperConfig =
@@ -29,7 +29,7 @@ namespace SiteManagement.XUnitTests.Application.Mock.Repositories.Commons
             Mapper = mapperConfig.CreateMapper();
 
             MockRepository = MockRepositoryHelper.GetRepository<TRepository, TEntity>(fakeData.Data);
-            BusinessRules = (TBusinessRules)Activator.CreateInstance(typeof(TBusinessRules), MockRepository.Object)!;
+            //BusinessRules = (TBusinessRules)Activator.CreateInstance(typeof(TBusinessRules), MockRepository.Object)!;
 
         }
 

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -26,6 +26,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\Api\Core\SiteManagement.Application\SiteManagement.Application.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Application\Features\Buildings\Apartments\Queries\" />
   </ItemGroup>
 
 </Project>

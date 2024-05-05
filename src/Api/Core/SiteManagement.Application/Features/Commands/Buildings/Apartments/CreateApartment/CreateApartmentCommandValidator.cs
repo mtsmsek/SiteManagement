@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBlock;
+using SiteManagement.Domain.Constants.Buildings.Apartments;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,7 +14,7 @@ namespace SiteManagement.Application.Features.Commands.Buildings.Apartments.Crea
         public CreateApartmentCommandValidator()
         {
             
-            RuleFor(x => x.ApartmentNumber).GreaterThanOrEqualTo(1).WithMessage("Apartman numarası 1 den başlamalıdır.");
+            RuleFor(x => x.ApartmentNumber).GreaterThanOrEqualTo(1).WithMessage(ApartmentMessages.ValidationMessages.ApartmentNumberCannotBeLowerThanOne);
         }
 
 
