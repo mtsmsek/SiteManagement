@@ -24,11 +24,15 @@ namespace SiteManagement.Application.Features.Queries.Apartments.GetListAllApart
 
         public async Task<PagedViewModel<GetListAllApartmentsByBlockResponse>> Handle(GetListAllApartmentsByBlockQuery request, CancellationToken cancellationToken)
         {
-            //TODO - add validation to  control both value is null or not
+          
             Expression<Func<Apartment, bool>> predicate;
 
             if (request.BlockId.HasValue)
-                predicate = apartment => apartment.Block.Id == request.BlockId.Value;
+            {
+                await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockId.Value);
+                predicate = apartment => apartment.BlockId == request.BlockId.Value;
+
+            }
 
             else
             {

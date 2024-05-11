@@ -1,10 +1,11 @@
 ﻿using MediatR;
+using SiteManagement.Application.Validators.Invoices;
 using SiteManagement.Domain.Enumarations.Invoices;
 
 
 namespace SiteManagement.Application.Features.Commands.Invoices.Bills.UpdateBill;
 
-public class UpdateBillCommand : IRequest<UpdateBillResponse>
+public class UpdateBillCommand : IRequest<UpdateBillResponse>, IBillCommandToValidate
 {
     public Guid Id { get; set; }
     public int Type { get; set; }

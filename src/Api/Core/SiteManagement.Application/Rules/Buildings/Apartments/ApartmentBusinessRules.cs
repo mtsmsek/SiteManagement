@@ -1,6 +1,8 @@
 ﻿using SiteManagement.Application.CrossCuttingConcerns.Exceptions.Types;
 using SiteManagement.Application.Rules.Commons;
 using SiteManagement.Application.Services.Repositories.Buildings;
+using SiteManagement.Domain.Constants.Buildings.Apartments;
+using SiteManagement.Domain.Constants.Buildings.Blocks;
 using SiteManagement.Domain.Entities.Buildings;
 using SiteManagement.Domain.Utulity;
 using System;
@@ -24,8 +26,6 @@ namespace SiteManagement.Application.Rules.Buildings.Apartments
         
         public async Task ApartmentNumberCannotBeDuplicateForSameBlock(Guid blockId, int apartmentNumber, CancellationToken cancellationToken = default)
         {
-            var block = await _blockRepository.GetByIdAsync(blockId);
-            Ensure.NotNull(block, new BusinessException("Geçersiz blok bilgisi. Lütfen blok ismini kontrol ediniz."));
 
             var apartmentsInBLock = await _apartmentRepository.GetListAsync(predicate: predicate => predicate.BlockId == blockId,
                                                                             includes: a => a.Block);
@@ -35,7 +35,7 @@ namespace SiteManagement.Application.Rules.Buildings.Apartments
 
             if (isApartmentNumberExist)
             {
-                throw new BusinessException("Apartment number cannot duplicate!");
+                throw new BusinessException(ApartmentMessages.RuleMessages.ApartmentNumberCannotDuplicateForSameBlock);
             }
 
 
@@ -44,7 +44,7 @@ namespace SiteManagement.Application.Rules.Buildings.Apartments
         {
             var apartment = await _apartmentRepository.GetSingleAsync(apartment => apartment.Id == apartmentId);
 
-            Ensure.NotNull(apartment, new BusinessException("Apartment cannot found!"));
+            Ensure.NotNull(apartment, new BusinessException(ApartmentMessages.RuleMessages.ApartmentCannotBeFound));
 
             return apartment;
             

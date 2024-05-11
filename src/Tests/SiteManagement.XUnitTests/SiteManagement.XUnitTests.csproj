@@ -28,8 +28,4 @@
     <ProjectReference Include="..\..\Api\Core\SiteManagement.Application\SiteManagement.Application.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Application\Features\Buildings\Apartments\Queries\" />
-  </ItemGroup>
-
 </Project>

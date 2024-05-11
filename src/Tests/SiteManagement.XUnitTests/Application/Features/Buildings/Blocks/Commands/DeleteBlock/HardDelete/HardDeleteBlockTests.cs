@@ -12,14 +12,14 @@ namespace SiteManagement.XUnitTests.Application.Features.Buildings.Blocks.Comman
     {
         private readonly HardDeleteBlockCommand _command;
         private readonly HardDeleteBlockCommandHandler _handler;
-        private readonly Guid Id;
+        //private readonly Guid Id;
        
 
         public HardDeleteBlockTests(BlockFakeDatas fakeData, HardDeleteBlockCommand command) : base(fakeData)
         {
             _command = command;
             _handler = new HardDeleteBlockCommandHandler(MockRepository.Object, BusinessRules);
-            Id = fakeData.Data.FirstOrDefault()!.Id;
+             //Id = fakeData.Data.FirstOrDefault()!.Id;
         }
         [Fact]
         public async Task HardDeleteSuccessfully_Should_CalledDeleteAsyncOnce()

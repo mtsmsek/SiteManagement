@@ -30,7 +30,6 @@ public class HardDeleteBillCommandHandler : IRequestHandler<HardDeleteBillComman
                                     cancellationToken: cancellationToken);
 
         return request.Id;
-        //TODO - Add update bill when payment service implemented
     }
 
 

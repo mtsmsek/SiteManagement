@@ -10,6 +10,7 @@ namespace SiteManagement.XUnitTests.Application.Mock.Rules.Buildings;
 
 public static class MockBlockBusinessRules
 {
+
     public static BlockBusinessRules GetBlockBusinessRules()
     {
         var blockRepository = new BlockMockRepository(new BlockFakeDatas());    

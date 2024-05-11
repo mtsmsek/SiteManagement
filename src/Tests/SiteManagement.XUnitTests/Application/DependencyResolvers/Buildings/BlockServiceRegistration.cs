@@ -13,7 +13,7 @@ namespace SiteManagement.XUnitTests.Application.DependencyResolvers.Buildings
         public static void AddBlockServices(this IServiceCollection services)
         {
             //Create Block
-            services.AddSingleton<BlockFakeDatas>();
+            services.AddScoped<BlockFakeDatas>();
             services.AddTransient<CreateBlockCommand>();
             services.AddTransient<CreateBlockCommandValidator>();
 

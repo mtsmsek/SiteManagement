@@ -20,6 +20,7 @@ using SiteManagement.Application.Features.Commands.VehicleResident.CreateVehicle
 using SiteManagement.Application.Features.Commands.Vehicles.CreateVehicle;
 using SiteManagement.Application.Features.Commands.Vehicles.UpdateVehicle;
 using SiteManagement.Application.Features.Queries.Apartments.GetListAllApartmentsByBlock;
+using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsByBlockName;
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsByStatus;
 using SiteManagement.Application.Features.Queries.Apartments.GetListApartmentsInBlockByStatus;
 using SiteManagement.Application.Features.Queries.Blocks.GetBlockDetailByName;
@@ -58,7 +59,7 @@ public class SiteManagementMapingProfile : Profile
         #region Commands
         CreateMap<CreateApartmentCommand, Apartment>()
             .ForMember(dest => dest.ApartmentType, opt => opt.MapFrom<ApartmentTypeResolver>());
-        CreateMap<Apartment, CreateApartmentResponse>().ReverseMap();
+        CreateMap<Apartment, CreateApartmentResponse>();
 
         CreateMap<Apartment, ChangeTenantStatusCommand>().ReverseMap();
         CreateMap<Apartment, ChangeResidentStatusCommand>().ReverseMap();
@@ -68,6 +69,8 @@ public class SiteManagementMapingProfile : Profile
           .ForMember(destinationMember: x => x.BlockName, memberOptions: y => y.MapFrom(x => x.Block.Name));
         CreateMap<PagedViewModel<Apartment>, PagedViewModel<GetListAllApartmentsByBlockResponse>>();
 
+        CreateMap<Apartment, GetListApartmentsByBlockNameResponse>();
+        CreateMap<PagedViewModel<Apartment>, PagedViewModel<GetListApartmentsByBlockNameResponse>>();
 
         CreateMap<Apartment, GetListApartmentsByStatusResponse>()
           .ForMember(destinationMember: x => x.BlockName, memberOptions: y => y.MapFrom(x => x.Block.Name))

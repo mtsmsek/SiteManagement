@@ -3,6 +3,7 @@ using SiteManagement.Application.Rules.Buildings.Apartments;
 using SiteManagement.Application.Rules.Commons;
 using SiteManagement.Application.Services.Repositories.Buildings;
 using SiteManagement.Application.Services.Repositories.Invoices;
+using SiteManagement.Domain.Constants.Invoices.Bills;
 using SiteManagement.Domain.Entities.Invoices;
 using SiteManagement.Domain.Enumarations.Invoices;
 using SiteManagement.Domain.Utulity;
@@ -18,7 +19,6 @@ namespace SiteManagement.Application.Rules.Invoices.Bills
     {
 
         private readonly IBillReposiotry _billRepository;
-        private readonly IApartmentRepository _apartmentRepository;
         private readonly ApartmentBusinessRules _apartmentBusinessRules;
 
         public BillBusinessRules(IBillReposiotry billRepository, ApartmentBusinessRules apartmentBusinessRules)
@@ -29,7 +29,7 @@ namespace SiteManagement.Application.Rules.Invoices.Bills
         public async Task<Bill> BillShouldBeExistInDatabase(Guid billId)
         {
             var bill = await _billRepository.GetByIdAsync(billId);
-            Ensure.NotNull(bill, new BusinessException("Aradığınız fatura veri tabanında mevcut değil"));
+            Ensure.NotNull(bill, new BusinessException(BillsMessages.RuleMessages.BillCannotBeFoundInDb));
 
             return bill;
         }
@@ -43,7 +43,7 @@ namespace SiteManagement.Application.Rules.Invoices.Bills
                                                         bill.Month == month &&
                                                         bill.Year == year);
             if (isBillExist)
-                throw new BusinessException("Aynı dönem için bir fatura türüne ait en fazla bir fatura kesebilirsiniz.");
+                throw new BusinessException(BillsMessages.RuleMessages.ForTheSamePeriodAndApartmentCanIncludeOneBillType);
 
         }
 

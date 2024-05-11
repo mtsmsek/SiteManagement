@@ -26,6 +26,45 @@ namespace SiteManagement.XUnitTests.Application.Helpers
             SetUpGetSingleAsync(mockRepository, list);
             SetUpDeleteAsync(mockRepository, list);
             SetUpUpdateAsync(mockRepository, list);
+            SetUpAnyAsync(mockRepository, list);
+            SetUpGetByIdAsync(mockRepository, list);
+        }
+
+        private static void SetUpGetByIdAsync<TRepository, TEntity>(Mock<TRepository> mockRepository, List<TEntity> entityList)
+            where TRepository : class, IAsyncRepository<TEntity>
+            where TEntity : BaseEntity
+        {
+            mockRepository
+               .Setup(
+               s =>
+               s.GetByIdAsync(It.IsAny<Guid>(), 
+               It.IsAny<bool>(),
+               It.IsAny<CancellationToken>(), 
+               It.IsAny<Expression<Func<TEntity, object>>[]>()))
+               .ReturnsAsync((Guid id, bool noTracking, CancellationToken cancellationToken, Expression<Func<TEntity, object>>[] includes) =>
+               {
+                  
+
+                   TEntity? entity =  entityList.FirstOrDefault(x => x.Id == id);
+                   return entity;
+               });
+        }
+
+        private static void SetUpAnyAsync<TRepository, TEntity>(Mock<TRepository> mockRepository, List<TEntity> entityList)
+            where TRepository : class, IAsyncRepository<TEntity>
+            where TEntity : BaseEntity
+        {
+            mockRepository
+                .Setup(
+                s =>
+                s.AnyAsync(It.IsAny<Expression<Func<TEntity,bool>>>(), It.IsAny<bool>(), It.IsAny<CancellationToken>()))
+                .ReturnsAsync((Expression<Func<TEntity,bool>> predicate ,bool noTracking, CancellationToken cancellationToken) =>
+                {
+                    //return true;
+
+                    return entityList.Any(predicate.Compile());
+
+                });
         }
 
         private static void SetUpUpdateAsync<TRepository, TEntity>(Mock<TRepository> mockRepository, List<TEntity> list)
@@ -103,7 +142,13 @@ namespace SiteManagement.XUnitTests.Application.Helpers
         {
             mockRepository
                 .Setup(r => r.AddAsync(It.IsAny<TEntity>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(1);                    
+                .ReturnsAsync((TEntity entity,CancellationToken cancellationToken) =>
+                {
+                    entity.Id = Guid.NewGuid();
+                    return 1;
+
+                }
+                );                    
 
         }
 
@@ -136,6 +181,14 @@ namespace SiteManagement.XUnitTests.Application.Helpers
                ) =>
                {
                    IList<TEntity> list = new List<TEntity>();
+
+                  // IList<TEntity> list = new List<TEntity>();
+
+
+                   //list = expression == null ? entityList : (IList<TEntity>)entityList.Where(expression.Compile()).ToList();
+
+                   //PagedViewModel<TEntity> paginateList = new() { Results = list };
+                   //return paginateList;
 
                    if (expression == null)
                        list = entityList;

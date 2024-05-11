@@ -31,9 +31,9 @@ public class CreateApartmentCommandHandler : IRequestHandler<CreateApartmentComm
         var apartmentToAdd = _mapper.Map<Apartment>(request);
 
         await _apartmentRepository.AddAsync(apartmentToAdd);
-       
+
         var response = _mapper.Map<CreateApartmentResponse>(apartmentToAdd);
-       response.BlockName = block.Name;
+        response.BlockName = block.Name;
         return response;
     }
 }

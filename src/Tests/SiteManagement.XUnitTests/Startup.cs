@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SiteManagement.XUnitTests.Application.DependencyResolvers.Buildings;
+using SiteManagement.XUnitTests.Application.DependencyResolvers.Invoices;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace SiteManagement.XUnitTests
         {
             services.AddBlockServices();
             services.AddApartmentServices();
+            services.AddBillServices();
 
         }
     }
