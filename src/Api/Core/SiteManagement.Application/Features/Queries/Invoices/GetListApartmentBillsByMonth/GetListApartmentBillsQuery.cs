@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace SiteManagement.Application.Features.Queries.Invoices.GetListApartmentBillsByMonth
 {
-    public class GetListApartmentBillsByMonthQuery : IRequest<PagedViewModel<GetListApartmentBillsByMonthResponse>>
+    public class GetListApartmentBillsQuery : IRequest<PagedViewModel<GetListApartmentBillsResponse>>
     {
         public Guid ApartmentId { get; set; }
         public int? BillType { get; set; }

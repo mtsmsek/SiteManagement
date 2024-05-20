@@ -47,7 +47,7 @@ public class BillsController : BaseController
     [HttpGet("getApartmentBills")]
     public async Task<IActionResult> GetApartmentBillsByMonth(Guid apartmentId, int? month, int? year, int? billType)
     {
-        var result = await Mediator!.Send(new GetListApartmentBillsByMonthQuery
+        var result = await Mediator!.Send(new GetListApartmentBillsQuery
         {
             ApartmentId = apartmentId,
             Month = month.HasValue ? month : null,

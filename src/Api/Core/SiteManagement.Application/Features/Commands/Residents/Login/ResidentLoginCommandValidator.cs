@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using SiteManagement.Application.Features.Commands.Buildings.Blocks.CreateBlock;
+using SiteManagement.Domain.Constants.Residents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,12 +13,22 @@ namespace SiteManagement.Application.Features.Commands.Residents.Login
     {
         public ResidentLoginCommandValidator()
         {
-            //TODO -- remove magic strings
-            RuleFor(x => x.Email).NotEmpty().When(x => string.IsNullOrEmpty(x.IdenticalNumber)).WithMessage("Lütfen email ya da TC numaranızı giriniz");
-           
-            RuleFor(x => x.IdenticalNumber).NotEmpty().When(x => string.IsNullOrEmpty(x.Email)).WithMessage("Lütfen email ya da TC numaranızı giriniz")
-             .EmailAddress(FluentValidation.Validators.EmailValidationMode.AspNetCoreCompatible)
-             .WithMessage("Geçersiz email");
+            RuleFor(x => x.Email).NotEmpty().When(x => string.IsNullOrEmpty(x.IdenticalNumber))
+            .WithMessage(ResidentMessages.ValidationMessages.EmailOrIdenticalNumberCannotBeEmpty)
+            .EmailAddress(FluentValidation.Validators.EmailValidationMode.AspNetCoreCompatible)
+            .When(x => !string.IsNullOrEmpty(x.Email))
+            .WithMessage(ResidentMessages.ValidationMessages.InvalidEmail);
+
+
+            RuleFor(x => x.IdenticalNumber).NotEmpty().When(x => string.IsNullOrEmpty(x.Email))
+                .WithMessage(ResidentMessages.ValidationMessages.EmailOrIdenticalNumberCannotBeEmpty)
+                .DependentRules
+                (() =>
+                 RuleFor(x => x.IdenticalNumber)
+                .Length(11).When(x => !string.IsNullOrEmpty(x.IdenticalNumber))
+                .WithMessage(ResidentMessages.ValidationMessages.IdenticalNumberMustIncludeElevenChar)
+                
+                );
         }
     }
 }

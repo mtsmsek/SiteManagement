@@ -1,32 +1,25 @@
 ﻿using AutoMapper;
-using AutoMapper.Execution;
 using MediatR;
 using SiteManagement.Application.Extensions;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Application.Rules.Buildings.Apartments;
 using SiteManagement.Application.Rules.Invoices.Bills;
-using SiteManagement.Application.Services.Repositories.Buildings;
 using SiteManagement.Application.Services.Repositories.Invoices;
 using SiteManagement.Domain.Entities.Invoices;
 using SiteManagement.Domain.Enumarations.Invoices;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SiteManagement.Application.Features.Queries.Invoices.GetListApartmentBillsByMonth
 {
-    public class GetListApartmentBillsByMonthQueryHandler : IRequestHandler<GetListApartmentBillsByMonthQuery,
-                                                                            PagedViewModel<GetListApartmentBillsByMonthResponse>>
+    public class GetListApartmentBillsQueryHandler : IRequestHandler<GetListApartmentBillsQuery,
+                                                                            PagedViewModel<GetListApartmentBillsResponse>>
     {
         private readonly IBillReposiotry _billReposiotry;
         private readonly IMapper _mapper;
         private readonly BillBusinessRules _billBusinessRules;
         private readonly ApartmentBusinessRules _apartmentBusinessRules;
 
-        public GetListApartmentBillsByMonthQueryHandler(IBillReposiotry billReposiotry, IMapper mapper, BillBusinessRules billBusinessRules, ApartmentBusinessRules apartmentBusinessRules)
+        public GetListApartmentBillsQueryHandler(IBillReposiotry billReposiotry, IMapper mapper, BillBusinessRules billBusinessRules, ApartmentBusinessRules apartmentBusinessRules)
         {
             _billReposiotry = billReposiotry;
             _mapper = mapper;
@@ -34,7 +27,7 @@ namespace SiteManagement.Application.Features.Queries.Invoices.GetListApartmentB
             _apartmentBusinessRules = apartmentBusinessRules;
         }
 
-        public async Task<PagedViewModel<GetListApartmentBillsByMonthResponse>> Handle(GetListApartmentBillsByMonthQuery request,
+        public async Task<PagedViewModel<GetListApartmentBillsResponse>> Handle(GetListApartmentBillsQuery request,
                                                                                       CancellationToken cancellationToken)
         {
             await _apartmentBusinessRules.ApartmentShouldExistInDatabase(request.ApartmentId, cancellationToken);
@@ -52,7 +45,7 @@ namespace SiteManagement.Application.Features.Queries.Invoices.GetListApartmentB
             var bills = await _billReposiotry.GetListAsync(predicate: predicate,
                                                  includes: [bill => bill.Apartment, bill => bill.Apartment.Block]);
 
-            return _mapper.Map<PagedViewModel<GetListApartmentBillsByMonthResponse>>(bills);
+            return _mapper.Map<PagedViewModel<GetListApartmentBillsResponse>>(bills);
 
 
         }

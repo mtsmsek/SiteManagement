@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SiteManagement.Application.Features.Queries.Invoices.GetListApartmentBillsByMonth
 {
-    public class GetListApartmentBillsByMonthResponse
+    public class GetListApartmentBillsResponse
     {
         public string BlockName { get; set; }
         public string ApartmentNumber { get; set; }

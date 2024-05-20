@@ -117,8 +117,8 @@ public class SiteManagementMapingProfile : Profile
         CreateMap<Bill, UpdateBillResponse>().ReverseMap();
         #endregion
         #region Queries
-        CreateMap<PagedViewModel<Bill>, PagedViewModel<GetListApartmentBillsByMonthResponse>>();
-        CreateMap<Bill, GetListApartmentBillsByMonthResponse>()
+        CreateMap<PagedViewModel<Bill>, PagedViewModel<GetListApartmentBillsResponse>>();
+        CreateMap<Bill, GetListApartmentBillsResponse>()
             .ForMember(dest => dest.Period, source => source.MapFrom(x => x.Period))
             .ForMember(dest => dest.BillType, source => source.MapFrom(x => x.Type.Name))
             .ForMember(dest => dest.BlockName, source => source.MapFrom(x => x.Apartment.Block.Name))

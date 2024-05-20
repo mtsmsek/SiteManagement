@@ -28,6 +28,30 @@ namespace SiteManagement.XUnitTests.Application.Mock.FakeDatas.Invoices
                 new()
                 {
                     Id = Guid.NewGuid(),
+                    CreatedDate = DateTime.Now.AddMonths(-13),
+                    ApartmentId = InDbApartmentGuid,
+                    Fee = 500,
+                    IsPaid = true,
+                    Month = Month.March,
+                    Year = 2023,
+                    Type = BillType.Electricity,
+
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
+                    CreatedDate = DateTime.Now.AddMonths(-13),
+                    ApartmentId = InDbApartmentGuid,
+                    Fee = 500,
+                    IsPaid = true,
+                    Month = Month.June,
+                    Year = 2023,
+                    Type = BillType.Electricity,
+
+                },
+                new()
+                {
+                    Id = Guid.NewGuid(),
                     CreatedDate = DateTime.Now.AddMonths(-1),
                     ApartmentId = InDbApartmentGuid,
                     Fee = 400,

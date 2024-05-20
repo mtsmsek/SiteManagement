@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using MediatR;
+using SiteManagement.Application.Pipelines.Transaction;
 using SiteManagement.Application.Rules.Residents;
 using SiteManagement.Application.Security.Hashing;
 using SiteManagement.Application.Services.Repositories.Residents;
@@ -11,7 +12,7 @@ using SiteManagement.Domain.Entities.Security;
 
 namespace SiteManagement.Application.Features.Commands.Residents.CreateResident
 {
-    public class CreateResidentCommandHandler : IRequestHandler<CreateResidentCommand, CreateResidentResponse>
+    public class CreateResidentCommandHandler : IRequestHandler<CreateResidentCommand, CreateResidentResponse>, ITransactionalRequest
     {
         const string passwordChars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"; // Characters to choose from
         const int passwordLength = 20;
@@ -43,7 +44,6 @@ namespace SiteManagement.Application.Features.Commands.Residents.CreateResident
             await _residentRepository.AddAsync(residentToAdd);
 
             await _userOperationClaimService.AddUserWithOperationClaim(residentToAdd.Id, UsersOperationClaims.User);
-            //todo - make this class transactional
 
             var response = _mapper.Map<CreateResidentResponse>(residentToAdd);
             response.Password = firstPassword;

@@ -3,6 +3,7 @@ using SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBill;
 using SiteManagement.Application.Features.Commands.Invoices.Bills.CreateBulkBills;
 using SiteManagement.Application.Features.Commands.Invoices.Bills.DeleteBill.HardDelete;
 using SiteManagement.Application.Features.Commands.Invoices.Bills.UpdateBill;
+using SiteManagement.Application.Features.Queries.Invoices.GetListApartmentBillsByMonth;
 using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Invoices;
 
 namespace SiteManagement.XUnitTests.Application.DependencyResolvers.Invoices;
@@ -26,6 +27,8 @@ public static class BillServiceRegistration
         //Update Bills
         services.AddTransient<UpdateBillCommand>();
         services.AddTransient<UpdateBillValidatior>();
+        //Get List Apartment Bills By Month
 
+        services.AddTransient < GetListApartmentBillsQuery>();
     }
 }

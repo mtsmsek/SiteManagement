@@ -28,4 +28,10 @@
     <ProjectReference Include="..\..\Api\Core\SiteManagement.Application\SiteManagement.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Application\DependencyResolvers\Messages\" />
+    <Folder Include="Application\Features\Messages\Queries\" />
+    <Folder Include="Application\Features\Residents\Queries\" />
+  </ItemGroup>
+
 </Project>

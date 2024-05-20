@@ -2,6 +2,7 @@
 using SiteManagement.Application.Rules.Commons;
 using SiteManagement.Application.Security.Hashing;
 using SiteManagement.Application.Services.Repositories.Residents;
+using SiteManagement.Domain.Constants.Residents;
 using SiteManagement.Domain.Entities.Residents;
 
 namespace SiteManagement.Application.Rules.Residents;
@@ -21,7 +22,7 @@ public class ResidentBusinessRules : BaseBusinessRules
 
         //TODO -- Remove magic string
         if (dbResident is not null)
-            throw new BusinessException("Resident already exist in system");
+            throw new BusinessException(ResidentMessages.RuleMessages.ResidentAlreadyExists);
 
 
         return dbResident!;
@@ -32,7 +33,7 @@ public class ResidentBusinessRules : BaseBusinessRules
 
         //TODO -- Remove magic string
         if (dbResident is not null)
-            throw new BusinessException("Resident already exist in system");
+            throw new BusinessException(ResidentMessages.RuleMessages.EmailCannotBeDuplicated);
 
 
         return dbResident!;
@@ -43,7 +44,7 @@ public class ResidentBusinessRules : BaseBusinessRules
 
         //TODO -- Remove magic string
         if(dbResident is null)
-            throw new BusinessException("Resident cannot found!");
+            throw new BusinessException(ResidentMessages.RuleMessages.ResidentCannotBeFound);
 
             
         return dbResident!;
@@ -52,10 +53,9 @@ public class ResidentBusinessRules : BaseBusinessRules
     {
         var dbResident = await _residentRepository.GetSingleAsync(predicate: resident => resident.Email == email,cancellationToken: cancellationToken);
 
-        //TODO -- Remove magic string
-        //TODO -- Alter the exception with Authorization
+
         if (dbResident is null)
-            throw new BusinessException("Resident cannot found!");
+            throw new BusinessException(ResidentMessages.RuleMessages.ResidentCannotBeFound);
 
 
         return dbResident!;
@@ -65,26 +65,25 @@ public class ResidentBusinessRules : BaseBusinessRules
         var dbResident = await _residentRepository.GetByIdAsync(id,cancellationToken: cancellationToken);
         //TODO -- remove magic string
         if (dbResident is null)
-            throw new BusinessException("Resident cannot found in system");
+            throw new BusinessException(ResidentMessages.RuleMessages.ResidentCannotBeFound);
 
 
         return dbResident!;
     }
     public void CheckIfPasswordIsTrue(string password, byte[] passwordHash, byte[] passwordSalt)
     {
-        //TODO -- remove magic strings
        var result = HashingHelper.VerifyPasswordHash(password, passwordHash, passwordSalt);
 
 
         if (!result)
-            throw new BusinessException("Hatalı Şifre");
+            throw new BusinessException(ResidentMessages.RuleMessages.WrongPassword);
         
         return;
     }
     public void EmailCannotBeSameWithOldEmail(string newEmail, string oldEmail)
     {
         if (newEmail == oldEmail)
-            throw new BusinessException("Emailiniz eski emailinizle aynı olamaz");
+            throw new BusinessException(ResidentMessages.RuleMessages.NewEmailCannotBeSameWithTheOldEmail);
 
     }
 }
