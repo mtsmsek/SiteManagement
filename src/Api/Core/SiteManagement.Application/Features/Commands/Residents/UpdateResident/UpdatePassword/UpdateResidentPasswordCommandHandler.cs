@@ -3,6 +3,7 @@ using SiteManagement.Application.CrossCuttingConcerns.Exceptions.Types;
 using SiteManagement.Application.Rules.Residents;
 using SiteManagement.Application.Security.Hashing;
 using SiteManagement.Application.Services.Repositories.Residents;
+using SiteManagement.Domain.Constants.Residents;
 using SiteManagement.Domain.Entities.Residents;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ namespace SiteManagement.Application.Features.Commands.Residents.UpdateResident.
             var isOldPasswordTrue =  HashingHelper.VerifyPasswordHash(request.OldPassword,resident.PasswordHash, resident.PasswordSalt);
 
             if (!isOldPasswordTrue)
-                throw new BusinessException("Old password is wrong");
+                throw new BusinessException(ResidentMessages.RuleMessages.OldPasswordWrong);
 
             HashingHelper.CreatePasswordHash(request.NewPassword, out byte[] newPasswordHash, out byte[] newPasswordSalt);
 

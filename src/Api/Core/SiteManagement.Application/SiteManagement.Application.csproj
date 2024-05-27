@@ -31,7 +31,6 @@
   <ItemGroup>
     <Folder Include="Features\Commands\CreditCards\DeleteCreditCard\" />
     <Folder Include="Features\Commands\CreditCards\UpdateCreditCard\" />
-    <Folder Include="Validators\Residents\" />
   </ItemGroup>
 
 </Project>

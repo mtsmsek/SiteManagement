@@ -1,6 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SiteManagement.Application.Features.Commands.Residents.CreateResident;
+using SiteManagement.Application.Features.Commands.Residents.DeleteResident.HardDelete;
 using SiteManagement.Application.Features.Commands.Residents.Login;
+using SiteManagement.Application.Features.Commands.Residents.UpdateResident.UpdateEmail;
+using SiteManagement.Application.Features.Commands.Residents.UpdateResident.UpdateInformation;
+using SiteManagement.Application.Features.Commands.Residents.UpdateResident.UpdatePassword;
 using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Residents;
 
 namespace SiteManagement.XUnitTests.Application.DependencyResolvers.Residents
@@ -19,6 +23,20 @@ namespace SiteManagement.XUnitTests.Application.DependencyResolvers.Residents
             services.AddTransient<ResidentLoginCommand>();
             services.AddTransient<ResidentLoginCommandValidator>();
 
+            //HardDelete
+            services.AddTransient<HardDeleteResidentCommand>();
+
+            //UpdateEmail
+            services.AddTransient<UpdateResidentEmailCommand>();
+            services.AddTransient<UpdateResidentEmailCommandValidator>();
+
+            //Update Password
+            services.AddTransient<UpdateResidentPasswordCommand>();
+            services.AddTransient<UpdateResidentPasswordCommandValidator>();
+
+            //Update Information
+            services.AddTransient<UpdateResidentCommand>();
+            services.AddTransient<UpdateResidentCommandValidator>();
         }
     }
 }

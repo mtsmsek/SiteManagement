@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using SiteManagement.Application.Validators.Residents;
+using SiteManagement.Domain.Constants.Residents;
 
 namespace SiteManagement.Application.Features.Commands.Residents.UpdateResident.UpdateInformation;
 
@@ -6,22 +8,20 @@ public class UpdateResidentCommandValidator : AbstractValidator<UpdateResidentCo
 {
     public UpdateResidentCommandValidator()
     {
+        //todo fix the interface for validaton
         var currentTime = DateTime.Now;
-        RuleFor(resident => resident.FirstName).NotEmpty().WithMessage("Ad alanı boş bırakılamaz");
-        RuleFor(resident => resident.LastName).NotEmpty().WithMessage("Soyad alanı boş bırakılamaz");
+        RuleFor(resident => resident.FirstName).ValidateFirstName();
+        RuleFor(resident => resident.LastName).ValidateLastName();
 
-        RuleFor(resident => resident.BirthYear).NotEmpty().WithMessage("Doğum yılınız boş bırakılamaz")
-            .LessThanOrEqualTo(currentTime.Year).WithMessage("Geçersiz doğum yılı");
+        RuleFor(resident => resident.BirthYear).ValidateBirthYear(currentTime);
+            
 
-        RuleFor(resident => resident.BirthMonth).NotEmpty().WithMessage("Doğum tarihi ay bölümü boş bırakılamaz")
-            .Must(MonthValueMustBeBetweenOneAndTwelve).WithMessage("Ay değeri 1 ve 12 arasında olmalı.")
-              .Must((command, month) => MonthValueMustBeLessThanOrEqualToCurrentMonthValueWhenBirthYearEqualsToCurrentYear(command.BirthYear, month,                                                                                                                      currentTime))
-                                                                                                                        .WithMessage("Ay değeri geçersiz.");
-        RuleFor(resident => resident.BirthDay).NotEmpty().WithMessage("Doğum günü bölümü boş bırakılamaz")
-            .GreaterThanOrEqualTo(1).LessThanOrEqualTo(31).WithMessage("Geçersiz gün değeri");
+        RuleFor(resident => resident.BirthMonth).ValidateBirthMonth(currentTime);
 
-        RuleFor(resident => resident.IdenticalNumber.Length)
-            .Equal(11).WithMessage("Kimlik numaranız 11 haneden oluşmalıdır");
+        RuleFor(resident => resident.BirthDay).ValidateBirthDay(currentTime);
+
+        RuleFor(resident => resident.IdenticalNumber.Length).ValidateIdenticalNumberLength();
+            
 
 
 

@@ -16,6 +16,7 @@ namespace SiteManagement.Domain.Constants.Residents
 
             public const string WrongPassword = "Hatalı Şifre";
             public const string NewEmailCannotBeSameWithTheOldEmail = "Yeni email'iniz eskisi ile aynı olamaz";
+            public const string OldPasswordWrong = "Old password is wrong";
         }
         public static class  ValidationMessages
         {
@@ -42,6 +43,12 @@ namespace SiteManagement.Domain.Constants.Residents
             //Login
             public const string EmailOrIdenticalNumberCannotBeEmpty = "Lütfen email ya da TC numaranızı giriniz";
             public const string WrongPassword = "Parola yanlış.";
+
+            //UpdatePassword
+            public const string PasswordCannotBeEmpty = "Parola alanı boş bırakılamaz";
+            public const string PasswordShouldLongerThanEightCharAndLessThanOrEqualToSixTeenChar = "Paralonuz en az 8 en fazla 16 karakter uzunluğunda olmalıdır.";
+            public const string PasswordShouldIncludeAtLeastOneBiggerOneNumberAndSpecialChar = "Parolanız en az bir büyük harf, bir sayı ve bir özel karakter içermelidir";
+
 
 
         }

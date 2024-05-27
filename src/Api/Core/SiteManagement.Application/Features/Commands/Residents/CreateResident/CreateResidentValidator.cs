@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using SiteManagement.Application.Validators.Residents;
 using SiteManagement.Domain.Constants.Residents;
 
 namespace SiteManagement.Application.Features.Commands.Residents.CreateResident;
@@ -9,36 +10,26 @@ public class CreateResidentValidator : AbstractValidator<CreateResidentCommand>
     {
 
         var currentTime = DateTime.Now;
-        RuleFor(resident => resident.FirstName).NotEmpty().WithMessage(ResidentMessages.ValidationMessages.FirstNameCannotBeEmpty);
-        RuleFor(resident => resident.LastName).NotEmpty().WithMessage(ResidentMessages.ValidationMessages.LastNameCannotBeEmpty);
 
-        RuleFor(resident => resident.BirthYear).NotEmpty().WithMessage(ResidentMessages.ValidationMessages.BirthYearCannotBeEmpty)
-            .LessThanOrEqualTo(currentTime.Year).WithMessage(ResidentMessages.ValidationMessages.InvalidBirthYear);
-
-        RuleFor(resident => resident.BirthMonth).NotEmpty().WithMessage(ResidentMessages.ValidationMessages.BirthMonthCannotBeEmpty)
-            .Must(MonthValueMustBeBetweenOneAndTwelve)
-            .WithMessage(ResidentMessages.ValidationMessages.MonthValueMustBeBetweenOneAndTwelve)
-            .Must((command, month) => MonthValueMustBeLessThanOrEqualToCurrentMonthValueWhenBirthYearEqualsToCurrentYear(command.BirthYear, month, currentTime)).WithMessage(ResidentMessages.ValidationMessages.InvalidBirthMonth);
-
-        RuleFor(resident => resident.BirthDay).NotEmpty().WithMessage(ResidentMessages.ValidationMessages.BirthDayCannotBeEmpty)
-             .DependentRules(() =>
-             {
-                     RuleFor(resident => resident.BirthDay)
-                     .Must((resident, birthDay) => BirthMustBeLessThanOrEqualToCurrentTime(DateTime.Now, resident.BirthYear, resident.BirthMonth, birthDay))
-                     .WithMessage(ResidentMessages.ValidationMessages.InvalidBirthDay);
-             });
+        RuleFor(resident => resident.FirstName).ValidateFirstName();
+        RuleFor(resident => resident.LastName).ValidateLastName();
+        RuleFor(resident => resident.BirthYear).ValidateBirthYear(currentTime);
 
 
-        RuleFor(resident => resident.Email).NotEmpty().WithMessage(ResidentMessages.ValidationMessages.EmailCannotBeEmpty)
-            .EmailAddress(FluentValidation.Validators.EmailValidationMode.AspNetCoreCompatible)
-            .WithMessage(ResidentMessages.ValidationMessages.InvalidEmail);
+        RuleFor(resident => resident.BirthMonth).ValidateBirthMonth(currentTime);
+        RuleFor(resident => resident.BirthDay).ValidateBirthDay(currentTime);
 
-        RuleFor(resident => resident.IdenticalNumber.Length)
-            .Equal(11).WithMessage(ResidentMessages.ValidationMessages.IdenticalNumberMustIncludeElevenChar);
+        RuleFor(resident => resident.Email).ValidateEmail();
+        RuleFor(resident => resident.IdenticalNumber.Length).ValidateIdenticalNumberLength();
+        RuleFor(resident => resident.PhoneNumber).ValidatePhoneNumber();
+        
+        
 
-        RuleFor(resident => resident.PhoneNumber).NotEmpty().WithMessage(ResidentMessages.ValidationMessages.PhoneNumberCannotBeEmpty)
-            .Matches(@"^\+?[1-9]\d{1,14}$")
-            .WithMessage(ResidentMessages.ValidationMessages.InvalidPhoneNumber);
+
+
+
+
+
 
 
 

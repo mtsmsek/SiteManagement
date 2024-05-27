@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using SiteManagement.Domain.Constants.Residents;
 
 namespace SiteManagement.Application.Features.Commands.Residents.UpdateResident.UpdatePassword;
 
@@ -7,9 +8,9 @@ public class UpdateResidentPasswordCommandValidator : AbstractValidator<UpdateRe
     private readonly string _specialCharacters = "*-.,<>";
     public UpdateResidentPasswordCommandValidator()
     {
-        RuleFor(x => x.NewPassword).NotEmpty()
-            .Must(PasswordMustBeGreaterThanOrEqualTo8CharactersAndLessThanOrEqualTo16Characters).WithMessage("Paralonuz 8 karakterden uzun olmalıdır.")
-            .Must(PasswordMustContainAtLeast1CapitalLetterAnd1SpecialChracterAnd1Number).WithMessage("Parolanız en az bir büyük harf, bir sayı ve bir özel karakter içermelidir");
+        RuleFor(x => x.NewPassword).NotEmpty().WithMessage(ResidentMessages.ValidationMessages.PasswordCannotBeEmpty)
+            .Must(PasswordMustBeGreaterThanOrEqualTo8CharactersAndLessThanOrEqualTo16Characters).WithMessage(ResidentMessages.ValidationMessages.PasswordShouldLongerThanEightCharAndLessThanOrEqualToSixTeenChar)
+            .Must(PasswordMustContainAtLeast1CapitalLetterAnd1SpecialChracterAnd1Number).WithMessage(ResidentMessages.ValidationMessages.PasswordShouldIncludeAtLeastOneBiggerOneNumberAndSpecialChar);
     }
 
     private bool PasswordMustBeGreaterThanOrEqualTo8CharactersAndLessThanOrEqualTo16Characters(string password)
