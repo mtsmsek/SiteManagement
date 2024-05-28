@@ -3,7 +3,7 @@ using SiteManagement.Application.Validators.Residents;
 
 namespace SiteManagement.Application.Features.Commands.Residents.CreateResident;
 
-public class CreateResidentCommand : IRequest<CreateResidentResponse>, IResidentCommand
+public class CreateResidentCommand : IRequest<CreateResidentResponse>, IResidentCommand, IResidentEmailCommand
 {
     public Guid ApartmentId { get; set; }
     public string FirstName { get ; set; }

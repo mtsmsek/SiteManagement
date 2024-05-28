@@ -26,21 +26,5 @@ public class UpdateResidentCommandValidator : AbstractValidator<UpdateResidentCo
 
 
     }
-    private bool MonthValueMustBeLessThanOrEqualToCurrentMonthValueWhenBirthYearEqualsToCurrentYear(int birthYear, int birthMonth, DateTime currentTime)
-    {
-        if (birthYear == currentTime.Year)
-        {
-            return birthMonth <= currentTime.Month;
-        }
 
-        return true;
-    }
-    private bool MonthValueMustBeBetweenOneAndTwelve(int month)
-    {
-
-        if (month <= 0 && month > 12)
-            return false;
-        return true;
-
-    }
 }

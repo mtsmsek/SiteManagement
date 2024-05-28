@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using SiteManagement.Application.Validators.Residents;
 using SiteManagement.Domain.Constants.Residents;
 using System;
 using System.Collections.Generic;
@@ -12,9 +13,7 @@ namespace SiteManagement.Application.Features.Commands.Residents.UpdateResident.
     {
         public UpdateResidentEmailCommandValidator()
         {
-            RuleFor(x => x.Email).NotEmpty().WithMessage(ResidentMessages.ValidationMessages.EmailCannotBeEmpty)
-                                            .EmailAddress(FluentValidation.Validators.EmailValidationMode.AspNetCoreCompatible)
-                                            .WithMessage(ResidentMessages.ValidationMessages.InvalidEmail);
+            RuleFor(x => x.Email).ValidateEmail();
         }
     }
 }

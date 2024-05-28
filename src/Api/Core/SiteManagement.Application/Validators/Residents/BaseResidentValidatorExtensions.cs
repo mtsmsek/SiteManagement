@@ -44,7 +44,7 @@ public static class BaseResidentValidatorExtensions
     }
 
     public static void ValidateEmail<TResidentCommand>(this IRuleBuilderInitial<TResidentCommand, string> ruleBuilder)
-        where TResidentCommand : IResidentCommand
+        where TResidentCommand : IResidentEmailCommand
     {
         ruleBuilder.NotEmpty().WithMessage(ResidentMessages.ValidationMessages.EmailCannotBeEmpty)
             .EmailAddress(FluentValidation.Validators.EmailValidationMode.AspNetCoreCompatible)

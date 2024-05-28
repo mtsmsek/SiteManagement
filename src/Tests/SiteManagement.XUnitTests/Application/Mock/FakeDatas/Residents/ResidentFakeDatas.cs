@@ -28,7 +28,7 @@ public class ResidentFakeDatas : BaseFakeData<Resident>
                 PhoneNumber = "1234567890",
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
-               
+              
                 
                 
             },

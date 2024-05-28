@@ -30,8 +30,7 @@ public class GetListResidentsByApartmentNumberAndBlockNameQueryHandler : IReques
 
     public async Task<PagedViewModel<GetListResidentsByApartmentNumberAndBlockNameResponse>> Handle(GetListResidentsByApartmentNumberAndBlockNameQuery request, CancellationToken cancellationToken)
     {
-        //TODO -- remove message
-        //TODO -- refactor
+
 
         await _blockBusinessRules.BlockShouldBeExistInDatabase(request.BlockName);
 
