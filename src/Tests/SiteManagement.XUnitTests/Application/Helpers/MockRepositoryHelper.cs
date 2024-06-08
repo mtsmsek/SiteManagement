@@ -180,12 +180,15 @@ namespace SiteManagement.XUnitTests.Application.Helpers
                    Expression<Func<TEntity, object>>[] include
                ) =>
                {
-                   IList<TEntity> list = new List<TEntity>();w
+                   IList<TEntity> list = new List<TEntity>();
 
                    if (expression == null)
                        list = entityList;
                    else
                        list = entityList.Where(expression.Compile()).ToList();
+
+                  
+
 
                    PagedViewModel<TEntity> paginateList = new() { Results = list };
                    return paginateList;

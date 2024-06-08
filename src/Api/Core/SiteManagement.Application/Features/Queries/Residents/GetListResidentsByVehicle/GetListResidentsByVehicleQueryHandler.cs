@@ -1,13 +1,9 @@
 ﻿using AutoMapper;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Application.Rules.Vehicles;
 using SiteManagement.Application.Services.Repositories.Residents;
 using SiteManagement.Application.Services.Repositories.Vehicles;
-using SiteManagement.Domain.Entities.Residents;
-using SiteManagement.Domain.Entities.Vehicles;
 
 namespace SiteManagement.Application.Features.Queries.Residents.GetListResidentsByVehicle;
 
@@ -31,17 +27,17 @@ public class GetListResidentsByVehicleQueryHandler : IRequestHandler<GetListResi
     {
 
         //TODO make comprasion between this algorithm and (first find vehicle and then use the resident vehicle id)
-        
-
-       await _vehicleBusinessRules.CheckIfVehicleExistByRegistrationPlate(request.VehicleRegistrationPlate, cancellationToken);
 
 
-        var residents = await _residentRepository.GetListAsync(predicate: resident => resident.Vehicles.Any(x => x.Vehicle.VehicleRegistrationPlate ==                                                                request.VehicleRegistrationPlate),
+        await _vehicleBusinessRules.CheckIfVehicleExistByRegistrationPlate(request.VehicleRegistrationPlate, cancellationToken);
+
+
+        var residents = await _residentRepository.GetListAsync(predicate: resident => resident.Vehicles.Any(x => x.Vehicle.VehicleRegistrationPlate == request.VehicleRegistrationPlate),
                                                                     includes: [resident => resident.Vehicles,
-                                                                    resident => resident.Apartment,
-                                                                    resident => resident.Apartment.Block]);
+                                                                        resident => resident.Apartment,
+                                                                        resident => resident.Apartment.Block]);
 
-       return  _mapper.Map<PagedViewModel<GetListResidentsByVehicleResponse>>(residents);
-       
+        return _mapper.Map<PagedViewModel<GetListResidentsByVehicleResponse>>(residents);
+
     }
 }

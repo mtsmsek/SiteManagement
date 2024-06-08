@@ -31,6 +31,7 @@
   <ItemGroup>
     <Folder Include="Application\DependencyResolvers\Messages\" />
     <Folder Include="Application\Features\Messages\Queries\" />
+    <Folder Include="Application\Mock\Rules\Residents\" />
   </ItemGroup>
 
 </Project>

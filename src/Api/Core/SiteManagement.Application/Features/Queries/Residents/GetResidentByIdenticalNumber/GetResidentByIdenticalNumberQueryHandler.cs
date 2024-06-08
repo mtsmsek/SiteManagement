@@ -2,6 +2,7 @@
 using MediatR;
 using SiteManagement.Application.CrossCuttingConcerns.Exceptions.Types;
 using SiteManagement.Application.Services.Repositories.Residents;
+using SiteManagement.Domain.Constants.Residents;
 
 namespace SiteManagement.Application.Features.Queries.Residents.GetResidentByIdenticalNumber;
 
@@ -21,10 +22,9 @@ public class GetResidentByIdenticalNumberQueryHandler : IRequestHandler<GetResid
         var resident = await _residenttRepository.GetSingleAsync(predicate: resident => resident.IdenticalNumber == request.IdenticalNumber,
                                                                     includes: [resident => resident.Apartment,
                                                                       resident => resident.Apartment.Block]);
-        //todo remove magic string
-        //todo -- move it to business rules ??
+
         if (resident is null)
-            throw new BusinessException("Aradığınız tc kimlik numarasına ait kimse bulunamadı.");
+            throw new BusinessException(ResidentMessages.RuleMessages.ResidentWithIdenticalNumberDoesNotExist);
 
         return _mapper.Map<GetResidentByIdenticalNumberResponse>(resident);
     }

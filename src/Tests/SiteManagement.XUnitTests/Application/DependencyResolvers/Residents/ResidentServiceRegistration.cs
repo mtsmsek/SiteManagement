@@ -7,6 +7,10 @@ using SiteManagement.Application.Features.Commands.Residents.UpdateResident.Upda
 using SiteManagement.Application.Features.Commands.Residents.UpdateResident.UpdatePassword;
 using SiteManagement.Application.Features.Queries.Residents.GetListAllResidents;
 using SiteManagement.Application.Features.Queries.Residents.GetListResidentByApartmentNumberAndBlockName;
+using SiteManagement.Application.Features.Queries.Residents.GetListResidentByBlockName;
+using SiteManagement.Application.Features.Queries.Residents.GetListResidentsByVehicle;
+using SiteManagement.Application.Features.Queries.Residents.GetResidentByIdenticalNumber;
+using SiteManagement.Application.Features.Queries.Residents.GetResidentsByFullName;
 using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Residents;
 
 namespace SiteManagement.XUnitTests.Application.DependencyResolvers.Residents
@@ -47,6 +51,18 @@ namespace SiteManagement.XUnitTests.Application.DependencyResolvers.Residents
 
             //Get List Residents By ApartmentNumber And Block Name
             services.AddTransient<GetListResidentsByApartmentNumberAndBlockNameQuery>();
+
+            //GetListResidentsByBlockName
+            services.AddTransient<GetListResidentsByBlockNameQuery>();
+
+            // GetListResidentsByVehicleQuery
+            services.AddTransient<GetListResidentsByVehicleQuery>();
+
+            //GetResidentByIdenticalNumberQuery
+            services.AddTransient<GetResidentByIdenticalNumberQuery>();
+
+            //GetResidentsByFullNameQuery
+            services.AddTransient<GetResidentsByFullNameQuery>();
         }
     }
 }

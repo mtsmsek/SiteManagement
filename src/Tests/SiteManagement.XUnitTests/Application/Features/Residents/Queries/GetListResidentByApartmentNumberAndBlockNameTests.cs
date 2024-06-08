@@ -7,11 +7,6 @@ using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Buildings;
 using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Residents;
 using SiteManagement.XUnitTests.Application.Mock.Repositories.Residents;
 using SiteManagement.XUnitTests.Application.Mock.Rules.Buildings;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SiteManagement.XUnitTests.Application.Features.Residents.Queries
 {
@@ -48,6 +43,17 @@ namespace SiteManagement.XUnitTests.Application.Features.Residents.Queries
             var response = await _handler.Handle(_query, CancellationToken.None);
             //Assert
             Assert.Equal(1, response.Results.Count);
+        }
+        [Fact]
+        public async Task BlockExistsAndApartmentNumberThree_ShouldReturn_ZeroResident()
+        {
+            //Act
+            _query.BlockName = BlockFakeDatas.InDbBlockName;
+            _query.ApartmentNumber = 3;
+            //Action
+            var response = await _handler.Handle(_query, CancellationToken.None);
+            //Assert
+            Assert.Equal(0, response.Results.Count);
         }
     }
 }

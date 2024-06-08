@@ -3,6 +3,7 @@ using MediatR;
 using SiteManagement.Application.CrossCuttingConcerns.Exceptions.Types;
 using SiteManagement.Application.Pagination.Responses;
 using SiteManagement.Application.Services.Repositories.Residents;
+using SiteManagement.Domain.Constants.Residents;
 
 namespace SiteManagement.Application.Features.Queries.Residents.GetResidentsByFullName
 {
@@ -19,20 +20,19 @@ namespace SiteManagement.Application.Features.Queries.Residents.GetResidentsByFu
 
         public async Task<PagedViewModel<GetResidentsByFullNameResponse>> Handle(GetResidentsByFullNameQuery request, CancellationToken cancellationToken)
         {
-            //TODO make it and ??
-            //TODO take one property named 'name' then process it here ??
-            var resident = await _residentRepository.GetListAsync(predicate: resident => resident.FirstName == request.FirstName &&
+
+            var residents = await _residentRepository.GetListAsync(predicate: resident => resident.FirstName == request.FirstName &&
                                                                       resident.LastName == request.LastName,
                                                                       cancellationToken: cancellationToken,
                                                                       includes: [resident => resident.Apartment,
                                                                                  resident => resident.Apartment.Block]);
-            //todo -- remove magic string
-            if (resident is null)
-                throw new BusinessException("Bu isimde bir kullanıcı bulunamadı");
+           
+            if (residents.Results.Count == 0)
+                throw new BusinessException(ResidentMessages.RuleMessages.ResidentCannotBeFound);
 
 
-            //todo -- investigater how to map includes
-            return _mapper.Map<PagedViewModel<GetResidentsByFullNameResponse>>(resident);
+            
+            return _mapper.Map<PagedViewModel<GetResidentsByFullNameResponse>>(residents);
         }
 
 

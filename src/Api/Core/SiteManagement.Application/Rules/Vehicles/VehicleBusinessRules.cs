@@ -1,7 +1,9 @@
 ﻿using SiteManagement.Application.CrossCuttingConcerns.Exceptions.Types;
 using SiteManagement.Application.Rules.Commons;
+using SiteManagement.Application.Services.Repositories.Residents;
 using SiteManagement.Application.Services.Repositories.Security;
 using SiteManagement.Application.Services.Repositories.Vehicles;
+using SiteManagement.Domain.Constants.Vehicles;
 using SiteManagement.Domain.Entities.Vehicles;
 
 namespace SiteManagement.Application.Rules.Vehicles
@@ -9,12 +11,12 @@ namespace SiteManagement.Application.Rules.Vehicles
     public class VehicleBusinessRules : BaseBusinessRules
     {
         private readonly IVehicleRepository _vehicleRepository;
-        private readonly IUserRepository _userRepository;
+        private readonly IResidentRepository _residentRepository;
 
-        public VehicleBusinessRules(IVehicleRepository vehicleRepository, IUserRepository userRepository)
+        public VehicleBusinessRules(IVehicleRepository vehicleRepository, IResidentRepository residentRepository)
         {
             _vehicleRepository = vehicleRepository;
-            _userRepository = userRepository;
+            _residentRepository = residentRepository;
         }
 
         public async Task VehiclePlateRegisterCannotDuplicateWhenInsert(string vehiclePlateRegister, CancellationToken cancellationToken)
@@ -23,14 +25,14 @@ namespace SiteManagement.Application.Rules.Vehicles
                                                      cancellationToken: cancellationToken);
             //TODO -- remove magic string
             if (dbVehicle is not null)
-                throw new BusinessException("Belirtilen plakalı araç sistemde mevcut");
+                throw new BusinessException(VehicleMessages.RuleMessages.RegistrationPlateAlreadyExist);
 
         }
         public async Task<bool> SetVehicleStatusOfResidents(Guid userGuid, CancellationToken cancellationToken)
         {
             var currentTime = DateTime.Now;
 
-            var user = await _userRepository.GetByIdAsync(userGuid, cancellationToken: cancellationToken);
+            var user = await _residentRepository.GetByIdAsync(userGuid, cancellationToken: cancellationToken);
             TimeSpan difference = currentTime - user.BirthDate;
             int age = (int)(difference.TotalDays / 365);
 
@@ -48,7 +50,7 @@ namespace SiteManagement.Application.Rules.Vehicles
             var dbVehicle = await _vehicleRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
 
             if (dbVehicle is null)
-                throw new BusinessException("Vehicle cannot found");
+                throw new BusinessException(VehicleMessages.RuleMessages.RegistrationPlateCannotBeFound);
 
             return dbVehicle;
         }
@@ -57,7 +59,7 @@ namespace SiteManagement.Application.Rules.Vehicles
             var dbVehicle = await _vehicleRepository.GetSingleAsync(predicate: vehicle => vehicle.VehicleRegistrationPlate == registrationPlate);
 
             if (dbVehicle is null)
-                throw new BusinessException("Bu plakaya ait bir araç bulunamadı");
+                throw new BusinessException(VehicleMessages.RuleMessages.NoVehicleFoundBelongToIndicatedRegistrationPlate);
 
             return dbVehicle;
         }

@@ -17,6 +17,8 @@ namespace SiteManagement.Domain.Constants.Residents
             public const string WrongPassword = "Hatalı Şifre";
             public const string NewEmailCannotBeSameWithTheOldEmail = "Yeni email'iniz eskisi ile aynı olamaz";
             public const string OldPasswordWrong = "Old password is wrong";
+            public const string ResidentWithIdenticalNumberDoesNotExist = "Aradığınız tc kimlik numarasına ait kimse bulunamadı.";
+            
         }
         public static class  ValidationMessages
         {
