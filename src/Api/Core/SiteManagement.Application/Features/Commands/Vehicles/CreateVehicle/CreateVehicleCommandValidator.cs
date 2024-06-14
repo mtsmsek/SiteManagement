@@ -1,23 +1,24 @@
 ﻿using FluentValidation;
+using SiteManagement.Domain.Constants.Vehicles;
 using SiteManagement.Domain.Enumarations.Vehicles;
 
 namespace SiteManagement.Application.Features.Commands.Vehicles.CreateVehicle
 {
     public class CreateVehicleCommandValidator : AbstractValidator<CreateVehicleCommand>
     {
-        //register plate => 34 BZD 285
+        //register plate => 34 ABC 285
         private string _provincePart = string.Empty; //34
-        private string _middlePart = string.Empty; //BZD
+        private string _middlePart = string.Empty; //ABC
         private string _lastPart = string.Empty; //285
         public CreateVehicleCommandValidator()
         {
-            RuleFor(c => c.VehicleRegistrationPlate).NotEmpty().WithMessage("Plaka boş geçilemez")
-               .Must(PlateMustBeConsistFrom3Part).WithMessage("Geçersiz plaka bilgisi")
-               .Must(ProvincePartMustBeBetween1And81).WithMessage("Geçersiz il bilgisi");
+            RuleFor(c => c.VehicleRegistrationPlate).NotEmpty().WithMessage(VehicleMessages.ValidationMessages.RegistraionPlateCannotBeEmpty)
+               .Must(PlateMustBeConsistFrom3Part).WithMessage(VehicleMessages.ValidationMessages.InvalidRegistrationPlate)
+               .Must(c => ProvincePartMustBeBetween1And81(_provincePart)).WithMessage(VehicleMessages.ValidationMessages.InvalidProvincePart);
 
 
-            RuleFor(c => c.VehicleType).NotEmpty().WithMessage("Lütfen araç tipini seçiniz")
-                .Must(VehicleTypeShouldBeExist).WithMessage("Geçersiz araç türü");
+            RuleFor(c => c.VehicleType).NotEmpty().WithMessage(VehicleMessages.ValidationMessages.VehicleTypeCannotBeEmpty)
+                .Must(VehicleTypeShouldBeExist).WithMessage(VehicleMessages.ValidationMessages.InvalidVehicleType);
 
         }
         private bool VehicleTypeShouldBeExist(int vehicleType)

@@ -2,6 +2,7 @@
 using SiteManagement.XUnitTests.Application.DependencyResolvers.Buildings;
 using SiteManagement.XUnitTests.Application.DependencyResolvers.Invoices;
 using SiteManagement.XUnitTests.Application.DependencyResolvers.Residents;
+using SiteManagement.XUnitTests.Application.DependencyResolvers.Vehicles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace SiteManagement.XUnitTests
             services.AddApartmentServices();
             services.AddBillServices();
             services.AddResidentServices();
+            services.AddVehicleServices();
 
         }
     }

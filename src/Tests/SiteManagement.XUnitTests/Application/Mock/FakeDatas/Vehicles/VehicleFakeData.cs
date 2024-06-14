@@ -1,5 +1,9 @@
-﻿using SiteManagement.Domain.Entities.Vehicles;
+﻿using SiteManagement.Domain.Entities.Residents;
+using SiteManagement.Domain.Entities.Vehicles;
+using SiteManagement.Domain.Enumarations.Vehicles;
+using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Buildings;
 using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Commons;
+using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Residents;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +24,24 @@ public class VehicleFakeData : BaseFakeData<Vehicle>
              {
                  Id = InDbId,
                  CreatedDate = DateTime.Now,
-                 VehicleRegistrationPlate = InDbRegistraionPlate
+                 VehicleRegistrationPlate = InDbRegistraionPlate,
+                 VehicleType = VehicleType.Car,
+                 Residents = new List<ResidentVehicle>()
+                 {
+                     new()
+                     {
+                         Id = Guid.NewGuid(),
+                         CreatedDate = DateTime.Now,
+                         ResidentId = ResidentFakeDatas.InDbId,
+                         Resident = new Resident
+                         {
+                             Id= Guid.NewGuid(),
+                             ApartmentId = ApartmentFakeDatas.InDbId
+                         },
+                         VehicleId = InDbId,
+                         
+                     }
+                 }
              }
         };
 

@@ -65,6 +65,7 @@ public class ApartmentFakeDatas : BaseFakeData<Apartment>
                     Name = "B",
                 }
 
+
             }
         };
 

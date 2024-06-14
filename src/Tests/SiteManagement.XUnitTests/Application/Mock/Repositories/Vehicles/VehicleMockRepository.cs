@@ -5,8 +5,10 @@ using SiteManagement.Application.Services.Repositories.Residents;
 using SiteManagement.Application.Services.Repositories.Security;
 using SiteManagement.Application.Services.Repositories.Vehicles;
 using SiteManagement.Domain.Entities.Vehicles;
+using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Residents;
 using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Vehicles;
 using SiteManagement.XUnitTests.Application.Mock.Repositories.Commons;
+using SiteManagement.XUnitTests.Application.Mock.Repositories.Residents;
 
 namespace SiteManagement.XUnitTests.Application.Mock.Repositories.Vehicles
 {
@@ -19,7 +21,7 @@ namespace SiteManagement.XUnitTests.Application.Mock.Repositories.Vehicles
 
         public override VehicleBusinessRules SetBusinessRules()
         {
-            return new VehicleBusinessRules(MockRepository.Object, new Mock<IResidentRepository>().Object);
+            return new VehicleBusinessRules(MockRepository.Object, new Mock<ResidentMockRepository>(new ResidentFakeDatas()).Object.MockRepository.Object);
         }
     }
 }

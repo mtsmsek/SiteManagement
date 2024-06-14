@@ -1,33 +1,37 @@
 ﻿using AutoMapper;
 using MediatR;
 using SiteManagement.Application.CrossCuttingConcerns.Exceptions.Types;
+using SiteManagement.Application.Pipelines.Transaction;
+using SiteManagement.Application.Rules.Buildings.Apartments;
 using SiteManagement.Application.Rules.Vehicles;
 using SiteManagement.Application.Services.Repositories.Residents;
 using SiteManagement.Application.Services.Repositories.Vehicles;
+using SiteManagement.Domain.Constants.Vehicles;
 using SiteManagement.Domain.Entities.Vehicles;
 
 namespace SiteManagement.Application.Features.Commands.Vehicles.CreateVehicle;
-//TODO -- control all mappings
-//TODO -- control all securitty functions
-public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleCommand, CreateVehicleResponse>
+
+public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleCommand, CreateVehicleResponse>, ITransactionalRequest
 {
     private readonly IVehicleRepository _vehicleRepository;
     private readonly IMapper _mapper;
     private readonly IResidentRepository _residentRepository;
     private readonly VehicleBusinessRules _vehicleBusinessRules;
     private readonly IResidentVehicleRepository _residentVehicleRepository;
-    public CreateVehicleCommandHandler(IVehicleRepository vehicleRepository, IMapper mapper, IResidentRepository residentRepository, VehicleBusinessRules vehicleBusinessRules, IResidentVehicleRepository residentVehicleRepository)
+    private readonly ApartmentBusinessRules _apartmentBusinessRules;
+    public CreateVehicleCommandHandler(IVehicleRepository vehicleRepository, IMapper mapper, IResidentRepository residentRepository, VehicleBusinessRules vehicleBusinessRules, IResidentVehicleRepository residentVehicleRepository, ApartmentBusinessRules apartmentBusinessRules)
     {
         _vehicleRepository = vehicleRepository;
         _mapper = mapper;
         _residentRepository = residentRepository;
         _vehicleBusinessRules = vehicleBusinessRules;
         _residentVehicleRepository = residentVehicleRepository;
+        _apartmentBusinessRules = apartmentBusinessRules;
     }
 
     public async Task<CreateVehicleResponse> Handle(CreateVehicleCommand request, CancellationToken cancellationToken)
     {
-        //TODO - add validation
+        await _apartmentBusinessRules.ApartmentShouldExistInDatabase(request.ApartmentId, cancellationToken);
         var vehicleToAdd = _mapper.Map<Vehicle>(request);
         await _vehicleRepository.AddAsync(vehicleToAdd);
 
@@ -47,11 +51,11 @@ public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleCommand,
         }
 
 
-        //TODO -- remove magic strinng
+        
         if (residentVehicles.Count == 0)
-            throw new BusinessException("Plaka eklemek istediğiniz tüm kullanıcılar 18 yaşından küçük");
+            throw new BusinessException(VehicleMessages.RuleMessages.AllUsersYoungerThan18);
 
-        //TODO-- make this ITransactional request
+        
         await _residentVehicleRepository.AddRangeAsync(residentVehicles, cancellationToken);
 
         return _mapper.Map<CreateVehicleResponse>(vehicleToAdd);
