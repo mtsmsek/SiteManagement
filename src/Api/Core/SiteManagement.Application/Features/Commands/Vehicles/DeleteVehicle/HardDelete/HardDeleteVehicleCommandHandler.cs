@@ -3,6 +3,7 @@ using SiteManagement.Application.CrossCuttingConcerns.Exceptions.Types;
 using SiteManagement.Application.Features.Commands.Buildings.Apartments.DeleteApartment.HardDelete;
 using SiteManagement.Application.Features.Commands.Vehicles.DeleteCehicle.HardDelete;
 using SiteManagement.Application.Services.Repositories.Vehicles;
+using SiteManagement.Domain.Constants.Vehicles;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,9 +25,9 @@ public class HardDeleteVehicleCommandHandler : IRequestHandler<HardDeleteVehicle
     {
        var vehicleToDelete =  await _vehicleRepository.GetByIdAsync(request.VehicleId, cancellationToken: cancellationToken);
         //TODO --this control in => vehicle business rule ??
-        //TODO -- remove magic string
+       
         if (vehicleToDelete is null)
-            throw new BusinessException("Silmek istediğiniz araba bulunamadı");
+            throw new BusinessException(VehicleMessages.RuleMessages.VehicleCannotFound);
 
         return await _vehicleRepository.DeleteAsync(vehicleToDelete,
                                              isPermenant: true,

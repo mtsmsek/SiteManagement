@@ -8,14 +8,14 @@ using SiteManagement.Domain.Entities.Vehicles;
 
 namespace SiteManagement.Application.Features.Commands.VehicleResident.CreateVehicleResident;
 
-public class CreateVehicleResidentCommandHandler : IRequestHandler<CreateResidentVehicleCommand, int>
+public class CreateResidentVehicleCommandHandler : IRequestHandler<CreateResidentVehicleCommand, int>
 {
     private readonly IResidentVehicleRepository _residentVehicleRepository;
     private readonly ResidentBusinessRules _residentBusinessRules;
     private readonly VehicleBusinessRules _vehicleResidentRules;
     private readonly IMapper _mapper;
 
-    public CreateVehicleResidentCommandHandler(IResidentVehicleRepository residentVehicleRepository, ResidentBusinessRules residentBusinessRules, VehicleBusinessRules vehicleResidentRules, IMapper mapper)
+    public CreateResidentVehicleCommandHandler(IResidentVehicleRepository residentVehicleRepository, ResidentBusinessRules residentBusinessRules, VehicleBusinessRules vehicleResidentRules, IMapper mapper)
     {
         _residentVehicleRepository = residentVehicleRepository;
         _residentBusinessRules = residentBusinessRules;
@@ -28,11 +28,11 @@ public class CreateVehicleResidentCommandHandler : IRequestHandler<CreateResiden
 
         //TODO -- Create all controllers
         //TODO -- Create mappings
-        await _residentBusinessRules.CheckIfResidentExistById(request.ResidentId, cancellationToken);
+       var resident =  await _residentBusinessRules.CheckIfResidentExistById(request.ResidentId, cancellationToken);
         await _vehicleResidentRules.CheckIfVehiceExistById(request.VehicleId, cancellationToken);
         var residentVehicleToAdd = _mapper.Map<ResidentVehicle>(request);
 
-        residentVehicleToAdd.DriveStatus = await _vehicleResidentRules.SetVehicleStatusOfResidents(request.ResidentId, cancellationToken);
+        residentVehicleToAdd.DriveStatus =  _vehicleResidentRules.SetVehicleStatusOfResidents(resident.BirthDate, cancellationToken);
 
         return await _residentVehicleRepository.AddAsync(residentVehicleToAdd);
     }

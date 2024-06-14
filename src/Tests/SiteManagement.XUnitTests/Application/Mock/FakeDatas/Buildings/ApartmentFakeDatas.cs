@@ -8,6 +8,8 @@ public class ApartmentFakeDatas : BaseFakeData<Apartment>
 {
 
     public static Guid FirstBlockId = BlockFakeDatas.InDbId;
+    public static Guid EmptyApartmentId = Guid.NewGuid();
+
 
     public override List<Apartment> CreateFakeData()
     {
@@ -51,7 +53,7 @@ public class ApartmentFakeDatas : BaseFakeData<Apartment>
             {
 
 
-                Id = Guid.NewGuid(),
+                Id = EmptyApartmentId,
                 CreatedDate = DateTime.Now,
                 BlockId = Guid.NewGuid(),
                 ApartmentNumber = 3,

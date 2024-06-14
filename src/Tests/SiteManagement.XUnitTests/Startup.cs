@@ -28,6 +28,7 @@ namespace SiteManagement.XUnitTests
             services.AddBillServices();
             services.AddResidentServices();
             services.AddVehicleServices();
+            services.AddResidentVehicleServices();
 
         }
     }

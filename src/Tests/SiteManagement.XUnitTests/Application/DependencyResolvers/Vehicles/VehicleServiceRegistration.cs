@@ -1,5 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SiteManagement.Application.Features.Commands.Vehicles.CreateVehicle;
+using SiteManagement.Application.Features.Commands.Vehicles.DeleteCehicle.HardDelete;
+using SiteManagement.Application.Features.Commands.Vehicles.UpdateVehicle;
+using SiteManagement.Application.Features.Queries.Vehicles.GetListVehicles;
+using SiteManagement.Application.Features.Queries.Vehicles.GetVehicleByRegistrationPlate;
 using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Vehicles;
 using System;
 using System.Collections.Generic;
@@ -18,6 +22,21 @@ namespace SiteManagement.XUnitTests.Application.DependencyResolvers.Vehicles
             //Create
             services.AddTransient<CreateVehicleCommand>();
             services.AddTransient<CreateVehicleCommandValidator>();
+
+            //HardDelete
+            services.AddTransient<HardDeleteVehicleCommand>();
+
+            //Update
+            services.AddTransient<UpdateVehicleCommand>();
+            services.AddTransient<UpdateVehicleCommandValidator>();
+
+            //Get List All Vehicles
+            services.AddTransient<GetListAllVehiclesQuery>();
+
+            //Get Vehicle By Registration Plate 
+            services.AddTransient<GetVehicleByRegistrationPlateQuery>();
+            
+
         }
     }
 }

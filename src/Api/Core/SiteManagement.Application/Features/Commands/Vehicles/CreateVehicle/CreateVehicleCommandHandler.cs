@@ -36,11 +36,16 @@ public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleCommand,
         await _vehicleRepository.AddAsync(vehicleToAdd);
 
         var residents = await _residentRepository.GetListAsync(predicate: resident => resident.ApartmentId == request.ApartmentId);
+            
+            if(residents.Results.Count == 0)
+                throw new BusinessException(VehicleMessages.RuleMessages.ThereIsNoResidentLivingInApartment);
+
+
         List<ResidentVehicle> residentVehicles = new();
         foreach(var resident in residents.Results) 
         {
 
-             var canResidentDrive = await _vehicleBusinessRules.SetVehicleStatusOfResidents(resident.Id, cancellationToken);
+            var canResidentDrive = _vehicleBusinessRules.SetVehicleStatusOfResidents(resident.BirthDate, cancellationToken);
             var vehicleResidentToAdd = new ResidentVehicle()
             {
                 ResidentId = resident.Id,
@@ -50,12 +55,6 @@ public class CreateVehicleCommandHandler : IRequestHandler<CreateVehicleCommand,
            residentVehicles.Add(vehicleResidentToAdd);
         }
 
-
-        
-        if (residentVehicles.Count == 0)
-            throw new BusinessException(VehicleMessages.RuleMessages.AllUsersYoungerThan18);
-
-        
         await _residentVehicleRepository.AddRangeAsync(residentVehicles, cancellationToken);
 
         return _mapper.Map<CreateVehicleResponse>(vehicleToAdd);

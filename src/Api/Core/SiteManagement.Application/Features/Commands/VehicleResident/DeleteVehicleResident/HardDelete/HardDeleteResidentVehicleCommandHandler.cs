@@ -4,21 +4,21 @@ using SiteManagement.Application.Services.Repositories.Vehicles;
 
 namespace SiteManagement.Application.Features.Commands.VehicleResident.DeleteVehicleResident.HardDelete;
 
-public class DeleteResidentVehicleCommandHandler : IRequestHandler<DeleteResidentVehicleCommand, int>
+public class HardDeleteResidentVehicleCommandHandler : IRequestHandler<HardDeleteResidentVehicleCommand, int>
 {
     private readonly IResidentVehicleRepository _residentVehicleRepository;
     private readonly ResidentVehicleBusinessRules _residentVehicleBusinessRules;
 
-    public DeleteResidentVehicleCommandHandler(IResidentVehicleRepository residentVehicleRepository, ResidentVehicleBusinessRules residentVehicleBusinessRules)
+    public HardDeleteResidentVehicleCommandHandler(IResidentVehicleRepository residentVehicleRepository, ResidentVehicleBusinessRules residentVehicleBusinessRules)
     {
         _residentVehicleRepository = residentVehicleRepository;
         _residentVehicleBusinessRules = residentVehicleBusinessRules;
     }
 
-    public async Task<int> Handle(DeleteResidentVehicleCommand request, CancellationToken cancellationToken)
+    public async Task<int> Handle(HardDeleteResidentVehicleCommand request, CancellationToken cancellationToken)
     {
-        //TODO -- Create all validations
-       var residentVehicleToAdd =  await _residentVehicleBusinessRules.CheckIfResidentVehicleExistById(request.ResidentId, cancellationToken);
+       
+       var residentVehicleToAdd =  await _residentVehicleBusinessRules.CheckIfResidentVehicleExistById(request.ResidentVehicleId, cancellationToken);
 
         return await _residentVehicleRepository.DeleteAsync(residentVehicleToAdd,
                                                             isPermenant: true,

@@ -63,7 +63,7 @@ public class ResidentBusinessRules : BaseBusinessRules
     public async Task<Resident> CheckIfResidentExistById(Guid id, CancellationToken cancellationToken)
     {
         var dbResident = await _residentRepository.GetByIdAsync(id,cancellationToken: cancellationToken);
-        //TODO -- remove magic string
+
         if (dbResident is null)
             throw new BusinessException(ResidentMessages.RuleMessages.ResidentCannotBeFound);
 

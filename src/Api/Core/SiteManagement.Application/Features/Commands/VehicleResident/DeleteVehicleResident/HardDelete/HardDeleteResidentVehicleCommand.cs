@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace SiteManagement.Application.Features.Commands.VehicleResident.DeleteVehicleResident.HardDelete
 {
-    public class DeleteResidentVehicleCommand : IRequest<int>
+    public class HardDeleteResidentVehicleCommand : IRequest<int>
     {
-        public Guid ResidentId { get; set; }
+        public Guid ResidentVehicleId { get; set; }
     }
 }

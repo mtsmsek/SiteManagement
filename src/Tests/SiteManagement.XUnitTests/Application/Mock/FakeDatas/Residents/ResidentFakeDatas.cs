@@ -13,7 +13,7 @@ public class ResidentFakeDatas : BaseFakeData<Resident>
     public const string NotInDbEmail = "test@gmail.com";
 
     public const string InDbIdenticalNumber = "10987654321";
-    public static Guid Under18ResidentId = Guid.NewGuid();
+
     public override List<Resident> CreateFakeData()
     {
         HashingHelper.CreatePasswordHash("12345", out byte[] passwordHash, out byte[] passwordSalt);
@@ -107,49 +107,7 @@ public class ResidentFakeDatas : BaseFakeData<Resident>
                 }
 
             },
-            //for create vehicle test
-            new() {
-                Id = Guid.NewGuid(),
-                CreatedDate = DateTime.Now,
-                ApartmentId = Under18ResidentId,
-                BirthDate = DateTime.Now.AddYears(-28),
-                Email = "ahmet@gmail.com",
-                FirstName = "Test2",
-                LastName = "Test2",
-                IdenticalNumber = "12345123456",
-                PhoneNumber = "12345789",
-                Apartment = new()
-                {
-                    Id = Under18ResidentId,
-                    ApartmentNumber = 2,
-                    BlockId = BlockFakeDatas.InDbId,
-                    Block = new()
-                    {
-                        Id = BlockFakeDatas.InDbId,
-                        Name = BlockFakeDatas.InDbBlockName
-                    },
 
-
-                },
-                Vehicles = new List<ResidentVehicle>()
-                {
-                    new()
-                    {
-                        Id = Guid.NewGuid(),
-                        CreatedDate = DateTime.Now,
-                        DriveStatus = true,
-                        VehicleId = VehicleFakeData.NotInDbId,
-                        ResidentId = Guid.NewGuid(),
-
-                        Vehicle = new()
-                        {
-                            Id = VehicleFakeData.InDbId,
-                            VehicleRegistrationPlate = "111",
-                        }
-                    }
-                }
-
-            }
         };
 
 

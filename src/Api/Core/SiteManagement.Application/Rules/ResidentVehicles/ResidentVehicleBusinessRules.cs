@@ -2,6 +2,7 @@
 using SiteManagement.Application.Rules.Commons;
 using SiteManagement.Application.Rules.Residents;
 using SiteManagement.Application.Services.Repositories.Vehicles;
+using SiteManagement.Domain.Constants.Vehicles;
 using SiteManagement.Domain.Entities.Vehicles;
 
 namespace SiteManagement.Application.Rules.ResidentVehicles;
@@ -20,9 +21,8 @@ public class ResidentVehicleBusinessRules : BaseBusinessRules
     public async Task<ResidentVehicle> CheckIfResidentVehicleExistById(Guid id, CancellationToken cancellationToken)
     {
 
-        await _residentBusinessRules.CheckIfResidentExistById(id, cancellationToken);
         var dbResidentVehicle = await _residentVehicleRepository.GetByIdAsync(id, cancellationToken: cancellationToken) ??
-                                 throw new BusinessException("Belirtilen kullanıcıya ait araç bulunamadı");
+                                 throw new BusinessException(ResidentVehicleMessages.RuleMessages.ResidentOrVehicleCannotBeFound);
 
         return dbResidentVehicle;
 

@@ -28,12 +28,12 @@ namespace SiteManagement.Application.Rules.Vehicles
                 throw new BusinessException(VehicleMessages.RuleMessages.RegistrationPlateAlreadyExist);
 
         }
-        public async Task<bool> SetVehicleStatusOfResidents(Guid userGuid, CancellationToken cancellationToken)
+        public bool SetVehicleStatusOfResidents(DateTime userBirthDate, CancellationToken cancellationToken)
         {
             var currentTime = DateTime.Now;
 
-            var user = await _residentRepository.GetByIdAsync(userGuid, cancellationToken: cancellationToken);
-            TimeSpan difference = currentTime - user.BirthDate;
+           
+            TimeSpan difference = currentTime - userBirthDate;
             int age = (int)(difference.TotalDays / 365);
 
             if (age >= 18)
@@ -50,7 +50,7 @@ namespace SiteManagement.Application.Rules.Vehicles
             var dbVehicle = await _vehicleRepository.GetByIdAsync(id, cancellationToken: cancellationToken);
 
             if (dbVehicle is null)
-                throw new BusinessException(VehicleMessages.RuleMessages.RegistrationPlateCannotBeFound);
+                throw new BusinessException(VehicleMessages.RuleMessages.VehicleCannotFound);
 
             return dbVehicle;
         }

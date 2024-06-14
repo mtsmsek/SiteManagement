@@ -1,9 +1,6 @@
 ﻿using Moq;
-using SiteManagement.Application.Rules.Buildings.Apartments;
 using SiteManagement.Application.Rules.Residents;
-using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Buildings;
 using SiteManagement.XUnitTests.Application.Mock.FakeDatas.Residents;
-using SiteManagement.XUnitTests.Application.Mock.Repositories.Buildings;
 using SiteManagement.XUnitTests.Application.Mock.Repositories.Residents;
 
 namespace SiteManagement.XUnitTests.Application.Mock.Rules.Residents;

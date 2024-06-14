@@ -36,7 +36,13 @@ public class VehicleFakeData : BaseFakeData<Vehicle>
                          Resident = new Resident
                          {
                              Id= Guid.NewGuid(),
-                             ApartmentId = ApartmentFakeDatas.InDbId
+                             ApartmentId = ApartmentFakeDatas.InDbId,
+                             Apartment = new()
+                             {
+                                 Id = ApartmentFakeDatas.InDbId,
+                                 
+                             }
+                            
                          },
                          VehicleId = InDbId,
                          
