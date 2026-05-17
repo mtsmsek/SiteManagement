@@ -1,28 +1,28 @@
-using Scalar.AspNetCore;
+using SiteManagement.Api.Configuration;
+using SiteManagement.Application;
+using SiteManagement.Infrastructure;
+using SiteManagement.Infrastructure.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Host.AddSerilogLogging();
+
+builder.Services
+    .AddControllers()
+    .Services
+    .AddApplication()
+    .AddInfrastructure(builder.Configuration)
+    .AddJwtAuth(builder.Configuration)
+    .AddSiteManagementHealthChecks(builder.Configuration)
+    .AddSiteManagementOpenApi();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    // OpenAPI JSON document at /openapi/v1.json
-    app.MapOpenApi();
+app.UseSiteManagementPipeline();
 
-    // Scalar UI at /scalar (W1 Day 4'te JWT bearer scheme eklenecek)
-    app.MapScalarApiReference(options =>
-    {
-        options.Title = "SiteManagement API";
-    });
-}
-
-app.MapGet("/health", () => Results.Ok(new { status = "ok" }));
-
-app.MapControllers();
+await DatabaseInitializer.MigrateAndSeedAsync(app.Services);
 
 app.Run();
 
+/// <summary>Exposes <c>Program</c> as a partial class so WebApplicationFactory can target it from E2E tests.</summary>
 public partial class Program;

@@ -21,10 +21,16 @@
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageVersion Include="Microsoft.Extensions.Localization.Abstractions" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.Extensions.Localization" Version="10.0.5" />
   </ItemGroup>
 
   <ItemGroup Label="Security / Crypto">
     <PackageVersion Include="BCrypt.Net-Next" Version="4.0.3" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.5.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Hosting helpers">
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="10.0.5" />
   </ItemGroup>
 
   <ItemGroup Label="API docs (OpenAPI via .NET 10 + Scalar UI)">
