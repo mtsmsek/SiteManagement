@@ -77,70 +77,81 @@
 
 ---
 
-### Gün 3 (Çarşamba) — ASP.NET Core Identity + EF Core
+### Gün 3 (Çarşamba) — ASP.NET Core Identity + EF Core ✅
 
 **Hedef:** Migration koştu, Identity tabloları Postgres'te oluştu, roller seed'lendi.
 
-- [ ] `Infrastructure/Persistence/AppDbContext.cs` → `IdentityDbContext<AppUser, AppRole, Guid>`
-- [ ] `AppUser : IdentityUser<Guid>` (ek alan yoksa şimdilik boş; ileride Resident ile linkleyeceğiz)
-- [ ] `AppRole : IdentityRole<Guid>`
-- [ ] `Infrastructure/Persistence/SeedData/RoleSeeder.cs`: Admin + Resident rollerini sabit Guid'lerle ekle
-- [ ] `Program.cs`'te DI:
-  - `services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(connectionString))`
-  - `services.AddIdentity<AppUser, AppRole>(...).AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders()`
-- [ ] `dotnet ef migrations add Initial -p src/SiteManagement.Infrastructure -s src/SiteManagement.Api`
-- [ ] `dotnet ef database update -p src/SiteManagement.Infrastructure -s src/SiteManagement.Api`
-- [ ] Startup'ta migration auto-apply (development için) + role seeding hook
-- [ ] Postgres'te AspNet* tablolarının oluştuğunu kontrol et
+- [x] `Infrastructure/Persistence/AppDbContext.cs` → `IdentityDbContext<AppUser, AppRole, Guid>` (tablo isimleri `Users`, `Roles`, `UserRoles`, ... — AspNet* prefix'i temizlendi)
+- [x] `Infrastructure/Identity/AppUser.cs : IdentityUser<Guid>` + `FullName` alanı
+- [x] `Infrastructure/Identity/AppRole.cs : IdentityRole<Guid>` + name-aware ctor
+- [x] `Infrastructure/Persistence/Seed/IdentitySeeder.cs`: Admin + Resident rollerini sabit Guid'lerle (Domain'deki `Roles.AdminId`/`ResidentId`) seed eder
+- [x] `Infrastructure/DependencyInjection.cs` → `AddInfrastructure(IConfiguration)`:
+  - `AddDbContext<AppDbContext>` + Npgsql + migrations assembly
+  - `AddIdentity<AppUser, AppRole>` + password policy (sabit'ler `IdentityPasswordPolicy`)
+  - `AddEntityFrameworkStores<AppDbContext>` + `AddDefaultTokenProviders`
+- [x] `Infrastructure/Persistence/AppDbContextFactory.cs` (`IDesignTimeDbContextFactory`) — EF tool API'yi boot'lamadan migration ekleyebilsin
+- [x] `dotnet ef migrations add Initial --project src/SiteManagement.Infrastructure --startup-project src/SiteManagement.Api --output-dir Persistence/Migrations` çalıştırıldı
+- [x] `Api/Configuration/DatabaseInitializer.cs` → `MigrateAndSeedAsync` startup'ta otomatik koşar (Program.cs içinde `await DatabaseInitializer.MigrateAndSeedAsync(app.Services)`)
+- [x] `dotnet ef` tool 10.0.8'e güncellendi (8.0.x net10 ile uyumsuzdu)
+- [x] _(compose smoke'da)_ Postgres'te `Users`, `Roles` ve diğer Identity tablolarının oluştuğunu doğrula
 
 **Commit:** `feat: aspnet identity with postgres, role seeding`
 
 ---
 
-### Gün 4 (Perşembe) — JWT + Auth Endpoints + Serilog + Swagger
+### Gün 4 (Perşembe) — JWT + Auth Endpoints + Serilog + (Scalar) ✅
 
-**Hedef:** Postman'de register + login + protected endpoint çalışıyor.
+**Hedef:** API'de register + login + refresh çalışıyor, Scalar UI'da Bearer auth görünüyor.
 
-- [ ] `Api/Auth/AuthController.cs`:
-  - POST `/auth/register` (email, password, fullName → Admin oluştur; sonra resident için ayrı flow olacak)
-  - POST `/auth/login` (email, password → access + refresh token)
-  - POST `/auth/refresh` (refresh token → yeni access token)
-- [ ] `Api/Auth/TokenService.cs`: JWT üret (issuer, audience, key config'den; user'ın role'leri claim olarak)
-- [ ] `appsettings.json`'a Jwt section (Key, Issuer, Audience, AccessTokenMinutes, RefreshTokenDays)
-- [ ] `Program.cs`'te JWT bearer auth registration
-- [ ] Serilog setup: console sink + dosya sink (Serilog.Sinks.Console, Serilog.Sinks.File), structured logging, RequestLoggingMiddleware
-- [ ] Swagger UI: JWT auth button (Bearer scheme tanımı), endpoint'lere XML doc
-- [ ] Health endpoint: `app.MapHealthChecks("/health")` + DB check (AspNetCore.HealthChecks.NpgSql)
-- [ ] Postman testi: register admin → login → token al → /health'e Authorization: Bearer {token} ile çağrı → 200
+- [x] `Api/Controllers/Auth/AuthController.cs` — thin controller, MediatR `ISender`'a delege:
+  - POST `/api/auth/register` (email, password, fullName → Admin oluşturur)
+  - POST `/api/auth/login` (email, password → access + refresh)
+  - POST `/api/auth/refresh` (refresh token → yeni access + refresh)
+- [x] **CQRS-lite uygulandı**: business logic Application'da `RegisterCommand`/`LoginCommand`/`RefreshTokenCommand` handler'larında, controller sıfır iş yapar
+- [x] `Infrastructure/Auth/TokenService.cs : ITokenService` — HS256 JWT + crypto-random refresh token; `TimeProvider` injection (test'lenebilir)
+- [x] `Application/Abstractions/Auth/ITokenService.cs` — Application portu, JWT detayı bilmez
+- [x] `Application/Abstractions/Auth/IUserAuthService.cs` + `Infrastructure/Auth/UserAuthService.cs` — `UserManager` Application'a sızmıyor
+- [x] `Application/Abstractions/Auth/IRefreshTokenStore.cs` + `Infrastructure/Auth/InMemoryRefreshTokenStore.cs` (W2'de EF-backed'a geçilecek)
+- [x] `appsettings.json`'a Jwt section (Key, Issuer, Audience, AccessTokenMinutes, RefreshTokenDays)
+- [x] `Infrastructure/Auth/AuthExtensions.cs` → `AddJwtAuth(IConfiguration)` (JwtBearer scheme + TokenValidationParameters; auth wiring Api'ye sızmadı)
+- [x] **Serilog setup** Api'de `Configuration/LoggingExtensions.cs` → `AddSerilogLogging()`; config `appsettings.json`'daki `Serilog` section'ından okunuyor; `UseSerilogRequestLogging()` pipeline'da
+- [x] **API docs UI**: Swashbuckle yerine Scalar (W1 Gün 2 fix'i); `Configuration/OpenApiExtensions.cs` → `AddSiteManagementOpenApi()` Bearer scheme'i OpenAPI dokümanına eklediği için Scalar Authorize panelinde Bearer button'u var
+- [x] Health: `app.MapHealthChecks("/health")` + Postgres probe (`AspNetCore.HealthChecks.NpgSql`); ayrı `/health/live` liveness endpoint
+- [x] **Lean Program.cs**: 20 satır, sadece extension method çağrıları. Inline wireup yok.
+- [x] _(compose smoke'da)_ register → login → token al → /health Bearer ile çağır → 200
 
-**Commit:** `feat: jwt auth (register/login/refresh), serilog, swagger, health endpoint`
+**Commit:** `feat: jwt auth (register/login/refresh) + serilog + scalar bearer + health-with-db`
 
 ---
 
-### Gün 5 (Cuma) — Exception Architecture
+### Gün 5 (Cuma) — Exception Architecture ✅
 
 **Hedef:** Domain ↔ Application ↔ Api exception katmanları doğru çalışıyor, test'lerle doğrulanmış.
 
-- [ ] `Domain/Shared/Exceptions/DomainException.cs` (abstract; ctor: messageKey, args)
-- [ ] Örnek alt class: `Domain/Shared/Exceptions/SampleDomainException.cs` (test amaçlı)
-- [ ] `Application/Shared/Exceptions/ApplicationException.cs` (abstract)
-- [ ] Alt class'lar:
-  - `BusinessRuleViolationException` (status 409)
-  - `EntityNotFoundException` (status 404)
-  - `UnauthorizedActionException` (status 403)
-  - `ValidationException` (status 400, FluentValidation'dan)
-- [ ] `Application/Behaviors/ExceptionTranslationBehavior.cs` (MediatR `IPipelineBehavior<,>`):
-  - try/catch DomainException → switch expression ile uygun ApplicationException
-- [ ] `Application/Behaviors/ValidationBehavior.cs` (FluentValidation pipeline)
-- [ ] `Application/Behaviors/LoggingBehavior.cs` (request/response log)
-- [ ] DI'a behavior'ları register et (MediatR config, `AddOpenBehavior(...)`)
-- [ ] `Api/Middleware/GlobalExceptionMiddleware.cs`: ApplicationException → RFC 7807 ProblemDetails JSON + uygun HTTP status
-- [ ] Unit test (`Application.Tests`):
-  - Fake handler içinde fake DomainException at → behavior'ın yakaladığını ve doğru ApplicationException döndüğünü doğrula
-- [ ] E2E test (`E2E.Tests`):
-  - Geçersiz request → API 400/409 + ProblemDetails formatında JSON
+- [x] `Domain/Shared/Exceptions/DomainException.cs` (abstract; ctor: `messageKey`, `params object[] args`)
+- [x] `Application/Shared/Exceptions/ApplicationException.cs` (abstract; `StatusCode` taşır)
+- [x] HTTP status code sabitleri `Application/Shared/Exceptions/HttpStatus.cs` (Application'da `Microsoft.AspNetCore.Http` reference'ı yok)
+- [x] Alt class'lar:
+  - `BusinessRuleViolationException` (409, `MessageKey` ile birlikte)
+  - `EntityNotFoundException` (404)
+  - `UnauthorizedActionException` (403)
+  - `AuthenticationException` (401)
+  - `ValidationException` (400, FluentValidation `ValidationFailure`'dan `errors` dict üretir)
+- [x] `Application/Behaviors/ExceptionTranslationBehavior.cs` (MediatR `IPipelineBehavior<,>`): handler içinde fırlatılan `DomainException` → `IStringLocalizer<ErrorMessages>` ile lokalize → `BusinessRuleViolationException` olarak rethrow
+- [x] `Application/Behaviors/ValidationBehavior.cs` (FluentValidation pipeline) — pipeline failures'ı `ValidationException` olarak fırlatır
+- [x] `Application/Behaviors/LoggingBehavior.cs` (structured request/response log + elapsed ms)
+- [x] DI'a behavior'ları doğru sırayla register: Logging (outer) → Validation → ExceptionTranslation (innermost)
+- [x] `Api/Middleware/GlobalExceptionMiddleware.cs`: `ApplicationException` → RFC 7807 ProblemDetails JSON (`application/problem+json`) + uygun HTTP status. `ValidationException.Errors` → `errors` extension. `BusinessRuleViolationException.MessageKey` → `messageKey` extension. Domain exception'lar pipeline'da çevrildiği için buraya HİÇ gelmez.
+- [x] **Magic literal yok**: `ProblemDetailsErrorsKey`, `ProblemDetailsMessageKey`, `ProblemDetailsTraceIdKey` sabit; `ValidationMessages` ve `ValidationLimits` Application'da; `CommonValidationRules` extension'ları (`ValidEmailAddress`, `ValidPassword`, `ValidFullName`, `RequiredText`) tekrarı engelliyor
+- [x] Unit test (`Application.Tests/Behaviors/ExceptionTranslationBehaviorTests.cs`):
+  - Domain exception → `BusinessRuleViolationException` lokalize mesajla
+  - Application exception bypass (kendisi)
+  - Success path return değiştirmez
+- [x] Unit test (`Application.Tests/Auth/LoginCommandHandlerTests.cs`): invalid → 401, valid → tokens issued + refresh stored
+- [x] `Doubles/AuthDoubles.cs` — sample factory'ler (`SampleUser`, `SampleTokens`), test'lerde tekrar yok
+- [x] AAA pattern + `// arrange/act/assert` yorum + boş satır ayrımı her testte
 
-**Commit:** `feat: layered exception architecture with mediatr translation pipeline`
+**Commit:** _(W1 Gün 3-4-5 birleşik commit)_ `feat: jwt auth (register/login/refresh) + serilog + scalar bearer + health-with-db` ya da daha doğru `feat: identity + jwt auth + layered exception architecture (W1 D3-D5)`
 
 ---
 
