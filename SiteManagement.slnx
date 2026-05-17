@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SiteManagement.Api/SiteManagement.Api.csproj" />
+    <Project Path="src/SiteManagement.Application/SiteManagement.Application.csproj" />
+    <Project Path="src/SiteManagement.Domain/SiteManagement.Domain.csproj" />
+    <Project Path="src/SiteManagement.Infrastructure/SiteManagement.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SiteManagement.Application.Tests/SiteManagement.Application.Tests.csproj" />
+    <Project Path="tests/SiteManagement.Domain.Tests/SiteManagement.Domain.Tests.csproj" />
+    <Project Path="tests/SiteManagement.E2E.Tests/SiteManagement.E2E.Tests.csproj" />
+  </Folder>
+</Solution>
