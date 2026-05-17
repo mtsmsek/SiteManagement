@@ -207,8 +207,13 @@
   - `Api/Configuration/DatabaseUrlExtensions.cs` → `postgresql://user:pass@host:port/db` formatlı `DATABASE_URL`'yi Npgsql connection string'ine çevirir (SSL Mode = Require)
   - 3 unit test (`E2E.Tests/Configuration/DatabaseUrlExtensionsTests.cs`) converter logic'i için
 - [x] `docs/DEPLOY-RAILWAY.md` — adım adım Railway deploy talimatları (hesap, repo bağlama, PostgreSQL add-on, env variables, domain, smoke test, troubleshooting, maliyet uyarısı)
-- [ ] _(Senin manuel adımın)_ Railway hesabı aç, repo bağla, ilk deploy → public URL al, README'ye yapıştır
+- [ ] _(W6'ya bırakıldı — bilinçli karar)_ Railway hesabı + ilk deploy → public URL: vitrin polish'iyle (W6) birlikte yapılacak; kart/hesap/maliyet yükünü vitrin son halinde alalım, ara dönemde sürekli kredi yememesi için
 - [ ] _(Opsiyonel)_ Main branch protection: PR'da review + status check zorunlu (tek başına çalışıyorsan şimdilik kapalı)
+- [x] **Architecture testleri** — yeni proje `SiteManagement.ArchitectureTests` (NetArchTest):
+  - **Layer dependency koruması**: Domain BCL-only, Application no-EF / no-AspNetCore / no-Identity, Infrastructure → Api referans yok
+  - **CQRS naming**: Her `IRequest<>` `Command`/`Query` ile bitiyor; orphan request yok (her birinin handler'ı var); her command'ın validator'ı var; handler'lar `sealed`
+  - **Resource key bütünlüğü**: Her `ErrorMessageKeys` ve `ValidationMessages` const'unun hem tr hem en resx'te karşılığı var; iki resx aynı key set'ine sahip (drift kontrolü)
+  - 15 test, hepsi yeşil — proje sağlığının uzun vadeli garantörü
 - [x] README v1:
   - Proje özeti + CI badge + License badge + .NET badge
   - "Bugün ne çalışıyor" özet listesi

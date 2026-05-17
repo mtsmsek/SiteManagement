@@ -159,19 +159,21 @@ docker compose down --volumes    # volume'leri de sil (DB sıfırlanır)
 
 ---
 
-## Production Deploy (Railway)
+## Production Deploy
 
-Adım adım: **[docs/DEPLOY-RAILWAY.md](docs/DEPLOY-RAILWAY.md)**.
+> _Live URL **W6**'da eklenecek_ — kod ve dokümantasyon hazır, deploy tarafı vitrin polish'iyle (W6) birlikte yapılacak.
 
-API kodunda iki platform helper var:
-- `PortBindingExtensions.UsePlatformPort()` — Railway / Render / Heroku tipi platformların inject ettiği `$PORT`'a otomatik bind
-- `DatabaseUrlExtensions.UsePlatformDatabaseUrl()` — `postgresql://user:pass@host:port/db` formatındaki `DATABASE_URL`'yi Npgsql syntax'ına otomatik çevirir
+Adım adım Railway talimatı: **[docs/DEPLOY-RAILWAY.md](docs/DEPLOY-RAILWAY.md)**.
 
-Local docker-compose'da bu env'ler set olmadığı için no-op.
+API kodunda iki platform helper var (Railway / Render / Heroku / Fly.io ile uyumlu):
+- `PortBindingExtensions.UsePlatformPort()` — host'un inject ettiği `$PORT`'a otomatik bind
+- `DatabaseUrlExtensions.UsePlatformDatabaseUrl()` — `postgresql://user:pass@host:port/db` formatlı `DATABASE_URL`'yi Npgsql syntax'ına otomatik çevirir
+
+Local docker-compose'da bu env'ler set olmadığı için bu helper'lar no-op.
 
 ---
 
-## CI
+## CI & Test stratejisi
 
 GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
 
@@ -179,6 +181,20 @@ GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
 - .NET 10 SDK kurar, Postgres 16 service container'ı ayağa kaldırır
 - `dotnet restore` → `dotnet build --configuration Release` (warnings = errors, csproj'da aktif) → `dotnet test`
 - Test sonuçları artifact olarak yüklenir
+
+Test projeleri:
+
+| Proje | Amaç |
+|---|---|
+| `SiteManagement.Domain.Tests` | Domain unit testleri (TDD ile yazılacak — W2'den itibaren aggregate invariant'ları) |
+| `SiteManagement.Application.Tests` | Handler / pipeline behavior unit testleri (repo mock'lı, NSubstitute) |
+| `SiteManagement.E2E.Tests` | TestContainers + WebApplicationFactory (W2 sonu altyapı, şimdilik pure helper testler) |
+| **`SiteManagement.ArchitectureTests`** | NetArchTest ile katman bağımlılık koruması + CQRS naming + resource key bütünlüğü |
+
+Architecture testleri proje sağlığının uzun vadeli garantörü:
+- **Layer dependency:** Domain BCL-only, Application no-EF / no-ASP.NET, Infrastructure → Api referans yok
+- **CQRS naming:** Her `IRequest<>` ya `Command` ya `Query` ile bitiyor; her command için handler **ve** validator var; handler'lar `sealed`
+- **Resource integrity:** Her `ErrorMessageKeys` / `ValidationMessages` const'unun **hem tr hem en resx**'te karşılığı var; iki resx **drift yok**
 
 ---
 
