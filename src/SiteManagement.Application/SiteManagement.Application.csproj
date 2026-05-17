@@ -19,4 +19,16 @@
     <ProjectReference Include="..\SiteManagement.Domain\SiteManagement.Domain.csproj" />
   </ItemGroup>
 
+  <!-- Localization resources. The default SDK glob already embeds .resx files,
+       but we add an explicit EmbeddedResource entry so the build is obvious to
+       anyone scanning the csproj for localization wiring. -->
+  <ItemGroup>
+    <EmbeddedResource Update="Shared/Resources/*.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Shared/Validation/*.resx">
+      <Generator></Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

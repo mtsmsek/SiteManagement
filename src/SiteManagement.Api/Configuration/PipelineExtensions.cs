@@ -1,17 +1,24 @@
+using Microsoft.Extensions.Options;
+using Microsoft.AspNetCore.Localization;
 using Serilog;
 using SiteManagement.Api.Middleware;
 
 namespace SiteManagement.Api.Configuration;
 
 /// <summary>
-/// Composes the request pipeline in the correct order: global exception
-/// handler → request logging → dev-only OpenAPI + Scalar → auth → endpoints.
+/// Composes the request pipeline in the correct order: request localization
+/// runs first so the global exception middleware (and every handler) sees
+/// the right culture; then global exception → request logging → dev-only
+/// OpenAPI + Scalar → auth → endpoints.
 /// </summary>
 public static class PipelineExtensions
 {
     /// <summary>Installs the full SiteManagement HTTP pipeline.</summary>
     public static WebApplication UseSiteManagementPipeline(this WebApplication app)
     {
+        var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
+        app.UseRequestLocalization(localizationOptions);
+
         app.UseMiddleware<GlobalExceptionMiddleware>();
         app.UseSerilogRequestLogging();
 

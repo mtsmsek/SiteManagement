@@ -14,6 +14,7 @@ builder.Services
     .AddInfrastructure(builder.Configuration)
     .AddJwtAuth(builder.Configuration)
     .AddSiteManagementHealthChecks(builder.Configuration)
+    .AddSiteManagementLocalization()
     .AddSiteManagementOpenApi();
 
 var app = builder.Build();

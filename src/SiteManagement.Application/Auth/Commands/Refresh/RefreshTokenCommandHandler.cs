@@ -1,7 +1,7 @@
 using MediatR;
 using SiteManagement.Application.Abstractions.Auth;
 using SiteManagement.Application.Shared.Exceptions;
-using SiteManagement.Application.Shared.Validation;
+using SiteManagement.Application.Shared.Resources;
 
 namespace SiteManagement.Application.Auth.Commands.Refresh;
 
@@ -24,10 +24,10 @@ public sealed class RefreshTokenCommandHandler(
     public async Task<AuthTokens> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
     {
         var userId = await _refreshTokenStore.ConsumeAsync(request.RefreshToken, cancellationToken)
-                     ?? throw new AuthenticationException(ValidationMessages.InvalidRefreshToken);
+                     ?? throw new AuthenticationException(ErrorMessageKeys.AuthRefreshTokenInvalid);
 
         var user = await _userAuth.GetByIdAsync(userId, cancellationToken)
-                   ?? throw new AuthenticationException(ValidationMessages.RefreshOwnerMissing);
+                   ?? throw new AuthenticationException(ErrorMessageKeys.AuthRefreshOwnerMissing);
 
         var tokens = _tokenService.IssueTokens(user.Id, user.Email, user.Roles);
 

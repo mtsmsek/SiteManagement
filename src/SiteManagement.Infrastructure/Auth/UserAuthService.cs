@@ -1,6 +1,8 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 using SiteManagement.Application.Abstractions.Auth;
 using SiteManagement.Application.Shared.Exceptions;
+using SiteManagement.Application.Shared.Resources;
 using SiteManagement.Infrastructure.Identity;
 
 namespace SiteManagement.Infrastructure.Auth;
@@ -10,9 +12,12 @@ namespace SiteManagement.Infrastructure.Auth;
 /// Core Identity's <see cref="UserManager{TUser}"/>. Keeps the Application
 /// layer free of any Identity-specific references.
 /// </summary>
-public class UserAuthService(UserManager<AppUser> userManager) : IUserAuthService
+public class UserAuthService(
+    UserManager<AppUser> userManager,
+    ILogger<UserAuthService> logger) : IUserAuthService
 {
     private readonly UserManager<AppUser> _userManager = userManager;
+    private readonly ILogger<UserAuthService> _logger = logger;
 
     /// <inheritdoc />
     public async Task<Guid> RegisterAsync(
@@ -35,17 +40,26 @@ public class UserAuthService(UserManager<AppUser> userManager) : IUserAuthServic
         var createResult = await _userManager.CreateAsync(user, password);
         if (!createResult.Succeeded)
         {
+            _logger.LogWarning(
+                "Identity user creation failed for {Email}: {Errors}",
+                email,
+                FormatIdentityErrors(createResult));
             throw new BusinessRuleViolationException(
-                FormatIdentityErrors(createResult),
-                IdentityErrorKeys.RegistrationFailed);
+                ErrorMessageKeys.AuthRegistrationFailed,
+                ErrorMessageKeys.AuthRegistrationFailed);
         }
 
         var roleResult = await _userManager.AddToRoleAsync(user, role);
         if (!roleResult.Succeeded)
         {
+            _logger.LogWarning(
+                "Role assignment failed for {Email} to {Role}: {Errors}",
+                email,
+                role,
+                FormatIdentityErrors(roleResult));
             throw new BusinessRuleViolationException(
-                FormatIdentityErrors(roleResult),
-                IdentityErrorKeys.RoleAssignmentFailed);
+                ErrorMessageKeys.AuthRoleAssignmentFailed,
+                ErrorMessageKeys.AuthRoleAssignmentFailed);
         }
 
         return user.Id;
@@ -87,7 +101,7 @@ public class UserAuthService(UserManager<AppUser> userManager) : IUserAuthServic
         return new AuthenticatedUser(user.Id, user.Email!, user.FullName, roles.ToArray());
     }
 
-    /// <summary>Flattens an <see cref="IdentityResult"/> error collection into a single line.</summary>
+    /// <summary>Flattens an <see cref="IdentityResult"/> error collection into a single line for logging.</summary>
     private static string FormatIdentityErrors(IdentityResult result)
         => string.Join("; ", result.Errors.Select(e => $"{e.Code}: {e.Description}"));
 }

@@ -155,20 +155,35 @@
 
 ---
 
-### Gün 6 (Cumartesi) — Localization (Backend)
+### Gün 6 (Cumartesi) — Localization (Backend) ✅
 
 **Hedef:** Hata mesajları kültüre göre tr-TR / en-US dönüyor.
 
-- [ ] `Application/Resources/ErrorMessages.tr.resx` (key → Türkçe mesaj)
-- [ ] `Application/Resources/ErrorMessages.en.resx` (key → İngilizce mesaj)
-- [ ] DomainException MessageKey'leri sabit constant'lar olarak: `"Apartment.AlreadyOccupied"`, `"TcNo.Invalid"`, vs.
-- [ ] `Program.cs`'te:
-  - `services.AddLocalization(opts => opts.ResourcesPath = "Resources")`
-  - RequestLocalizationOptions: SupportedCultures = [tr-TR, en-US], DefaultRequestCulture = tr-TR
-  - `app.UseRequestLocalization(...)`
-- [ ] ExceptionTranslationBehavior'da IStringLocalizer ile MessageKey'i çevir, lokalize mesajla ApplicationException at
-- [ ] E2E test:
-  - `Accept-Language: en-US` header'ı ile request → response message İngilizce
+- [x] `Application/Shared/Resources/ErrorMessages.{tr,en}.resx` — Auth + Generic + Validation header mesajları (Türkçe / İngilizce)
+- [x] `Application/Shared/Validation/ValidationMessages.{tr,en}.resx` — FluentValidation mesajları (`Validation.Required`, `Validation.EmailInvalidFormat`, vs.)
+- [x] Resource key sabitleri **tek noktada**:
+  - `Application/Shared/Resources/ErrorMessageKeys.cs` — Auth / Error / Validation header key'leri
+  - `Application/Shared/Validation/ValidationMessages.cs` — FluentValidation key'leri
+- [x] `Application/Shared/Validation/CommonValidationRules.cs` — validator'lar sadece **key** basıyor (`WithMessage(ValidationMessages.Required)`); Application'da `IStringLocalizer` referansı yok
+- [x] `Application/Shared/Exceptions/ValidationException.cs` artık `Failures` taşıyor (her bir failure için key + FluentValidation placeholder dict — `{PropertyName}`, `{MaxLength}`)
+- [x] `AuthenticationException`, `BusinessRuleViolationException` artık `MessageKey` taşıyor; handler'lar `throw new AuthenticationException(ErrorMessageKeys.AuthInvalidCredentials)` yazıyor
+- [x] **Mimari karar — Yaklaşım B**: validator'lar key basar, **GlobalExceptionMiddleware translate eder**. Validator'lar tamamen sade ve framework-clean; localize iş tek noktada. (Yaklaşım A — her validator localizer inject — daha boilerplate'liydi)
+- [x] `Api/Configuration/LocalizationExtensions.cs` → `AddSiteManagementLocalization()` — Supported = [tr-TR, en-US], Default = tr-TR
+- [x] `Api/Configuration/PipelineExtensions.cs` — `app.UseRequestLocalization(...)` pipeline'ın **en üstünde** (middleware'lardan önce ki culture context'i set olsun)
+- [x] `Api/Middleware/GlobalExceptionMiddleware.cs`:
+  - `IStringLocalizer<ErrorMessages>` + `IStringLocalizer<ValidationMessages>` inject
+  - `AuthenticationException.MessageKey` ve `BusinessRuleViolationException.MessageKey` → localized `detail`
+  - `ValidationException.Failures` → her message key localize + `{PropertyName}/{MaxLength}/...` placeholder substitution (compiled regex)
+  - Missing key → key'i raw döndürür (developer-friendly fallback)
+- [x] Live smoke (Postman/curl):
+  - `Accept-Language: en-US` → `"Invalid email or password."`, `"Email is required."`
+  - `Accept-Language: tr-TR` → `"E-posta veya şifre hatalı."`, `"Email alanı zorunludur."`
+  - Header yok → tr-TR default
+  - Unsupported culture (`fr-FR`) → tr-TR fallback
+- [ ] _(W2'ye bırakıldı)_ E2E test: `Accept-Language` header smoke (TestContainers altyapısı W2 sonu)
+- [ ] _(W2'ye bırakıldı)_ Domain MessageKey sabitleri (Apartment.AlreadyOccupied, TcNo.Invalid, ...) — W2 Property/Residency aggregate'leriyle birlikte gelecek
+
+**Commit:** `feat: backend localization (tr-TR, en-US) with resx + request culture middleware (W1 Day 6)`
   - Header yok → Türkçe
 - [ ] FluentValidation'ın validation mesajlarını da lokalize et
 
