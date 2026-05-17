@@ -27,8 +27,8 @@
     <PackageVersion Include="BCrypt.Net-Next" Version="4.0.3" />
   </ItemGroup>
 
-  <ItemGroup Label="Swagger / API docs">
-    <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.6" />
+  <ItemGroup Label="API docs (OpenAPI via .NET 10 + Scalar UI)">
+    <PackageVersion Include="Scalar.AspNetCore" Version="2.14.14" />
   </ItemGroup>
 
   <ItemGroup Label="Logging">
