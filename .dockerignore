@@ -1,0 +1,43 @@
+# Keep the build context small and deterministic.
+**/.git
+**/.gitignore
+**/.gitattributes
+**/.github
+
+# .NET build outputs
+**/bin
+**/obj
+**/out
+**/publish
+**/TestResults
+**/*.user
+**/*.suo
+**/.vs
+**/.vscode
+**/.idea
+
+# Node / Angular (W2 sonrasi `web/` icin)
+**/node_modules
+**/dist
+**/.angular
+
+# Secrets / env / IDE clutter
+**/.env
+**/.env.*
+!**/.env.example
+**/appsettings.*.local.json
+**/*.local.json
+
+# Docs / large assets that shouldn't be inside images
+docs/
+*.md
+LICENSE
+
+# Test projects shouldn't end up in the API image build context unnecessarily,
+# but `dotnet restore -p:SolutionDir=...` would walk slnx and pull them in. We
+# avoid that by restoring with the csproj path directly (see Dockerfile).
+tests/
+
+# OS
+**/.DS_Store
+**/Thumbs.db

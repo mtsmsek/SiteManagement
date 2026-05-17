@@ -6,67 +6,74 @@
 
 ## HAFTA 1 — Foundation & Deploy
 
-### Gün 1 (Pazartesi) — Repo + Solution İskelet
+### Gün 1 (Pazartesi) — Repo + Solution İskelet ✅
 
 **Hedef:** GitHub'da temiz başlangıç, `dotnet build` solution hatasız geçiyor.
 
-- [ ] GitHub'da `site-management` adında private repo aç (sonradan public yapacağız)
-- [ ] Local'e clone
-- [ ] `dotnet new sln -n SiteManagement`
-- [ ] Class library projeleri:
+- [x] GitHub'da `SiteManagement` adında public repo aç (vitrin projesi, private değil) → https://github.com/mtsmsek/SiteManagement
+- [x] Local'e clone
+- [x] `dotnet new sln -n SiteManagement` _(net10 default'u `.slnx` üretiyor — yeni XML formatı)_
+- [x] Class library projeleri:
   - `dotnet new classlib -n SiteManagement.Domain -o src/SiteManagement.Domain`
   - `dotnet new classlib -n SiteManagement.Application -o src/SiteManagement.Application`
   - `dotnet new classlib -n SiteManagement.Infrastructure -o src/SiteManagement.Infrastructure`
-- [ ] WebApi projesi:
-  - `dotnet new webapi -n SiteManagement.Api -o src/SiteManagement.Api`
-- [ ] Test projeleri:
+- [x] WebApi projesi:
+  - `dotnet new webapi -n SiteManagement.Api -o src/SiteManagement.Api --use-controllers`
+- [x] Test projeleri:
   - `dotnet new xunit -n SiteManagement.Domain.Tests -o tests/SiteManagement.Domain.Tests`
   - `dotnet new xunit -n SiteManagement.Application.Tests -o tests/SiteManagement.Application.Tests`
   - `dotnet new xunit -n SiteManagement.E2E.Tests -o tests/SiteManagement.E2E.Tests`
-- [ ] `dotnet sln add **/*.csproj` (tüm projeleri solution'a ekle)
-- [ ] Project reference'lar:
+- [x] Tüm projeleri solution'a ekle (PowerShell: `dotnet sln add (Get-ChildItem -Recurse -Filter *.csproj | Select-Object -ExpandProperty FullName)`)
+- [x] Project reference'lar:
   - Application → Domain
   - Infrastructure → Application, Domain
   - Api → Application, Infrastructure
   - Domain.Tests → Domain
   - Application.Tests → Application
   - E2E.Tests → Api (+ Infrastructure indirect)
-- [ ] NuGet'ler:
+- [x] NuGet'ler — Central Package Management (Directory.Packages.props):
   - Application: `MediatR`, `FluentValidation`, `FluentValidation.DependencyInjectionExtensions`, `Microsoft.Extensions.Localization.Abstractions`
-  - Infrastructure: `Microsoft.EntityFrameworkCore`, `Npgsql.EntityFrameworkCore.PostgreSQL`, `Microsoft.AspNetCore.Identity.EntityFrameworkCore`, `BCrypt.Net-Next`
-  - Api: `Serilog.AspNetCore`, `Microsoft.AspNetCore.Authentication.JwtBearer`, `Swashbuckle.AspNetCore`
-  - Test'ler: `FluentAssertions`, `NSubstitute`, `Testcontainers.PostgreSql`, `Microsoft.AspNetCore.Mvc.Testing`
-- [ ] `.gitignore` (.NET için standart)
-- [ ] `LICENSE` (MIT)
-- [ ] `README.md` placeholder ("# SiteManagement — Patika bitirme projesi")
-- [ ] `dotnet build` solution hatasız geçiyor
-- [ ] `git add .`, commit, push
+  - Infrastructure: `Microsoft.EntityFrameworkCore`, `Npgsql.EntityFrameworkCore.PostgreSQL`, `Microsoft.AspNetCore.Identity.EntityFrameworkCore`, `BCrypt.Net-Next`, `Refit`, `Refit.HttpClientFactory`, `Microsoft.Extensions.Http.Resilience`
+  - Api: `Serilog.AspNetCore` + `Serilog.Sinks.{Console,File}`, `Microsoft.AspNetCore.Authentication.JwtBearer`, **`Scalar.AspNetCore`** (Swashbuckle yerine — .NET 10 + Microsoft.OpenApi 2.0 ile uyumsuzluk), `AspNetCore.HealthChecks.NpgSql`
+  - Test'ler: `FluentAssertions` 6.12.2 (8.x ticari lisansa geçti), `NSubstitute`, `Testcontainers.PostgreSql`, `Microsoft.AspNetCore.Mvc.Testing`
+- [x] Repo-scope `NuGet.config` — sadece `nuget.org` (deterministik build, başkası clone edince çalışsın)
+- [x] `Directory.Packages.props` — Central Package Management aktif
+- [x] `TreatWarningsAsErrors=true` tüm src projelerinde (production-grade discipline)
+- [x] `.gitignore` (.NET için standart + Node/Angular hazır)
+- [x] `LICENSE` (MIT)
+- [x] `README.md` placeholder
+- [x] `dotnet build` solution hatasız geçiyor (0 uyarı / 0 hata)
+- [x] `git add .`, commit, push
 
-**Commit:** `chore: initial solution skeleton with clean architecture layers`
+**Commit:** `chore: initial solution skeleton with clean architecture layers` → `2cc4a58`
 
 ---
 
-### Gün 2 (Salı) — Docker Compose
+### Gün 2 (Salı) — Docker Compose ✅
 
 **Hedef:** `docker compose up` ile Postgres + Mongo + MailHog + API hep birlikte ayağa kalkıyor.
 
-- [ ] Solution root'una `docker-compose.yml`:
-  - `postgres:16` (env: POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB; port 5432; volume: postgres-data)
-  - `mongo:7` (env: MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD; port 27017; volume: mongo-data)
+- [x] Solution root'una `docker-compose.yml`:
+  - `postgres:16-alpine` (env: POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB; port 5432; volume: postgres-data; **healthcheck: pg_isready**)
+  - `mongo:7` (env: MONGO_INITDB_ROOT_USERNAME, MONGO_INITDB_ROOT_PASSWORD; port 27017; volume: mongo-data; **healthcheck: db.adminCommand('ping')**)
   - `mailhog:latest` (port 1025 SMTP, 8025 UI)
-  - `api` (build: ./src/SiteManagement.Api; depends_on: postgres; ports: 8080:8080)
-- [ ] `.env.example` (gizli olmayan örnek değerlerle)
-- [ ] `.env` gitignore'da olduğunu doğrula
-- [ ] API için multi-stage `Dockerfile` (build → publish → runtime mcr.microsoft.com/dotnet/aspnet:10.0)
-- [ ] `appsettings.Development.json`'da connection string'leri container hostname'leriyle ayarla (Postgres = `Host=postgres`, Mongo = `Server=mongo`)
-- [ ] `docker compose up --build -d` çalıştır
-- [ ] `docker compose ps` ile tüm container'ların `running` olduğunu doğrula
-- [ ] MailHog UI: http://localhost:8025
-- [ ] Postgres'e DBeaver/pgAdmin ile bağlan (test connection)
-- [ ] Mongo'ya Compass ile bağlan
-- [ ] README'ye "Local Setup" bölümü ekle
+  - `api` (build: kök context + `src/SiteManagement.Api/Dockerfile`; depends_on: postgres healthy; ports: 8080:8080; **healthcheck: curl /health**)
+- [x] `.env.example` (Postgres, Mongo, MailHog, API, JWT placeholder credentials)
+- [x] `.env` gitignore'da (`.env` gitignored, `.env.example` istisna)
+- [x] API için multi-stage `Dockerfile` (sdk:10.0 → publish → aspnet:10.0; non-root `$APP_UID`; layer-cache için önce csproj sonra src kopyalama; healthcheck için curl kurulu)
+- [x] `appsettings.Development.json`'da default connection string + Smtp config; compose env var'ları (`ConnectionStrings__DefaultConnection`, `Smtp__Host`, `Jwt__*`) override eder
+- [x] `docker compose up --build -d` çalıştır → tüm container'lar `(healthy)`
+- [x] `docker compose ps` ile tüm container'ların `running` olduğunu doğrula
+- [x] MailHog UI: http://localhost:8025 → 200
+- [x] `/health` smoke endpoint: http://localhost:8080/health → `{"status":"ok"}`
+- [x] Scalar API docs UI: http://localhost:8080/scalar/v1 → 200 (Swashbuckle yerine)
+- [x] OpenAPI JSON: http://localhost:8080/openapi/v1.json → 200
+- [ ] _(Opsiyonel, manuel)_ Postgres'e DBeaver/pgAdmin ile bağlan (test connection)
+- [ ] _(Opsiyonel, manuel)_ Mongo'ya Compass ile bağlan
+- [x] README'ye "Local Setup" bölümü ekle
+- [x] PC kurulum talimatları: [docs/SETUP-MACHINE.md](docs/SETUP-MACHINE.md)
 
-**Commit:** `chore: docker-compose with postgres, mongo, mailhog and api service`
+**Commit:** `chore: docker-compose with postgres, mongo, mailhog and api service` + `fix: replace Swashbuckle with Scalar for .NET 10 / OpenApi 2.0 compatibility`
 
 ---
 
