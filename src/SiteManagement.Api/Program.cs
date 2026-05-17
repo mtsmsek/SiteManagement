@@ -5,6 +5,11 @@ using SiteManagement.Infrastructure.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Platform-injected env vars (Railway / Render / Heroku style): bind to $PORT
+// and translate DATABASE_URL to Npgsql syntax. No-ops locally.
+builder.UsePlatformPort();
+builder.UsePlatformDatabaseUrl();
+
 builder.Host.AddSerilogLogging();
 
 builder.Services

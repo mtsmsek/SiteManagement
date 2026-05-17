@@ -195,27 +195,31 @@
 
 **Hedef:** GitHub Actions yeşil, Railway'de live URL açılıyor, README sunulabilir.
 
-- [ ] `.github/workflows/ci.yml`:
-  - Trigger: pull_request, push to main
-  - Steps: checkout, setup-dotnet@v4 (10.0.x), restore, build, test
-  - Postgres service container (test'lerin DB'ye erişimi için) veya TestContainers (Docker-in-Docker)
-  - Test sonuç raporlamayı GitHub'a publish et
-- [ ] Main branch protection: PR'da review zorunlu (eğer tek başına çalışıyorsan kapalı tut), status check zorunlu
-- [ ] Railway hesabı, GitHub repo bağla
-- [ ] Railway'de:
-  - PostgreSQL add-on
-  - Environment variables: ConnectionStrings__DefaultConnection, Jwt__Key, vs.
-  - Dockerfile-based deploy
-- [ ] İlk deploy → public URL al
-- [ ] Postman'le live URL'de register + login test, /health 200
-- [ ] README v1:
-  - Proje özeti (Patika bitirme + DDD ile modernize)
-  - Tech stack listesi
-  - Local çalıştırma (`docker compose up`)
-  - Live URL
-  - Mimari özeti placeholder (W6'da detay)
+- [x] `.github/workflows/ci.yml`:
+  - Trigger: pull_request, push to main, workflow_dispatch
+  - Concurrency group: aynı branch'e gelen yeni push eskisini iptal eder
+  - Postgres 16 service container (5432 exposed, healthcheck `pg_isready`)
+  - NuGet cache (`actions/cache@v4`, key = csproj + `Directory.Packages.props` hash)
+  - Steps: checkout → setup-dotnet@v4 (10.0.x) → restore → build (Release, warnings = errors) → test (TRX + Coverlet code coverage)
+  - Test sonuçları artifact olarak yüklenir (`actions/upload-artifact@v4`)
+- [x] Railway uyumluluğu — kodda iki extension:
+  - `Api/Configuration/PortBindingExtensions.cs` → `$PORT` env varsa `ASPNETCORE_URLS=http://+:$PORT`'a bind
+  - `Api/Configuration/DatabaseUrlExtensions.cs` → `postgresql://user:pass@host:port/db` formatlı `DATABASE_URL`'yi Npgsql connection string'ine çevirir (SSL Mode = Require)
+  - 3 unit test (`E2E.Tests/Configuration/DatabaseUrlExtensionsTests.cs`) converter logic'i için
+- [x] `docs/DEPLOY-RAILWAY.md` — adım adım Railway deploy talimatları (hesap, repo bağlama, PostgreSQL add-on, env variables, domain, smoke test, troubleshooting, maliyet uyarısı)
+- [ ] _(Senin manuel adımın)_ Railway hesabı aç, repo bağla, ilk deploy → public URL al, README'ye yapıştır
+- [ ] _(Opsiyonel)_ Main branch protection: PR'da review + status check zorunlu (tek başına çalışıyorsan şimdilik kapalı)
+- [x] README v1:
+  - Proje özeti + CI badge + License badge + .NET badge
+  - "Bugün ne çalışıyor" özet listesi
+  - Tech stack tablosu
+  - Mimari özeti (katmanlar + akış)
+  - Local çalıştırma adımları (clone → .env → docker compose → curl /health → auth smoke)
+  - Lokalizasyon smoke örneği (`Accept-Language: en-US`)
+  - Production deploy bölümü (Railway pointers)
+  - CI bölümü
 
-**Commit:** `chore: github actions ci, railway deploy, readme v1`
+**Commit:** `chore: github actions ci, railway deploy prep, readme v1 (W1 Day 7)`
 
 ---
 
