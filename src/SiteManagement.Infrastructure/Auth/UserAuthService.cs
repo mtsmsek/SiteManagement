@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using SiteManagement.Application.Abstractions.Auth;
 using SiteManagement.Application.Shared.Exceptions;
 using SiteManagement.Application.Shared.Resources;
+using SiteManagement.Domain.Identity;
 using SiteManagement.Infrastructure.Identity;
 
 namespace SiteManagement.Infrastructure.Auth;
@@ -20,11 +21,70 @@ public class UserAuthService(
     private readonly ILogger<UserAuthService> _logger = logger;
 
     /// <inheritdoc />
-    public async Task<Guid> RegisterAsync(
+    public Task<Guid> RegisterAdminAsync(
+        string email,
+        string password,
+        string fullName,
+        CancellationToken ct)
+        => CreateUserInRoleAsync(email, password, fullName, Roles.Admin, residentId: null, ct);
+
+    /// <inheritdoc />
+    public Task<Guid> RegisterResidentUserAsync(
+        Guid residentId,
+        string email,
+        string password,
+        string fullName,
+        CancellationToken ct)
+        => CreateUserInRoleAsync(email, password, fullName, Roles.Resident, residentId, ct);
+
+    /// <inheritdoc />
+    public async Task<AuthenticatedUser?> AuthenticateAsync(string email, string password, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user is null)
+        {
+            return null;
+        }
+
+        var passwordOk = await _userManager.CheckPasswordAsync(user, password);
+        if (!passwordOk)
+        {
+            return null;
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return new AuthenticatedUser(user.Id, user.Email!, user.FullName, roles.ToArray(), user.ResidentId);
+    }
+
+    /// <inheritdoc />
+    public async Task<AuthenticatedUser?> GetByIdAsync(Guid userId, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user is null)
+        {
+            return null;
+        }
+
+        var roles = await _userManager.GetRolesAsync(user);
+        return new AuthenticatedUser(user.Id, user.Email!, user.FullName, roles.ToArray(), user.ResidentId);
+    }
+
+    /// <summary>
+    /// Common create-with-role implementation shared by the admin and
+    /// resident registration flows. The non-public method keeps the
+    /// role + residentId pairing rules in one place; public surface enforces
+    /// the right combination via separate methods on the interface.
+    /// </summary>
+    private async Task<Guid> CreateUserInRoleAsync(
         string email,
         string password,
         string fullName,
         string role,
+        Guid? residentId,
         CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested();
@@ -35,6 +95,7 @@ public class UserAuthService(
             Email = email,
             FullName = fullName,
             EmailConfirmed = true,
+            ResidentId = residentId,
         };
 
         var createResult = await _userManager.CreateAsync(user, password);
@@ -63,42 +124,6 @@ public class UserAuthService(
         }
 
         return user.Id;
-    }
-
-    /// <inheritdoc />
-    public async Task<AuthenticatedUser?> AuthenticateAsync(string email, string password, CancellationToken ct)
-    {
-        ct.ThrowIfCancellationRequested();
-
-        var user = await _userManager.FindByEmailAsync(email);
-        if (user is null)
-        {
-            return null;
-        }
-
-        var passwordOk = await _userManager.CheckPasswordAsync(user, password);
-        if (!passwordOk)
-        {
-            return null;
-        }
-
-        var roles = await _userManager.GetRolesAsync(user);
-        return new AuthenticatedUser(user.Id, user.Email!, user.FullName, roles.ToArray());
-    }
-
-    /// <inheritdoc />
-    public async Task<AuthenticatedUser?> GetByIdAsync(Guid userId, CancellationToken ct)
-    {
-        ct.ThrowIfCancellationRequested();
-
-        var user = await _userManager.FindByIdAsync(userId.ToString());
-        if (user is null)
-        {
-            return null;
-        }
-
-        var roles = await _userManager.GetRolesAsync(user);
-        return new AuthenticatedUser(user.Id, user.Email!, user.FullName, roles.ToArray());
     }
 
     /// <summary>Flattens an <see cref="IdentityResult"/> error collection into a single line for logging.</summary>

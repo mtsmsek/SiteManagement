@@ -1,8 +1,5 @@
 namespace SiteManagement.Api.Controllers.Auth;
 
-/// <summary>Request body for <c>POST /api/auth/register</c>.</summary>
-public sealed record RegisterRequest(string Email, string Password, string FullName);
-
 /// <summary>Request body for <c>POST /api/auth/login</c>.</summary>
 public sealed record LoginRequest(string Email, string Password);
 
@@ -15,6 +12,3 @@ public sealed record TokensResponse(
     DateTime AccessTokenExpiresAtUtc,
     string RefreshToken,
     DateTime RefreshTokenExpiresAtUtc);
-
-/// <summary>Response body for <c>POST /api/auth/register</c>.</summary>
-public sealed record RegisterResponse(Guid UserId);

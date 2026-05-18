@@ -41,6 +41,10 @@ public static class DependencyInjection
             .ValidateDataAnnotations()
             .ValidateOnStart();
 
+        services.AddOptions<AdminBootstrapOptions>()
+            .Bind(configuration.GetSection(AdminBootstrapOptions.SectionName))
+            .ValidateDataAnnotations();
+
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserAuthService, UserAuthService>();

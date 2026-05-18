@@ -5,15 +5,29 @@ namespace SiteManagement.Application.Abstractions.Auth;
 /// layer free of <c>UserManager</c>/<c>SignInManager</c> references so it
 /// stays infrastructure-agnostic and easy to unit-test with NSubstitute.
 /// </summary>
+/// <remarks>
+/// The admin and resident registration flows are split into separate
+/// methods on purpose: the resident flow takes a non-nullable
+/// <c>residentId</c> tying the AppUser to the Domain aggregate, and the
+/// admin flow forbids supplying one. Caller can't accidentally mix them up.
+/// </remarks>
 public interface IUserAuthService
 {
-    /// <summary>Creates a new user with the supplied details and assigns the given role.</summary>
+    /// <summary>Creates an Admin user with no resident link.</summary>
     /// <returns>The new user's identifier on success.</returns>
-    Task<Guid> RegisterAsync(
+    Task<Guid> RegisterAdminAsync(
         string email,
         string password,
         string fullName,
-        string role,
+        CancellationToken ct);
+
+    /// <summary>Creates a Resident user linked to the given Domain Resident aggregate.</summary>
+    /// <returns>The new user's identifier on success.</returns>
+    Task<Guid> RegisterResidentUserAsync(
+        Guid residentId,
+        string email,
+        string password,
+        string fullName,
         CancellationToken ct);
 
     /// <summary>Validates credentials and returns the principal payload needed to mint tokens.</summary>
@@ -26,5 +40,12 @@ public interface IUserAuthService
 
 /// <summary>
 /// Minimal user projection needed by the auth commands when issuing tokens.
+/// Carries <see cref="ResidentId"/> when the principal is a resident so the
+/// token service can embed it as the <c>resident_id</c> claim.
 /// </summary>
-public sealed record AuthenticatedUser(Guid Id, string Email, string FullName, IReadOnlyList<string> Roles);
+public sealed record AuthenticatedUser(
+    Guid Id,
+    string Email,
+    string FullName,
+    IReadOnlyList<string> Roles,
+    Guid? ResidentId);

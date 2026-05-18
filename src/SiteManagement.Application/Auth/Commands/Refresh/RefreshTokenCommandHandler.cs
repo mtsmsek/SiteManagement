@@ -29,7 +29,7 @@ public sealed class RefreshTokenCommandHandler(
         var user = await _userAuth.GetByIdAsync(userId, cancellationToken)
                    ?? throw new AuthenticationException(ErrorMessageKeys.AuthRefreshOwnerMissing);
 
-        var tokens = _tokenService.IssueTokens(user.Id, user.Email, user.Roles);
+        var tokens = _tokenService.IssueTokens(user.Id, user.Email, user.Roles, user.ResidentId);
 
         await _refreshTokenStore.StoreAsync(
             user.Id,

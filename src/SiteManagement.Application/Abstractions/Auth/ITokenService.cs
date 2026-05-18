@@ -2,8 +2,8 @@ namespace SiteManagement.Application.Abstractions.Auth;
 
 /// <summary>
 /// Application-facing port for issuing access &amp; refresh tokens. The
-/// Application layer never references <c>JwtSecurityTokenHandler</c> directly
-/// — the Infrastructure layer supplies the concrete implementation.
+/// Application layer never references <c>JwtSecurityTokenHandler</c>
+/// directly — the Infrastructure layer supplies the concrete implementation.
 /// </summary>
 public interface ITokenService
 {
@@ -13,12 +13,17 @@ public interface ITokenService
     /// <param name="userId">Identifier of the authenticated user.</param>
     /// <param name="email">Email claim embedded in the access token.</param>
     /// <param name="roles">Roles to encode as <c>ClaimTypes.Role</c> claims.</param>
-    AuthTokens IssueTokens(Guid userId, string email, IEnumerable<string> roles);
+    /// <param name="residentId">
+    /// When the user is linked to a <c>Resident</c> aggregate, emitted as
+    /// the <see cref="AuthClaims.ResidentId"/> claim so resident-only
+    /// endpoints can resolve the current resident without a database round-trip.
+    /// </param>
+    AuthTokens IssueTokens(Guid userId, string email, IEnumerable<string> roles, Guid? residentId);
 }
 
 /// <summary>
-/// Result of <see cref="ITokenService.IssueTokens"/>: a signed access JWT and
-/// an opaque refresh token, each with its expiry stamp in UTC.
+/// Result of <see cref="ITokenService.IssueTokens"/>: a signed access JWT
+/// and an opaque refresh token, each with its expiry stamp in UTC.
 /// </summary>
 public sealed record AuthTokens(
     string AccessToken,

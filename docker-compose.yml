@@ -75,6 +75,9 @@ services:
       Jwt__Audience: ${JWT_AUDIENCE:-SiteManagement.Clients}
       Jwt__AccessTokenMinutes: ${JWT_ACCESS_TOKEN_MINUTES:-60}
       Jwt__RefreshTokenDays: ${JWT_REFRESH_TOKEN_DAYS:-14}
+      Admin__BootstrapEmail: ${ADMIN_BOOTSTRAP_EMAIL:-}
+      Admin__BootstrapPassword: ${ADMIN_BOOTSTRAP_PASSWORD:-}
+      Admin__BootstrapFullName: ${ADMIN_BOOTSTRAP_FULL_NAME:-Site Admin}
     ports:
       - "${API_PORT:-8080}:8080"
     healthcheck:

@@ -3,39 +3,27 @@ using Microsoft.AspNetCore.Mvc;
 using SiteManagement.Api.Configuration;
 using SiteManagement.Application.Auth.Commands.Login;
 using SiteManagement.Application.Auth.Commands.Refresh;
-using SiteManagement.Application.Auth.Commands.Register;
 
 namespace SiteManagement.Api.Controllers.Auth;
 
 /// <summary>
-/// Authentication endpoints. The controller is a thin shell that translates
-/// HTTP DTOs to MediatR commands; all business logic lives in the handlers.
+/// Authentication endpoints. Thin controller that translates HTTP DTOs to
+/// MediatR commands; all business logic lives in the handlers.
 /// </summary>
+/// <remarks>
+/// Deliberately no <c>register</c> endpoint here. The bootstrap admin is
+/// seeded at startup from environment variables; every subsequent user
+/// (resident or admin) is created by an authenticated admin via the
+/// resident / admin management endpoints, never by anonymous self-service.
+/// </remarks>
 [ApiController]
 [Route($"{ApiConstants.RoutePrefix}/auth")]
 public class AuthController(ISender sender) : ControllerBase
 {
-    private const string RegisterRoute = "register";
     private const string LoginRoute = "login";
     private const string RefreshRoute = "refresh";
 
     private readonly ISender _sender = sender;
-
-    /// <summary>Creates an admin user. Resident accounts use a different flow (W2).</summary>
-    [HttpPost(RegisterRoute)]
-    [ProducesResponseType<RegisterResponse>(StatusCodes.Status200OK)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
-    public async Task<ActionResult<RegisterResponse>> Register(
-        [FromBody] RegisterRequest request,
-        CancellationToken ct)
-    {
-        var result = await _sender.Send(
-            new RegisterCommand(request.Email, request.Password, request.FullName),
-            ct);
-
-        return Ok(new RegisterResponse(result.UserId));
-    }
 
     /// <summary>Authenticates an existing user and returns an access + refresh token pair.</summary>
     [HttpPost(LoginRoute)]

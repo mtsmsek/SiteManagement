@@ -44,7 +44,7 @@ public class LoginCommandHandlerTests
 
         _userAuth.AuthenticateAsync(user.Email, AuthDoubles.DefaultPassword, Arg.Any<CancellationToken>())
             .Returns(user);
-        _tokenService.IssueTokens(user.Id, user.Email, Arg.Any<IEnumerable<string>>())
+        _tokenService.IssueTokens(user.Id, user.Email, Arg.Any<IEnumerable<string>>(), user.ResidentId)
             .Returns(expectedTokens);
 
         var sut = CreateHandler();

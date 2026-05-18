@@ -18,6 +18,7 @@ builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration)
     .AddJwtAuth(builder.Configuration)
+    .AddCurrentUser()
     .AddSiteManagementHealthChecks(builder.Configuration)
     .AddSiteManagementLocalization()
     .AddSiteManagementOpenApi();

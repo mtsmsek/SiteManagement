@@ -26,7 +26,7 @@ public sealed class LoginCommandHandler(
         var user = await _userAuth.AuthenticateAsync(request.Email, request.Password, cancellationToken)
                    ?? throw new AuthenticationException(ErrorMessageKeys.AuthInvalidCredentials);
 
-        var tokens = _tokenService.IssueTokens(user.Id, user.Email, user.Roles);
+        var tokens = _tokenService.IssueTokens(user.Id, user.Email, user.Roles, user.ResidentId);
 
         await _refreshTokenStore.StoreAsync(
             user.Id,

@@ -18,7 +18,7 @@ public class TokenService(IOptions<JwtOptions> options, TimeProvider clock) : IT
     private readonly TimeProvider _clock = clock;
 
     /// <inheritdoc />
-    public AuthTokens IssueTokens(Guid userId, string email, IEnumerable<string> roles)
+    public AuthTokens IssueTokens(Guid userId, string email, IEnumerable<string> roles, Guid? residentId)
     {
         var nowUtc = _clock.GetUtcNow().UtcDateTime;
         var accessExpiresAt = nowUtc.AddMinutes(_options.AccessTokenMinutes);
@@ -31,6 +31,11 @@ public class TokenService(IOptions<JwtOptions> options, TimeProvider clock) : IT
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         };
         claims.AddRange(roles.Select(r => new Claim(ClaimTypes.Role, r)));
+
+        if (residentId is { } rid)
+        {
+            claims.Add(new Claim(AuthClaims.ResidentId, rid.ToString()));
+        }
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

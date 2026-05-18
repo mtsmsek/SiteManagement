@@ -31,8 +31,9 @@ public static class AuthDoubles
         Guid? id = null,
         string email = DefaultEmail,
         string fullName = DefaultFullName,
-        IReadOnlyList<string>? roles = null)
-        => new(id ?? Guid.NewGuid(), email, fullName, roles ?? new[] { Roles.Admin });
+        IReadOnlyList<string>? roles = null,
+        Guid? residentId = null)
+        => new(id ?? Guid.NewGuid(), email, fullName, roles ?? new[] { Roles.Admin }, residentId);
 
     /// <summary>Creates a sample <see cref="AuthTokens"/> with sensible expiry defaults.</summary>
     public static AuthTokens SampleTokens(
