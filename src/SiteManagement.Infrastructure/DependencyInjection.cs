@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SiteManagement.Application.Abstractions.Auth;
+using SiteManagement.Application.Abstractions.Email;
 using SiteManagement.Infrastructure.Auth;
+using SiteManagement.Infrastructure.Email;
 using SiteManagement.Infrastructure.Identity;
 using SiteManagement.Infrastructure.Persistence;
 
@@ -45,10 +47,15 @@ public static class DependencyInjection
             .Bind(configuration.GetSection(AdminBootstrapOptions.SectionName))
             .ValidateDataAnnotations();
 
+        services.AddOptions<SmtpOptions>()
+            .Bind(configuration.GetSection(SmtpOptions.SectionName));
+
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserAuthService, UserAuthService>();
         services.AddSingleton<IRefreshTokenStore, InMemoryRefreshTokenStore>();
+        services.AddSingleton<IPasswordGenerator, PasswordGenerator>();
+        services.AddScoped<IEmailSender, SmtpEmailSender>();
 
         return services;
     }

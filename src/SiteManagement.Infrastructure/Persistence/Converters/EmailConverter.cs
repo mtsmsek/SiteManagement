@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using SiteManagement.Domain.Residency.ValueObjects;
+using DomainEmail = SiteManagement.Domain.Residency.ValueObjects.Email;
 
 namespace SiteManagement.Infrastructure.Persistence.Converters;
 
-/// <summary>Maps <see cref="Email"/> to/from its lower-cased string storage form.</summary>
-public sealed class EmailConverter : ValueConverter<Email, string>
+/// <summary>Maps the Residency <c>Email</c> value object to/from its lower-cased string storage form.</summary>
+public sealed class EmailConverter : ValueConverter<DomainEmail, string>
 {
     public EmailConverter()
-        : base(v => v.Value, v => Email.From(v))
+        : base(v => v.Value, v => DomainEmail.From(v))
     {
     }
 }

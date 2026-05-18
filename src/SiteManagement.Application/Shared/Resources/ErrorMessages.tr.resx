@@ -98,4 +98,10 @@
   <data name="Residency.VehicleNote.TooLong" xml:space="preserve">
     <value>Araç notu en fazla {0} karakter olabilir.</value>
   </data>
+  <data name="Residency.DuplicateTcNo" xml:space="preserve">
+    <value>Bu T.C. kimlik numarası ile zaten bir sakin kayıtlı.</value>
+  </data>
+  <data name="Residency.DuplicateEmail" xml:space="preserve">
+    <value>Bu e-posta adresi ile zaten bir kullanıcı kayıtlı.</value>
+  </data>
 </root>

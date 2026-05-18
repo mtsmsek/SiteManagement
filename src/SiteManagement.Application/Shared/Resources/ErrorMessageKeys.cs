@@ -29,4 +29,10 @@ public static class ErrorMessageKeys
 
     /// <summary>RFC 7807 default title for the validation problem.</summary>
     public const string ValidationFailed = "Validation.Failed";
+
+    /// <summary>Resident registration attempted with a TcNo that is already on file.</summary>
+    public const string ResidencyDuplicateTcNo = "Residency.DuplicateTcNo";
+
+    /// <summary>Resident registration attempted with an email that is already on file (Identity unique constraint).</summary>
+    public const string ResidencyDuplicateEmail = "Residency.DuplicateEmail";
 }
