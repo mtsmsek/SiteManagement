@@ -290,35 +290,36 @@
 
 ### Gün 3 (Çarşamba) — Residency Domain (TDD)
 
-**Hedef:** Resident aggregate ve value object'ler tamam, TC validation çalışıyor.
+**Hedef:** Resident aggregate ve value object'ler tamam, TC validation çalışıyor. ✅
 
-- [ ] `Domain/Residency/ValueObjects/`:
-  - `TcNo` (string, 11 hane + checksum validation — gerçek TC algoritması)
-  - `FullName` (firstName, lastName, max length)
-  - `Email` (regex validation)
-  - `PhoneNumber` (Türkiye formatı: +90 veya 0 ile başlar, 10 hane)
-  - `PlateNumber` (Türkiye plaka format'ı: il kodu + harf + sayı)
-  - `VehicleInfo` (PlateNumber, opsiyonel ek bilgi)
-- [ ] `Domain/Residency/Exceptions/`:
-  - `InvalidTcNoException`
-  - `InvalidEmailException`
-  - `InvalidPhoneNumberException`
-  - `InvalidPlateNumberException`
-- [ ] **TDD** (`Domain.Tests/Residency/TcNoTests.cs`):
-  - Geçerli TC ile create → success
-  - Checksum'ı yanlış TC → exception
-  - 11 haneden az/fazla → exception
-  - Harf içeriyor → exception
-- [ ] `Domain/Residency/Resident.cs` (aggregate root):
-  - Id, TcNo, FullName, Email, PhoneNumber, Vehicles (List<VehicleInfo>)
+- [x] `Domain/Residency/ResidencyLimits.cs` — numeric sabitler (TcNoLength=11, NameComponentMaxLength=60, EmailMaxLength=254, PhoneNumberMaxLength=16, VehicleNoteMaxLength=120) tek noktada
+- [x] `Domain/Residency/Exceptions/ResidencyMessageKeys.cs` — 8 stable resource key
+- [x] `Domain/Residency/ValueObjects/`:
+  - `TcNo` — 11 hane + leading-digit + **gerçek T.C. checksum** algoritması (odd*7-even mod 10, sum mod 10)
+  - `FullName.Create(firstName, lastName)` — iki parça, trim + length cap
+  - `Email` — `local@domain.tld` + lowercase normalize + length cap (`GeneratedRegex`)
+  - `PhoneNumber` — TR formatı (5XXXXXXXXX / 05XXXXXXXXX / +905XXXXXXXXX, noise stripping); canonical `+90XXXXXXXXXX`
+  - `PlateNumber` — TR plaka NN[A-Z]{1,3}NNNN, **gerçek il kodu range'i 01..81**, uppercase + whitespace strip
+  - `VehicleInfo` — `PlateNumber` (required) + optional note (whitespace → null, length cap)
+- [x] `Domain/Residency/Exceptions/` — 8 concrete `DomainException`:
+  - `InvalidTcNoException`, `InvalidFullNameException`, `InvalidEmailException`, `InvalidPhoneNumberException`, `InvalidPlateNumberException`
+  - `DuplicateVehiclePlateException`, `VehicleNotFoundException`, `VehicleNoteTooLongException`
+- [x] Localization: `Residency.*` MessageKey'leri için tr + en `.resx` entry'leri (8 anahtar)
+- [x] **TDD — önce test, sonra kod**:
+  - `Domain.Tests/Residency/ValueObjects/TcNoTests.cs` — algorithm-valid sample'lar (10000000146, 12345678950), bad-shape vakaları, checksum failure (12345678901)
+  - `FullNameTests.cs`, `EmailTests.cs`, `PhoneNumberTests.cs` (5 input form'u → canonical), `PlateNumberTests.cs` (province 01..81 boundary, normalisation), `VehicleInfoTests.cs`
+  - `Residency/ResidentTests.cs` — Create, UpdateContactInfo, ChangeFullName, AddVehicle (case-insensitive duplicate plate rejection), RemoveVehicle success+not-found, Vehicles read-only encapsulation
+- [x] `Domain/Residency/Resident.cs : AggregateRoot<Guid>`:
+  - Id (auto), TcNo (immutable), FullName, Email, Phone, Vehicles (`IReadOnlyCollection<VehicleInfo>`)
   - Factory `Resident.Create(...)`
-  - Behaviors: `UpdateContactInfo(email, phone)`, `AddVehicle(VehicleInfo)`, `RemoveVehicle(plateNumber)`, `ChangeFullName(...)`
-- [ ] **Test yaz** (`ResidentTests.cs`):
-  - `Create_WithValidData_Success`
-  - `AddVehicle_WithDuplicatePlate_Throws`
-  - `RemoveVehicle_WhenNotExists_Throws`
+  - Behaviors: `UpdateContactInfo(email, phone)`, `ChangeFullName(name)`, `AddVehicle(vehicle)`, `RemoveVehicle(plate)`
+- [x] `Domain.Tests/Doubles/ResidencyDoubles.cs` — paylaşılan factory'ler (`SampleTc`, `SampleResident`, `SampleVehicle`, ...) — test'lerde tekrar yok
+- [x] AAA pattern + `// arrange/act/assert` yorumları her testte
+- [x] **Coverage**: Domain assembly **%88.9** (W1 sonu %86.5 → +%2.4 artış)
+- [x] Architecture testleri yeşil (Domain framework-free, ResourceIntegrity drift yok, CQRS conventions intact)
+- [x] **172/172 test** yeşil (Domain 149, Application 5, E2E 3, Architecture 15)
 
-**Commit:** `feat(domain): residency bounded context with value objects and tc validation`
+**Commit:** `feat(domain): residency bounded context with value objects and tc validation (W2 Day 3)`
 
 ---
 

@@ -72,4 +72,30 @@
   <data name="Property.Site.BlockNotFound" xml:space="preserve">
     <value>Block ({0}) was not found in this site.</value>
   </data>
+
+  <!-- Residency context -->
+  <data name="Residency.TcNo.Invalid" xml:space="preserve">
+    <value>Invalid Turkish citizenship number.</value>
+  </data>
+  <data name="Residency.FullName.Invalid" xml:space="preserve">
+    <value>First and last names are required and each must be at most {0} characters.</value>
+  </data>
+  <data name="Residency.Email.Invalid" xml:space="preserve">
+    <value>Invalid email address: '{0}'.</value>
+  </data>
+  <data name="Residency.PhoneNumber.Invalid" xml:space="preserve">
+    <value>Invalid phone number: '{0}'. Expected format: 5XXXXXXXXX, 05XXXXXXXXX, or +905XXXXXXXXX.</value>
+  </data>
+  <data name="Residency.PlateNumber.Invalid" xml:space="preserve">
+    <value>Invalid license plate: '{0}'. Expected format: 34ABC123 (province code + 1-3 letters + 2-4 digits).</value>
+  </data>
+  <data name="Residency.Vehicle.DuplicatePlate" xml:space="preserve">
+    <value>A vehicle with plate '{0}' is already registered for this resident.</value>
+  </data>
+  <data name="Residency.Vehicle.NotFound" xml:space="preserve">
+    <value>No vehicle with plate '{0}' was found for this resident.</value>
+  </data>
+  <data name="Residency.VehicleNote.TooLong" xml:space="preserve">
+    <value>Vehicle note must be at most {0} characters.</value>
+  </data>
 </root>

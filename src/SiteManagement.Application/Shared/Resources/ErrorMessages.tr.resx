@@ -72,4 +72,30 @@
   <data name="Property.Site.BlockNotFound" xml:space="preserve">
     <value>Blok ({0}) bu sitede bulunamadı.</value>
   </data>
+
+  <!-- Residency context -->
+  <data name="Residency.TcNo.Invalid" xml:space="preserve">
+    <value>Geçersiz T.C. kimlik numarası.</value>
+  </data>
+  <data name="Residency.FullName.Invalid" xml:space="preserve">
+    <value>Ad ve soyad alanları boş olamaz ve her biri en fazla {0} karakter olabilir.</value>
+  </data>
+  <data name="Residency.Email.Invalid" xml:space="preserve">
+    <value>Geçersiz e-posta adresi: '{0}'.</value>
+  </data>
+  <data name="Residency.PhoneNumber.Invalid" xml:space="preserve">
+    <value>Geçersiz telefon numarası: '{0}'. Beklenen format: 5XXXXXXXXX, 05XXXXXXXXX veya +905XXXXXXXXX.</value>
+  </data>
+  <data name="Residency.PlateNumber.Invalid" xml:space="preserve">
+    <value>Geçersiz plaka: '{0}'. Beklenen format: 34ABC123 gibi (il kodu + 1-3 harf + 2-4 rakam).</value>
+  </data>
+  <data name="Residency.Vehicle.DuplicatePlate" xml:space="preserve">
+    <value>'{0}' plakalı araç bu sakine zaten kayıtlı.</value>
+  </data>
+  <data name="Residency.Vehicle.NotFound" xml:space="preserve">
+    <value>'{0}' plakalı araç bu sakinde bulunamadı.</value>
+  </data>
+  <data name="Residency.VehicleNote.TooLong" xml:space="preserve">
+    <value>Araç notu en fazla {0} karakter olabilir.</value>
+  </data>
 </root>
