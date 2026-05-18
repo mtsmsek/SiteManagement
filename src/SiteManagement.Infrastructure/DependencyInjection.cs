@@ -44,8 +44,7 @@ public static class DependencyInjection
             .ValidateOnStart();
 
         services.AddOptions<AdminBootstrapOptions>()
-            .Bind(configuration.GetSection(AdminBootstrapOptions.SectionName))
-            .ValidateDataAnnotations();
+            .Bind(configuration.GetSection(AdminBootstrapOptions.SectionName));
 
         services.AddOptions<SmtpOptions>()
             .Bind(configuration.GetSection(SmtpOptions.SectionName));

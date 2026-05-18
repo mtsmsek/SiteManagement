@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace SiteManagement.Infrastructure.Auth;
 
 /// <summary>
@@ -8,13 +6,19 @@ namespace SiteManagement.Infrastructure.Auth;
 /// The startup seeder skips when either field is missing, so local dev runs
 /// without any bootstrap admin if the operator hasn't set one up.
 /// </summary>
+/// <remarks>
+/// No <c>[EmailAddress]</c> annotation on <see cref="BootstrapEmail"/> on
+/// purpose — DataAnnotations runs at bind time, so a deliberately-empty
+/// value (the "no bootstrap admin in this environment" signal) would
+/// otherwise blow up startup. Email shape is validated by
+/// <c>UserManager.CreateAsync</c> when the seeder actually uses the value.
+/// </remarks>
 public class AdminBootstrapOptions
 {
     /// <summary>Configuration section name bound at startup.</summary>
     public const string SectionName = "Admin";
 
     /// <summary>Email + login of the bootstrap admin. Empty disables seeding.</summary>
-    [EmailAddress]
     public string? BootstrapEmail { get; init; }
 
     /// <summary>Password for the bootstrap admin. Empty disables seeding.</summary>
