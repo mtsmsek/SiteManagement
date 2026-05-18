@@ -12,9 +12,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+
+  <!-- Generic -->
   <data name="Error.Generic" xml:space="preserve">
     <value>Bir hata oluştu.</value>
   </data>
+  <data name="Validation.Failed" xml:space="preserve">
+    <value>Bir veya daha fazla doğrulama hatası oluştu.</value>
+  </data>
+
+  <!-- Auth -->
   <data name="Auth.InvalidCredentials" xml:space="preserve">
     <value>E-posta veya şifre hatalı.</value>
   </data>
@@ -30,7 +37,39 @@
   <data name="Auth.RoleAssignmentFailed" xml:space="preserve">
     <value>Kullanıcı rol ataması yapılamadı.</value>
   </data>
-  <data name="Validation.Failed" xml:space="preserve">
-    <value>Bir veya daha fazla doğrulama hatası oluştu.</value>
+
+  <!-- Property context -->
+  <data name="Property.ApartmentType.Invalid" xml:space="preserve">
+    <value>Geçersiz daire tipi: '{0}'. Beklenen format: '2+1' gibi N+M.</value>
+  </data>
+  <data name="Property.ApartmentNumber.OutOfRange" xml:space="preserve">
+    <value>Daire numarası {0}, izin verilen aralığın dışında ({1}..{2}).</value>
+  </data>
+  <data name="Property.Floor.OutOfRange" xml:space="preserve">
+    <value>Kat numarası {0}, izin verilen aralığın dışında ({1}..{2}).</value>
+  </data>
+  <data name="Property.BlockName.Invalid" xml:space="preserve">
+    <value>Blok adı boş olamaz ve en fazla {0} karakter olabilir.</value>
+  </data>
+  <data name="Property.SiteName.Invalid" xml:space="preserve">
+    <value>Site adı boş olamaz ve en fazla {0} karakter olabilir.</value>
+  </data>
+  <data name="Property.Apartment.AlreadyOccupied" xml:space="preserve">
+    <value>Daire ({0}) zaten dolu.</value>
+  </data>
+  <data name="Property.Apartment.NotOccupied" xml:space="preserve">
+    <value>Daire ({0}) zaten boş.</value>
+  </data>
+  <data name="Property.Block.DuplicateApartmentNumber" xml:space="preserve">
+    <value>{0} numaralı daire bu blokta zaten mevcut.</value>
+  </data>
+  <data name="Property.Block.ApartmentNotFound" xml:space="preserve">
+    <value>Daire ({0}) bu blokta bulunamadı.</value>
+  </data>
+  <data name="Property.Site.DuplicateBlockName" xml:space="preserve">
+    <value>'{0}' adlı blok bu sitede zaten mevcut.</value>
+  </data>
+  <data name="Property.Site.BlockNotFound" xml:space="preserve">
+    <value>Blok ({0}) bu sitede bulunamadı.</value>
   </data>
 </root>

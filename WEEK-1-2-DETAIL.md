@@ -255,38 +255,36 @@
   - `ApartmentNumber` (int, range 1-999)
   - `Floor` (int, range -5 to 50, negatif = bodrum)
   - `BlockName` (string, max 50 char)
-- [ ] `Domain/Property/Exceptions/`:
-  - `InvalidApartmentTypeException : DomainException`
-  - `DuplicateApartmentNumberException : DomainException`
-  - `ApartmentAlreadyOccupiedException : DomainException`
-  - `ApartmentNotOccupiedException : DomainException`
-  - `EmptyBlockException : DomainException` (boş blok silinemez gibi kural varsa)
-- [ ] **TDD — önce test yaz** (`Domain.Tests/Property/ApartmentTests.cs`):
-  - `Create_WithInvalidType_Throws`
-  - `Create_DefaultStatus_IsEmpty`
-  - `MarkAsOccupied_WhenEmpty_ChangesStatusToOccupied`
-  - `MarkAsOccupied_WhenAlreadyOccupied_Throws`
-  - `MarkAsEmpty_WhenOccupied_ChangesStatusToEmpty`
-- [ ] `Domain/Property/Apartment.cs`:
-  - private ctor, public factory `Apartment.Create(ApartmentNumber, Floor, ApartmentType)`
-  - Status property (private set), enum (Empty, Occupied)
-  - Behaviors: `MarkAsOccupied()`, `MarkAsEmpty()`, `ChangeType(ApartmentType)`
-- [ ] **Test yaz** (`BlockTests.cs`):
-  - `AddApartment_WithDuplicateNumber_Throws`
-  - `Block_Apartments_IsReadOnly` (encapsulation)
-- [ ] `Domain/Property/Block.cs`:
-  - private List<Apartment> _apartments, public IReadOnlyCollection<Apartment> Apartments
-  - `AddApartment(...)`, `RemoveApartment(apartmentId)`
-- [ ] **Test yaz** (`SiteTests.cs`):
-  - `AddBlock_WithDuplicateName_Throws`
-  - `Site_IsAggregateRoot_ManagesBlocks`
-- [ ] `Domain/Property/Site.cs` (aggregate root):
-  - private List<Block> _blocks, public IReadOnlyCollection<Block> Blocks
-  - `Site.Create(name, address)` factory
-  - `AddBlock(...)`, `RemoveBlock(...)`
-- [ ] `coverlet` ile coverage report → Domain.Property %85+ doğrula
+- [x] `Domain/Shared/` — DDD omurgası (W1'de yoktu, W2 başlangıcında oturtuldu):
+  - `Entity<TId>` — Id-based equality, transient-id guard, EF-friendly protected ctor
+  - `AggregateRoot<TId> : Entity<TId>` — domain event listesi sadece root'ta tutulur
+  - `ValueObject` — `GetEqualityComponents()` ile component-based equality
+  - `IDomainEvent` — `OccurredOnUtc` taşır; W3-W5'te concrete event'ler eklenecek
+- [x] `Domain/Property/Exceptions/`: 11 concrete `DomainException`:
+  - `InvalidApartmentTypeException`, `ApartmentNumberOutOfRangeException`, `FloorOutOfRangeException`
+  - `InvalidBlockNameException`, `InvalidSiteNameException`
+  - `ApartmentAlreadyOccupiedException`, `ApartmentNotOccupiedException`
+  - `DuplicateApartmentNumberException`, `ApartmentNotFoundInBlockException`
+  - `DuplicateBlockNameException`, `BlockNotFoundInSiteException`
+- [x] `Domain/Property/PropertyMessageKeys.cs` — tüm key sabitleri tek noktada (no magic strings)
+- [x] `Domain/Property/PropertyLimits.cs` — numeric sabitler (ApartmentNumber 1..999, Floor -5..50, BlockName ≤50, SiteName ≤120) tek noktada
+- [x] Localization: `Property.*` MessageKey'leri için tr + en `.resx` entry'leri (placeholder format'ları `{0}/{1}/{2}` ile)
+- [x] **TDD — önce test, sonra kod** (4 VO + 3 aggregate test class'ı):
+  - `Domain.Tests/Property/ValueObjects/ApartmentTypeTests.cs` — N+M parsing, equality, invalid input cases
+  - `ApartmentNumberTests.cs` — range invariant
+  - `FloorTests.cs` — signed range, `IsBasement` derived property
+  - `BlockNameTests.cs` — trim + length + case-insensitive equality
+  - `Property/ApartmentTests.cs` — `Create` default empty, `MarkAsOccupied`/`MarkAsEmpty` transitions, `ChangeType`
+  - `BlockTests.cs` — `AddApartment` duplicate-number rejection, `RemoveApartment` not-found, `Apartments` read-only encapsulation
+  - `SiteTests.cs` — name validation, `AddBlock` case-insensitive duplicate rejection, `RemoveBlock`, `GetBlock`, `Blocks` read-only encapsulation
+- [x] Production: 4 VO (`ApartmentType`, `ApartmentNumber`, `Floor`, `BlockName`), `OccupancyStatus` enum, `Apartment : Entity<Guid>`, `Block : Entity<Guid>`, `Site : AggregateRoot<Guid>`
+- [x] `Domain.Tests/Doubles/PropertyDoubles.cs` — paylaşılan factory'ler (`SampleApartment`, `SampleApartmentType`, vs.) — test'lerde tekrar yok
+- [x] AAA pattern + `// arrange/act/assert` yorumları her testte
+- [x] **Coverage**: Domain.Property %86.5+ (Apartment/Block/Site 100%, VO'lar 100%, Entity/AggregateRoot base'lerinin uncovered branch'leri: domain event'ler henüz raise edilmiyor, W3-W5'te kapanacak)
+- [x] Architecture testleri yeşil (Domain hala framework-free, ResourceIntegrity drift yok)
+- [x] 92/92 test yeşil (Domain 69, Application 5, E2E 3, Architecture 15)
 
-**Commit:** `feat(domain): property bounded context with rich aggregates and tdd invariants`
+**Commit:** `feat(domain): property bounded context with rich aggregates + tdd invariants (W2 Day 1-2)`
 
 ---
 

@@ -12,9 +12,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+
+  <!-- Generic -->
   <data name="Error.Generic" xml:space="preserve">
     <value>An error occurred.</value>
   </data>
+  <data name="Validation.Failed" xml:space="preserve">
+    <value>One or more validation errors occurred.</value>
+  </data>
+
+  <!-- Auth -->
   <data name="Auth.InvalidCredentials" xml:space="preserve">
     <value>Invalid email or password.</value>
   </data>
@@ -30,7 +37,39 @@
   <data name="Auth.RoleAssignmentFailed" xml:space="preserve">
     <value>Could not assign the requested role to the user.</value>
   </data>
-  <data name="Validation.Failed" xml:space="preserve">
-    <value>One or more validation errors occurred.</value>
+
+  <!-- Property context -->
+  <data name="Property.ApartmentType.Invalid" xml:space="preserve">
+    <value>Invalid apartment type '{0}'. Expected format: N+M (e.g. '2+1').</value>
+  </data>
+  <data name="Property.ApartmentNumber.OutOfRange" xml:space="preserve">
+    <value>Apartment number {0} is outside the allowed range ({1}..{2}).</value>
+  </data>
+  <data name="Property.Floor.OutOfRange" xml:space="preserve">
+    <value>Floor {0} is outside the allowed range ({1}..{2}).</value>
+  </data>
+  <data name="Property.BlockName.Invalid" xml:space="preserve">
+    <value>Block name must be non-empty and at most {0} characters.</value>
+  </data>
+  <data name="Property.SiteName.Invalid" xml:space="preserve">
+    <value>Site name must be non-empty and at most {0} characters.</value>
+  </data>
+  <data name="Property.Apartment.AlreadyOccupied" xml:space="preserve">
+    <value>Apartment ({0}) is already occupied.</value>
+  </data>
+  <data name="Property.Apartment.NotOccupied" xml:space="preserve">
+    <value>Apartment ({0}) is already empty.</value>
+  </data>
+  <data name="Property.Block.DuplicateApartmentNumber" xml:space="preserve">
+    <value>Apartment number {0} already exists in this block.</value>
+  </data>
+  <data name="Property.Block.ApartmentNotFound" xml:space="preserve">
+    <value>Apartment ({0}) was not found in this block.</value>
+  </data>
+  <data name="Property.Site.DuplicateBlockName" xml:space="preserve">
+    <value>A block named '{0}' already exists in this site.</value>
+  </data>
+  <data name="Property.Site.BlockNotFound" xml:space="preserve">
+    <value>Block ({0}) was not found in this site.</value>
   </data>
 </root>
