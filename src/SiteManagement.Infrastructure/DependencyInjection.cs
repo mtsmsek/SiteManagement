@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SiteManagement.Application.Abstractions.Auth;
@@ -10,28 +9,19 @@ using SiteManagement.Infrastructure.Persistence;
 namespace SiteManagement.Infrastructure;
 
 /// <summary>
-/// Composition root for the Infrastructure layer. Wires up EF Core +
-/// PostgreSQL, ASP.NET Core Identity, and concrete implementations of the
-/// Application-layer auth ports.
+/// Composition root for the Infrastructure layer. Delegates to focused
+/// per-concern extensions (persistence, identity, auth) so each wireup
+/// lives where the rest of its code lives instead of bloating one method.
 /// </summary>
 public static class DependencyInjection
 {
-    /// <summary>Name of the connection string read from configuration.</summary>
-    public const string ConnectionStringName = "DefaultConnection";
+    /// <summary>Re-exported so the Api layer can read it without taking a direct PersistenceExtensions dependency.</summary>
+    public const string ConnectionStringName = PersistenceExtensions.ConnectionStringName;
 
-    /// <summary>
-    /// Registers EF Core, Identity, and the auth services on the supplied
-    /// collection and returns it for chaining.
-    /// </summary>
+    /// <summary>Registers every Infrastructure service in the right scope.</summary>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString(ConnectionStringName)
-            ?? throw new InvalidOperationException(
-                $"Connection string '{ConnectionStringName}' is missing from configuration.");
-
-        services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(
-            connectionString,
-            npg => npg.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
+        services.AddPersistence(configuration);
 
         services
             .AddIdentity<AppUser, AppRole>(opts =>

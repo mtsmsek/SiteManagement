@@ -1,0 +1,51 @@
+namespace SiteManagement.Infrastructure.Persistence;
+
+/// <summary>
+/// Schema-level magic-value-free constants used by the EF Core
+/// configurations: table names, shadow foreign-key column names, and the
+/// private backing-field names that drive EF's read/write access for the
+/// aggregate-internal collections.
+/// </summary>
+public static class SchemaConstants
+{
+    /// <summary>Table names — one per persisted root or owned collection.</summary>
+    public static class Tables
+    {
+        public const string Sites = "Sites";
+        public const string Blocks = "Blocks";
+        public const string Apartments = "Apartments";
+        public const string Residents = "Residents";
+        public const string ResidentVehicles = "ResidentVehicles";
+
+        // Identity tables — flattened from the default AspNet* prefixes.
+        public const string Users = "Users";
+        public const string Roles = "Roles";
+        public const string UserRoles = "UserRoles";
+        public const string UserClaims = "UserClaims";
+        public const string UserLogins = "UserLogins";
+        public const string RoleClaims = "RoleClaims";
+        public const string UserTokens = "UserTokens";
+    }
+
+    /// <summary>Shadow foreign-key column names created by EF's parent-child mapping.</summary>
+    public static class ForeignKeys
+    {
+        public const string SiteId = "SiteId";
+        public const string BlockId = "BlockId";
+        public const string ResidentId = "ResidentId";
+    }
+
+    /// <summary>
+    /// Private backing-field names EF uses to read/write aggregate-internal
+    /// collections without going through the read-only facade.
+    /// </summary>
+    public static class BackingFields
+    {
+        public const string SiteBlocks = "_blocks";
+        public const string BlockApartments = "_apartments";
+        public const string ResidentVehicles = "_vehicles";
+    }
+
+    /// <summary>Shadow property name used as the synthetic PK on owned-collection rows.</summary>
+    public const string OwnedSurrogateKey = "Id";
+}

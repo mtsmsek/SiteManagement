@@ -27,4 +27,10 @@ public static class PropertyLimits
 
     /// <summary>Maximum length of a site address.</summary>
     public const int SiteAddressMaxLength = 250;
+
+    /// <summary>Maximum stored length of an apartment type string (e.g. <c>"3+1"</c>).</summary>
+    public const int ApartmentTypeMaxLength = 16;
+
+    /// <summary>Maximum stored length of an occupancy status name (string-converted enum).</summary>
+    public const int OccupancyStatusMaxLength = 20;
 }

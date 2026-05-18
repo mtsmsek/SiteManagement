@@ -1,23 +1,48 @@
+using System.Reflection;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SiteManagement.Domain.Property;
+using SiteManagement.Domain.Residency;
 using SiteManagement.Infrastructure.Identity;
 
 namespace SiteManagement.Infrastructure.Persistence;
 
+/// <summary>
+/// EF Core context for the relational store. Inherits from
+/// <see cref="IdentityDbContext{TUser, TRole, TKey}"/> so ASP.NET Core
+/// Identity uses the same migrations as the rest of the domain; aggregate
+/// roots register their mappings through <c>IEntityTypeConfiguration</c>
+/// classes picked up by assembly scanning.
+/// </summary>
 public class AppDbContext(DbContextOptions<AppDbContext> options)
     : IdentityDbContext<AppUser, AppRole, Guid>(options)
 {
+    /// <summary>Property bounded context root set.</summary>
+    public DbSet<Site> Sites => Set<Site>();
+
+    /// <summary>Residency bounded context root set.</summary>
+    public DbSet<Resident> Residents => Set<Resident>();
+
+    /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
-        // Shorter, conventional table names instead of AspNet* prefixes.
-        modelBuilder.Entity<AppUser>(b => b.ToTable("Users"));
-        modelBuilder.Entity<AppRole>(b => b.ToTable("Roles"));
-        modelBuilder.Entity<Microsoft.AspNetCore.Identity.IdentityUserRole<Guid>>(b => b.ToTable("UserRoles"));
-        modelBuilder.Entity<Microsoft.AspNetCore.Identity.IdentityUserClaim<Guid>>(b => b.ToTable("UserClaims"));
-        modelBuilder.Entity<Microsoft.AspNetCore.Identity.IdentityUserLogin<Guid>>(b => b.ToTable("UserLogins"));
-        modelBuilder.Entity<Microsoft.AspNetCore.Identity.IdentityRoleClaim<Guid>>(b => b.ToTable("RoleClaims"));
-        modelBuilder.Entity<Microsoft.AspNetCore.Identity.IdentityUserToken<Guid>>(b => b.ToTable("UserTokens"));
+        ApplyShorterIdentityTableNames(modelBuilder);
+
+        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
+
+    /// <summary>Flattens the default <c>AspNet*</c> prefixes so the schema reads like the rest of the domain.</summary>
+    private static void ApplyShorterIdentityTableNames(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<AppUser>(b => b.ToTable(SchemaConstants.Tables.Users));
+        modelBuilder.Entity<AppRole>(b => b.ToTable(SchemaConstants.Tables.Roles));
+        modelBuilder.Entity<IdentityUserRole<Guid>>(b => b.ToTable(SchemaConstants.Tables.UserRoles));
+        modelBuilder.Entity<IdentityUserClaim<Guid>>(b => b.ToTable(SchemaConstants.Tables.UserClaims));
+        modelBuilder.Entity<IdentityUserLogin<Guid>>(b => b.ToTable(SchemaConstants.Tables.UserLogins));
+        modelBuilder.Entity<IdentityRoleClaim<Guid>>(b => b.ToTable(SchemaConstants.Tables.RoleClaims));
+        modelBuilder.Entity<IdentityUserToken<Guid>>(b => b.ToTable(SchemaConstants.Tables.UserTokens));
     }
 }

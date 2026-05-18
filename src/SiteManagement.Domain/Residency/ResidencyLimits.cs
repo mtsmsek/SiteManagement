@@ -21,4 +21,7 @@ public static class ResidencyLimits
 
     /// <summary>Maximum length of a free-form vehicle description note.</summary>
     public const int VehicleNoteMaxLength = 120;
+
+    /// <summary>Maximum stored length of a canonical TR license plate (uppercase, no separators).</summary>
+    public const int PlateNumberMaxLength = 16;
 }

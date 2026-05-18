@@ -323,32 +323,72 @@
 
 ---
 
-### Gün 4 (Perşembe) — EF Mapping + Migration + Repositories
+### Gün 4 (Perşembe) — EF Mapping + Migration + Repositories ✅
 
-**Hedef:** Property + Residency tabloları Postgres'te oluştu, repository'ler hazır.
+**Hedef:** Property + Residency tabloları Postgres'te oluştu, repository + read-query port'ları hazır, CQRS read/write tam ayrı.
 
-- [ ] `Infrastructure/Persistence/Configurations/`:
-  - `SiteConfiguration : IEntityTypeConfiguration<Site>`
-  - `BlockConfiguration : IEntityTypeConfiguration<Block>` (FK to Site)
-  - `ApartmentConfiguration : IEntityTypeConfiguration<Apartment>` (FK to Block)
-  - `ResidentConfiguration : IEntityTypeConfiguration<Resident>`
-  - `VehicleInfoConfiguration` (owned entity collection)
-- [ ] Value object converter'lar:
-  - `TcNoConverter : ValueConverter<TcNo, string>`
-  - `EmailConverter`, `PhoneNumberConverter`, vs.
-- [ ] `AppDbContext.OnModelCreating`'de configuration'ları apply et
-- [ ] `dotnet ef migrations add PropertyAndResidency -p src/SiteManagement.Infrastructure -s src/SiteManagement.Api`
-- [ ] `dotnet ef database update ...`
-- [ ] Postgres'te tabloları gör (Sites, Blocks, Apartments, Residents, ResidentVehicles)
-- [ ] Repository interface'leri Domain'de:
-  - `Domain/Property/ISiteRepository.cs` (GetByIdAsync, AddAsync, ListAsync, ...)
-  - `Domain/Residency/IResidentRepository.cs`
-- [ ] Implementation'lar:
-  - `Infrastructure/Repositories/SiteRepository.cs`
-  - `Infrastructure/Repositories/ResidentRepository.cs`
-- [ ] DI registration
+- [x] **Mimari kararlar (tartışılarak alındı, AI hazırladığı roadmap'te eksikti):**
+  - Repository ports **Application'da, Domain'de değil** — Domain BCL-only kalsın
+  - **Generic `IRepository<TRoot> where TRoot : AggregateRoot<Guid>`** (Microsoft / Ardalis / Jason Taylor template'leri yaklaşımı) — boilerplate azaltır, compile-time aggregate-root garantisi verir
+  - **CQRS read tarafı tam ayrılmış**: Repository **command-only** (`ListAsync` yok); query handler'lar Infrastructure'daki `ISiteQueries` / `IResidentQueries` port'ları üzerinden projection yapar — **EF Application'da yok**
+  - **Shadow foreign keys** (Block.SiteId C# tarafında yok, EF config'le tanımlanır) — Domain temizliği için klasik "parent reference" pattern'i kullanılmadı
 
-**Commit:** `feat(infra): ef mappings, migrations and repositories for property and residency`
+- [x] `Application/Abstractions/Persistence/`:
+  - `IRepository<TRoot>` — command-side `GetByIdAsync` + `AddAsync` + `Remove` (NO ListAsync, NO Update — root state değişikliği change tracker'la)
+  - `ISiteRepository : IRepository<Site>`, `IResidentRepository : IRepository<Resident>` + `FindByTcNoAsync(TcNo)`
+  - `IUnitOfWork.SaveChangesAsync()` — handlers'ın commit boundary'si
+
+- [x] **Read-side port'ları** (`Application/{Property,Residency}/Queries/`):
+  - `ISiteQueries` + `SiteListItemDto` + `SiteDetailsDto` (BlockSummary + ApartmentSummary)
+  - `IResidentQueries` + `ResidentListItemDto` + `ResidentDetailsDto` (VehicleDto)
+  - DTO'lar Application'da yaşar, EF tipi yok
+
+- [x] `Infrastructure/Persistence/Configurations/Property/`:
+  - `SiteConfiguration` — `Sites` table, blocks 1:N **required** + cascade, `DomainEvents` ignored, backing field `_blocks`
+  - `BlockConfiguration` — `Blocks` table, apartments 1:N **required** + cascade, BlockName converter, backing field `_apartments`
+  - `ApartmentConfiguration` — `Apartments` table, ApartmentNumber/Floor/ApartmentType converters, OccupancyStatus → string
+
+- [x] `Infrastructure/Persistence/Configurations/Residency/`:
+  - `ResidentConfiguration` — `Residents` table, TcNo + Email **unique index**, FullName **flattened** via `ComplexProperty` (`FullName_FirstName`/`FullName_LastName`), Vehicles `OwnsMany` → `ResidentVehicles` child table with surrogate int PK + (`ResidentId`, `Plate`) unique index
+
+- [x] Value object converter'lar (8 tane, `Infrastructure/Persistence/Converters/`):
+  - Property: `ApartmentTypeConverter`, `ApartmentNumberConverter`, `FloorConverter`, `BlockNameConverter`
+  - Residency: `TcNoConverter`, `EmailConverter`, `PhoneNumberConverter`, `PlateNumberConverter`
+
+- [x] **No magic literals**:
+  - `SchemaConstants` (Infrastructure) — table names, FK column names (`SiteId`, `BlockId`, `ResidentId`), backing field names, owned surrogate key
+  - `PropertyLimits` — yeni eklenenler: `ApartmentTypeMaxLength`, `OccupancyStatusMaxLength`
+  - `ResidencyLimits` — yeni eklenen: `PlateNumberMaxLength`
+
+- [x] `AppDbContext` — `DbSet<Site>`, `DbSet<Resident>` + `ApplyConfigurationsFromAssembly` ile otomatik discovery; Identity tablo isimleri `AspNet*` prefix'siz
+
+- [x] Repository implementations (`Infrastructure/Persistence/Repositories/`):
+  - `SiteRepository` — `GetByIdAsync` site → blocks → apartments eager-load
+  - `ResidentRepository` — `GetByIdAsync` + `FindByTcNoAsync` vehicles eager-load
+  - `EfUnitOfWork` — `SaveChangesAsync` AppDbContext'e delegate
+
+- [x] Read implementations (`Infrastructure/Persistence/Queries/`):
+  - `SiteQueries` — `.AsNoTracking().Select(...)` DTO projection, no eager Include zinciri
+  - `ResidentQueries` — aynı pattern
+
+- [x] DI registration — `PersistenceExtensions.AddPersistence()` ayrı extension, `AddInfrastructure` ona delegate eder (Program.cs lean kalır)
+
+- [x] `dotnet ef migrations add PropertyAndResidency -p src/SiteManagement.Infrastructure -s src/SiteManagement.Api --output-dir Persistence/Migrations`
+
+- [x] Startup'ta otomatik migrate (DatabaseInitializer.MigrateAndSeedAsync W1'den beri yazılı, yeni migration'ı otomatik uyguladı)
+
+- [x] **Postgres'te tablolar doğrulandı:**
+  - `Sites`, `Blocks`, `Apartments`, `Residents`, `ResidentVehicles` + Identity tabloları + `__EFMigrationsHistory`
+  - `Blocks.SiteId` ve `Apartments.BlockId` **NOT NULL** (`IsRequired()` eklendiği için), cascade delete aktif
+  - Unique index'ler: `IX_Residents_TcNo`, `IX_Residents_Email`, `IX_ResidentVehicles_ResidentId_Plate`
+  - FullName flattened columns: `FullName_FirstName`, `FullName_LastName`
+
+- [x] **Architecture testleri yeşil** (Application hala EF Core / ASP.NET Core / Identity referansından bağımsız — query'ler bile Application'da `DbSet` görmüyor)
+- [x] 172/172 test yeşil, `/health` Healthy, compose stack ayakta
+
+**W2 Gün 5'e bırakılan:** Round-trip + DB-constraint test'leri için TestContainers altyapısı zaten Gün 5'te command handler test'leriyle kurulacak; iki kez kurmamak için bu commit'te yer almıyor.
+
+**Commit:** `feat(infra): ef mappings, migrations and repositories for property and residency (W2 Day 4)`
 
 ---
 
