@@ -48,4 +48,13 @@ public static class SchemaConstants
 
     /// <summary>Shadow property name used as the synthetic PK on owned-collection rows.</summary>
     public const string OwnedSurrogateKey = "Id";
+
+    /// <summary>
+    /// Shadow concurrency-token property name. Mapped to Postgres' built-in
+    /// <c>xmin</c> system column by the npgsql convention — no migration
+    /// needed because xmin always exists. Used to stop EF from emitting
+    /// empty UPDATEs when an aggregate's child collection changes but no
+    /// scalar property does, and to give us real optimistic concurrency.
+    /// </summary>
+    public const string ConcurrencyTokenColumn = "xmin";
 }

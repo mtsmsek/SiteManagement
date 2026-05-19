@@ -18,6 +18,18 @@ public sealed class SiteConfiguration : IEntityTypeConfiguration<Site>
 
         builder.HasKey(s => s.Id);
 
+        // Use Postgres' built-in `xmin` system column as the optimistic
+        // concurrency token (shadow uint property; npgsql convention
+        // detects "uint OnAddOrUpdate concurrency token" and maps it to
+        // xmin). Stops EF from emitting empty UPDATEs when an aggregate's
+        // child collection changes but no scalar property does (e.g.
+        // site.AddBlock without touching Name/Address), and gives us real
+        // concurrency safety for free.
+        builder.Property<uint>(SchemaConstants.ConcurrencyTokenColumn)
+            .HasColumnName(SchemaConstants.ConcurrencyTokenColumn)
+            .IsConcurrencyToken()
+            .ValueGeneratedOnAddOrUpdate();
+
         builder.Property(s => s.Name)
             .IsRequired()
             .HasMaxLength(PropertyLimits.SiteNameMaxLength);

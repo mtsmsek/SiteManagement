@@ -35,6 +35,12 @@ public sealed class AddApartmentCommandHandler(
             ApartmentType.From(request.Type));
 
         block.AddApartment(apartment);
+
+        // Same EF tracker workaround as AddBlock: brand-new inner entity
+        // added through the domain method is "modified" by default, force
+        // it to "added" so we get an INSERT instead of an UPDATE.
+        _unitOfWork.MarkAsAdded(apartment);
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new AddApartmentResult(apartment.Id);

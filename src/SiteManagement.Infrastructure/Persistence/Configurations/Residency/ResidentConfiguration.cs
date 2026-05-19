@@ -20,6 +20,14 @@ public sealed class ResidentConfiguration : IEntityTypeConfiguration<Resident>
 
         builder.HasKey(r => r.Id);
 
+        // Same reason as SiteConfiguration: lets EF skip the empty UPDATE
+        // when AddVehicle / RemoveVehicle flips the owned collection
+        // without touching any scalar resident column.
+        builder.Property<uint>(SchemaConstants.ConcurrencyTokenColumn)
+            .HasColumnName(SchemaConstants.ConcurrencyTokenColumn)
+            .IsConcurrencyToken()
+            .ValueGeneratedOnAddOrUpdate();
+
         builder.Property(r => r.TcNo)
             .HasConversion(new TcNoConverter())
             .HasMaxLength(ResidencyLimits.TcNoLength)

@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using SiteManagement.Application.Abstractions.Persistence;
 
@@ -17,6 +18,10 @@ public sealed class EfUnitOfWork(AppDbContext dbContext) : IUnitOfWork
     /// <inheritdoc />
     public Task<int> SaveChangesAsync(CancellationToken ct = default)
         => _dbContext.SaveChangesAsync(ct);
+
+    /// <inheritdoc />
+    public void MarkAsAdded<TEntity>(TEntity entity) where TEntity : class
+        => _dbContext.Entry(entity).State = EntityState.Added;
 
     /// <inheritdoc />
     public async Task<IUnitOfWorkScope> BeginScopeAsync(CancellationToken ct = default)

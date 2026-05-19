@@ -392,31 +392,52 @@
 
 ---
 
-### Gün 5 (Cuma) — Application Handlers + API Endpoints
+### Gün 5 (Cuma) — Application Handlers + API Endpoints ✅
 
-**Hedef:** API endpoint'leri Swagger'da görünüyor, Postman'le çalışıyor.
+**Hedef:** API endpoint'leri Scalar'da görünüyor, smoke test ile full akış çalışıyor.
 
-- [ ] `Application/Property/Commands/`:
-  - `CreateSiteCommand`, `CreateSiteCommandHandler`, `CreateSiteCommandValidator`
-  - `AddBlockCommand`, ...
-  - `AddApartmentCommand`, ...
-  - `UpdateApartmentCommand`, ...
-  - `DeleteApartmentCommand`, ...
-- [ ] `Application/Property/Queries/`:
-  - `GetSiteByIdQuery`, `ListSitesQuery`, `ListApartmentsByBlockQuery`, ...
-- [ ] `Application/Residency/Commands/`:
-  - `CreateResidentCommand` (otomatik password generation: random 12 char, BCrypt hash, AppUser oluştur, ResidentId-AppUserId link)
-  - `UpdateResidentCommand`, `DeleteResidentCommand`
-- [ ] `Application/Residency/Queries/`:
-  - `GetResidentByIdQuery`, `ListResidentsQuery`
-- [ ] FluentValidation validator'lar her command için
-- [ ] Handler'lar: temiz, try/catch yok, sadece domain çağrısı + EntityNotFound throw
-- [ ] `Api/Controllers/PropertyController.cs` ([Authorize(Roles="Admin")])
-- [ ] `Api/Controllers/ResidentController.cs` ([Authorize(Roles="Admin")])
-- [ ] Swagger annotations (ProducesResponseType ile)
-- [ ] Postman koleksiyonu hazırla: auth → property CRUD → resident CRUD
+**Mimari kararlar (oturum sırasında tartışılarak alındı):**
+- **Public register endpoint silindi** — `POST /api/auth/register` privilege escalation hole'üydü; bootstrap admin env'den startup'ta seed edilir (`AdminBootstrapOptions`)
+- **`IUserAuthService` split** — `RegisterAdminAsync` + `RegisterResidentUserAsync(residentId, ...)`; admin/resident kayıt flow'ları imza seviyesinde ayrı
+- **`AppUser.ResidentId` nullable FK** — admin'ler null, resident'lar Resident.Id'ye işaret eder; unique index `WHERE ResidentId IS NOT NULL` ile filtered
+- **`AuthClaims.ResidentId` JWT claim** — `TokenService.IssueTokens(..., residentId)` ile gömülür; resident endpoint'leri claim'den okur, body'den almaz (IDOR koruması)
+- **`ICurrentUser` port** — Application/Abstractions; Api implementation `HttpContext.User` claim'lerini okur. Resident self-service endpoint'leri için W3'te kullanılacak altyapı
+- **`IUnitOfWork.BeginScopeAsync` + `IUnitOfWorkScope`** — multi-write command'lar (RegisterResident: Resident + AppUser + welcome email) için explicit transaction scope. `await using` pattern + try/catch-free rollback
+- **Strict atomicity** — RegisterResident'ta welcome email **transaction içinde**; SMTP fail olursa rollback (sistem şifreyi bilen tek taraf, mail gitmezse resident kullanılamaz)
+- **`MarkAsAdded<T>` workaround** — `site.AddBlock(...)` ile child eklendiğinde EF tracker yanlışlıkla "modified" sayıyor, INSERT yerine UPDATE atıyor; IUnitOfWork'e port ekledik, AddBlock/AddApartment handler'lar bunu çağırır
+- **`xmin` concurrency token** — Site/Block/Resident tablolarında Postgres'in sistem kolonu mapped; boş UPDATE'leri önler, real optimistic concurrency verir. Migration no-op (xmin zaten Postgres'te var)
+- **`CommonValidationRules` genişletildi** — `ValidId`, `InRange`, `ValidTcNo`, `ValidPhoneNumber`, `ValidPlateNumber`, `ValidNameComponent` (her command'da tekrar yazmak yerine)
+- **`CreatedAtAction` 201 + Location header** — REST best practice
 
-**Commit:** `feat(app): property and residency command/query handlers, validators, api endpoints`
+- [x] `Application/Property/Commands/`: CreateSite, AddBlock, AddApartment, MarkApartmentOccupied, MarkApartmentEmpty, DeleteSite
+- [x] `Application/Property/Queries/`: GetSiteByIdQuery, ListSitesQuery (her ikisi de `ISiteQueries` projection üzerinden)
+- [x] `Application/Residency/Commands/`: RegisterResident (transactional), UpdateContactInfo, AddVehicle, RemoveVehicle
+- [x] `Application/Residency/Queries/`: GetResidentByIdQuery, ListResidentsQuery
+- [x] FluentValidation validator'lar her command için, `CommonValidationRules` kullanılarak
+- [x] Handler'lar: temiz, try/catch yok, sadece domain çağrısı + EntityNotFound throw + UoW commit
+- [x] `Api/Controllers/Sites/SitesController.cs` ([Authorize(Roles="Admin")]) — POST sites, POST sites/{}/blocks, GET sites, GET sites/{}, DELETE sites/{}
+- [x] `Api/Controllers/Apartments/ApartmentsController.cs` — POST blocks/{}/apartments, POST apartments/{}/occupy, POST apartments/{}/vacate
+- [x] `Api/Controllers/Residents/ResidentsController.cs` — POST residents, GET residents, GET residents/{}, PUT residents/{}/contact, POST residents/{}/vehicles, DELETE residents/{}/vehicles/{plate}
+- [x] `ProducesResponseType` annotation'ları her action'da (200/201/204/400/401/404/409 vakaları)
+- [x] **EF Core 10 bug fix'leri** — owned-collection projection'unda `OrderBy().Select()` çalışmıyor, ResidentQueries.GetByIdAsync için 2-step (Include + client-side projection)
+- [x] **Live smoke test (compose stack)** — full flow doğrulandı:
+  - Bootstrap admin login → access token
+  - POST site → 201
+  - POST block → 201
+  - POST apartment → 201
+  - POST apartment/occupy → 204
+  - POST resident → 201 + welcome email MailHog'a düştü
+  - POST vehicle → 201
+  - GET site/{id} → full hierarchy
+  - GET resident/{id} → vehicles dahil
+
+**W2 Gün 6-7'e bırakılan:** TestContainers altyapısı + 2-3 integration test (Resident round-trip, TcNo unique constraint, AddBlock/Apartment flow).
+
+**Commit'ler (3 part):**
+- `063c10a refactor: foundation for W2 day 5 + plug privilege-escalation hole` (UoW scope, UserAuthService split, AppUser.ResidentId, ICurrentUser, bootstrap admin)
+- `6235ef0 feat(app): property + residency command and query handlers (W2 day 5, part 1)` (CommonValidationRules, helpers, command/query handlers)
+- `a78dfab feat(api): sites + apartments + residents controllers (W2 day 5, part 2) — WIP` (controllers)
+- `<final> fix: ef concurrency token + add-child workaround + owned-collection query split (W2 day 5, part 3)` (xmin tokens, MarkAsAdded, ResidentQueries 2-step)
 
 ---
 

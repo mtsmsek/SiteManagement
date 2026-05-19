@@ -18,6 +18,14 @@ public sealed class BlockConfiguration : IEntityTypeConfiguration<Block>
 
         builder.HasKey(b => b.Id);
 
+        // Same reason as SiteConfiguration: lets EF skip the empty UPDATE
+        // when block.AddApartment(...) flips the navigation collection
+        // without touching the block's scalar columns.
+        builder.Property<uint>(SchemaConstants.ConcurrencyTokenColumn)
+            .HasColumnName(SchemaConstants.ConcurrencyTokenColumn)
+            .IsConcurrencyToken()
+            .ValueGeneratedOnAddOrUpdate();
+
         builder.Property(b => b.Name)
             .HasConversion(new BlockNameConverter())
             .IsRequired()

@@ -20,6 +20,17 @@ public interface IUnitOfWork
     /// so the <c>await using</c> pattern is both correct and try/catch-free.
     /// </summary>
     Task<IUnitOfWorkScope> BeginScopeAsync(CancellationToken ct = default);
+
+    /// <summary>
+    /// Marks a child entity as inserted in the current change-tracker.
+    /// Workaround for EF Core's behaviour when a brand-new inner entity is
+    /// added to a tracked aggregate via a domain method (e.g.
+    /// <c>site.AddBlock(...)</c>): EF treats the new child as <em>modified</em>
+    /// and tries to <c>UPDATE</c> a row that doesn't exist yet. Calling
+    /// this right after the domain mutation flips the entry state back to
+    /// <em>added</em> so the INSERT goes out instead.
+    /// </summary>
+    void MarkAsAdded<TEntity>(TEntity entity) where TEntity : class;
 }
 
 /// <summary>

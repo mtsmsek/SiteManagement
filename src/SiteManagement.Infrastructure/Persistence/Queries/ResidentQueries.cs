@@ -4,10 +4,17 @@ using SiteManagement.Application.Residency.Queries;
 namespace SiteManagement.Infrastructure.Persistence.Queries;
 
 /// <summary>
-/// EF Core-backed <see cref="IResidentQueries"/>. Every method projects
-/// straight into the DTO record at the database level so the Application
-/// layer never sees a domain entity for read paths.
+/// EF Core-backed <see cref="IResidentQueries"/>. Projections target the
+/// DTO records at the database level so the Application layer never sees
+/// a domain entity on the read path.
 /// </summary>
+/// <remarks>
+/// <see cref="GetByIdAsync"/> hydrates the vehicles client-side rather
+/// than inlining <c>Vehicles.Select(...)</c> in the SQL projection: EF Core
+/// 10 cannot translate ordered + projected owned collections (see
+/// "ShapedQueryExpression … cannot be translated"). Splitting the load
+/// keeps the query in pure-SQL territory.
+/// </remarks>
 public sealed class ResidentQueries(AppDbContext dbContext) : IResidentQueries
 {
     private readonly AppDbContext _dbContext = dbContext;
@@ -29,20 +36,30 @@ public sealed class ResidentQueries(AppDbContext dbContext) : IResidentQueries
             .ToListAsync(ct);
 
     /// <inheritdoc />
-    public Task<ResidentDetailsDto?> GetByIdAsync(Guid id, CancellationToken ct = default)
-        => _dbContext.Residents
+    public async Task<ResidentDetailsDto?> GetByIdAsync(Guid id, CancellationToken ct = default)
+    {
+        var resident = await _dbContext.Residents
             .AsNoTracking()
-            .Where(r => r.Id == id)
-            .Select(r => new ResidentDetailsDto(
-                r.Id,
-                r.TcNo.Value,
-                r.FullName.FirstName,
-                r.FullName.LastName,
-                r.Email.Value,
-                r.Phone.Value,
-                r.Vehicles
-                    .OrderBy(v => v.Plate.Value)
-                    .Select(v => new VehicleDto(v.Plate.Value, v.Note))
-                    .ToList()))
-            .FirstOrDefaultAsync(ct);
+            .Include(r => r.Vehicles)
+            .FirstOrDefaultAsync(r => r.Id == id, ct);
+
+        if (resident is null)
+        {
+            return null;
+        }
+
+        var vehicles = resident.Vehicles
+            .OrderBy(v => v.Plate.Value)
+            .Select(v => new VehicleDto(v.Plate.Value, v.Note))
+            .ToList();
+
+        return new ResidentDetailsDto(
+            resident.Id,
+            resident.TcNo.Value,
+            resident.FullName.FirstName,
+            resident.FullName.LastName,
+            resident.Email.Value,
+            resident.Phone.Value,
+            vehicles);
+    }
 }

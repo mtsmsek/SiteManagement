@@ -28,6 +28,13 @@ public sealed class AddBlockCommandHandler(
             ?? throw new EntityNotFoundException(nameof(Site), request.SiteId);
 
         var block = site.AddBlock(BlockName.From(request.Name));
+
+        // EF treats a brand-new child added through a domain method on a
+        // tracked aggregate as "modified" by default, which makes the
+        // change tracker emit an UPDATE against a row that doesn't exist
+        // yet. Flip the entry state to "added" so the INSERT goes out.
+        _unitOfWork.MarkAsAdded(block);
+
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new AddBlockResult(block.Id);
