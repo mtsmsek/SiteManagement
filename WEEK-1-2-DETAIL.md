@@ -480,27 +480,43 @@
 
 ---
 
-### E2E Test Altyapısı (Gün 7 sonu veya pazartesiye sarkabilir)
+### E2E Test Altyapısı (W2 Gün 6 — Angular öncesi yapıldı) ✅
 
-**Hedef:** TestContainers + WebApplicationFactory yerinde, ilk E2E test yeşil.
+**Hedef:** TestContainers + WebApplicationFactory yerinde, integration test'ler yeşil.
 
-- [ ] `tests/SiteManagement.E2E.Tests/`:
-  - `CustomWebApplicationFactory<TProgram> : WebApplicationFactory<TProgram>, IAsyncLifetime`
-  - InitializeAsync: PostgreSqlContainer kaldır, connection string override
-  - DisposeAsync: container kapat
-- [ ] `Fixtures/DatabaseFixture.cs` (xUnit collection fixture)
-- [ ] İlk E2E test (`PropertyFlowTests.cs`):
-  - Register admin (DB'ye seed veya endpoint çağrısı)
-  - Login → token al
-  - POST /sites → 201
-  - POST /sites/{id}/blocks → 201
-  - POST /blocks/{id}/apartments → 201
-  - GET /sites/{id} → tüm yapı görünür
-  - Assertions FluentAssertions ile
-- [ ] CI'a E2E test koşumunu ekle (Docker-in-Docker veya GitHub Actions PostgreSQL service container)
-- [ ] README'de "How to run E2E tests" bölümü
+**Mimari kararlar (oturum sırasında):**
+- **TestContainers + xunit collection fixture** — tek Postgres container session boyunca paylaşılır; `ResetDomainDataAsync` her test öncesi domain tablolarını TRUNCATE + bootstrap olmayan Identity user'ları siler. Hızlı (~7 saniye 8 test) + izole.
+- **RecordingEmailSender** — `IEmailSender` test-only impl, gerçek SMTP yerine in-memory queue. Welcome email assertion'larını mümkün kılar.
+- **CustomWebApplicationFactory** — `WebApplicationFactory<Program>` üzerinde `ConfigureAppConfiguration` ile in-memory config override (connection string, JWT key, bootstrap admin, SMTP).
+- **`AuthFlow.LoginAsBootstrapAdminAsync` helper** — login + token boilerplate'ini tek yere çek; her test sadece kendi senaryosuna odaklanır.
 
-**Commit:** `test(e2e): testcontainers infrastructure with first property flow`
+**JWT eager-read bug fix:**
+- `AuthExtensions.AddJwtAuth` `configuration.GetSection().Get<JwtOptions>()` **eager** çağırıyordu (DI register time)
+- `WebApplicationFactory.ConfigureAppConfiguration` bu çağrıdan sonra çalıştığı için test'lerin in-memory JWT key'i `TokenValidationParameters`'a hiç gelmiyordu → token üretimi + doğrulama farklı key'lerle yapılıyordu
+- Fix: `services.AddOptions<JwtBearerOptions>().Configure<IOptions<JwtOptions>>((bearer, jwt) => ...)` ile **lazy bind** — `IOptions<JwtOptions>` runtime'da resolve olduğundan in-memory override doğru şekilde okunuyor
+
+- [x] `tests/SiteManagement.E2E.Tests/Infrastructure/`:
+  - `PostgresFixture` — `Testcontainers.PostgreSql` ile `postgres:16-alpine` container; session boyunca paylaşılır
+  - `ApiCollection` — xunit `ICollectionFixture<PostgresFixture>` collection definition
+  - `CustomWebApplicationFactory` — in-memory config + `RecordingEmailSender` swap + `ResetDomainDataAsync` cleanup
+  - `RecordingEmailSender` — test-only `IEmailSender` (ConcurrentQueue ile thread-safe)
+  - `AuthFlow` — login helper + Bearer token client extension
+- [x] **5 integration test** (`PropertyFlowTests` + `ResidentFlowTests`):
+  - `Admin_CanBuildFullPropertyHierarchy` — site → block → apartment → occupy → detail readback (full chain)
+  - `AddingBlockWithDuplicateName_IsRejectedAsConflict` — case-insensitive duplicate name → 409
+  - `RegisterResident_PersistsAggregateAndQueuesWelcomeEmail` — happy path + welcome email captured with non-empty password
+  - `RegisterResident_WithDuplicateTcNo_IsRejectedAsConflict` — duplicate TC handler-level check
+  - `DifferentEmails_ButSameTcNo_StillRejected` — Application-level check + DB unique index fallback
+- [x] **InMemoryRefreshTokenStore.Clear()** — singleton state'in test'ler arası temizliği için
+- [x] **CI uyumluluğu** — `Testcontainers` GitHub Actions runner'da Docker daemon erişimi ile çalışır (zaten mevcut Postgres service container yerine container-per-test).
+- [x] **CORS extension** — `CorsExtensions.AddSiteManagementCors`:
+  - `DevelopmentPolicy` — `http://localhost:4200` (Angular dev) + `Cors:AllowedOrigins` config eklemeleri
+  - `ProductionPolicy` — sadece `Cors:AllowedOrigins` config (whitelist)
+  - Pipeline `UseCors` Auth'tan **önce** çalışır (preflight 401 olmasın)
+  - `appsettings.json`, `docker-compose.yml`, `.env.example` örnek değerlerle güncellendi
+- [x] 177/177 test yeşil (Domain 149, Application 5, E2E 8 ← +5 yeni integration, Architecture 15)
+
+**Commit:** `test(e2e): testcontainers infrastructure + 5 integration tests, jwt eager-read fix, cors (W2 Day 6)`
 
 ---
 

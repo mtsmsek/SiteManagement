@@ -15,32 +15,39 @@ namespace SiteManagement.Infrastructure.Auth;
 public static class AuthExtensions
 {
     /// <summary>
-    /// Registers the JWT bearer scheme using the <see cref="JwtOptions"/>
-    /// already bound by <c>AddInfrastructure</c>. Must be called after
-    /// <c>AddInfrastructure</c>.
+    /// Registers the JWT bearer scheme. The
+    /// <see cref="TokenValidationParameters"/> are built lazily from
+    /// <see cref="IOptions{JwtOptions}"/> at request-resolve time so any
+    /// in-memory configuration override applied by tests (or
+    /// <c>WebApplicationFactory</c>) is honoured.
     /// </summary>
     public static IServiceCollection AddJwtAuth(this IServiceCollection services, IConfiguration configuration)
     {
-        var jwt = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
-            ?? throw new InvalidOperationException(
-                $"Configuration section '{JwtOptions.SectionName}' is missing.");
-
         services
             .AddAuthentication(opts =>
             {
                 opts.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 opts.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
-            .AddJwtBearer(opts =>
+            .AddJwtBearer();
+
+        // Bind JwtBearerOptions lazily — reads the same IOptions<JwtOptions>
+        // that TokenService uses, so the signing key + issuer + audience
+        // stay consistent even when ConfigureAppConfiguration overrides
+        // them after AddJwtAuth registration (e.g. in integration tests).
+        services
+            .AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+            .Configure<IOptions<JwtOptions>>((bearer, jwt) =>
             {
-                opts.TokenValidationParameters = new TokenValidationParameters
+                var options = jwt.Value;
+                bearer.TokenValidationParameters = new TokenValidationParameters
                 {
                     ValidateIssuer = true,
-                    ValidIssuer = jwt.Issuer,
+                    ValidIssuer = options.Issuer,
                     ValidateAudience = true,
-                    ValidAudience = jwt.Audience,
+                    ValidAudience = options.Audience,
                     ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key)),
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(options.Key)),
                     ValidateLifetime = true,
                     ClockSkew = TimeSpan.Zero,
                 };

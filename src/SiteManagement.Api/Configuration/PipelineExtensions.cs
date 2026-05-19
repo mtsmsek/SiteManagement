@@ -22,6 +22,13 @@ public static class PipelineExtensions
         app.UseMiddleware<GlobalExceptionMiddleware>();
         app.UseSerilogRequestLogging();
 
+        // CORS picks the wide-open dev policy in Development and the
+        // config-driven whitelist in every other environment. Must come
+        // before auth so preflight (OPTIONS) responses don't 401.
+        app.UseCors(app.Environment.IsDevelopment()
+            ? CorsExtensions.DevelopmentPolicy
+            : CorsExtensions.ProductionPolicy);
+
         if (app.Environment.IsDevelopment())
         {
             app.MapSiteManagementOpenApi();

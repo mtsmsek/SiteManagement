@@ -39,6 +39,12 @@ public class InMemoryRefreshTokenStore : IRefreshTokenStore
         return Task.FromResult<Guid?>(entry.UserId);
     }
 
+    /// <summary>
+    /// Wipes every stored token. Used by integration tests to reset state
+    /// between runs — production code never calls this.
+    /// </summary>
+    public void Clear() => _entries.Clear();
+
     /// <summary>Stored shape: owning user id and expiry timestamp (UTC).</summary>
     private sealed record RefreshTokenEntry(Guid UserId, DateTime ExpiresAtUtc);
 }

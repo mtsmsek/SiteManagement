@@ -78,6 +78,9 @@ services:
       Admin__BootstrapEmail: ${ADMIN_BOOTSTRAP_EMAIL:-}
       Admin__BootstrapPassword: ${ADMIN_BOOTSTRAP_PASSWORD:-}
       Admin__BootstrapFullName: ${ADMIN_BOOTSTRAP_FULL_NAME:-Site Admin}
+      # Cors:AllowedOrigins is read as an array; the colon-prefixed __0__
+      # index syntax sets the first entry. Add more with __1__, __2__, ...
+      Cors__AllowedOrigins__0: ${CORS_ALLOWED_ORIGIN_0:-}
     ports:
       - "${API_PORT:-8080}:8080"
     healthcheck:

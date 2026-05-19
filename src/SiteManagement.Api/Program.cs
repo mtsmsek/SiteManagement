@@ -19,6 +19,7 @@ builder.Services
     .AddInfrastructure(builder.Configuration)
     .AddJwtAuth(builder.Configuration)
     .AddCurrentUser()
+    .AddSiteManagementCors(builder.Configuration)
     .AddSiteManagementHealthChecks(builder.Configuration)
     .AddSiteManagementLocalization()
     .AddSiteManagementOpenApi();
