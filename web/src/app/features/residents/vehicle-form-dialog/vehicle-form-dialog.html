@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>{{ 'residents.vehicles.add' | translate }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'residents.vehicles.plate' | translate }}</mat-label>
+      <input matInput formControlName="plate" />
+      @if (form.controls.plate.touched && form.controls.plate.hasError('required')) {
+        <mat-error>{{ 'residents.vehicles.plateRequired' | translate }}</mat-error>
+      }
+      @if (form.controls.plate.hasError('server')) {
+        <mat-error>{{ form.controls.plate.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'residents.vehicles.note' | translate }}</mat-label>
+      <input matInput formControlName="note" />
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
+    <button matButton="filled" type="submit" [disabled]="submitting()">{{ 'common.add' | translate }}</button>
+  </mat-dialog-actions>
+</form>

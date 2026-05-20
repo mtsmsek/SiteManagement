@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>{{ 'residents.contact.edit' | translate }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'residents.fields.email' | translate }}</mat-label>
+      <input matInput type="email" formControlName="email" />
+      @if (form.controls.email.touched && form.controls.email.hasError('required')) {
+        <mat-error>{{ 'residents.errors.emailRequired' | translate }}</mat-error>
+      }
+      @if (form.controls.email.touched && form.controls.email.hasError('email')) {
+        <mat-error>{{ 'residents.errors.emailInvalid' | translate }}</mat-error>
+      }
+      @if (form.controls.email.hasError('server')) {
+        <mat-error>{{ form.controls.email.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'residents.fields.phone' | translate }}</mat-label>
+      <input matInput formControlName="phone" />
+      @if (form.controls.phone.touched && form.controls.phone.hasError('required')) {
+        <mat-error>{{ 'residents.errors.phoneRequired' | translate }}</mat-error>
+      }
+      @if (form.controls.phone.hasError('server')) {
+        <mat-error>{{ form.controls.phone.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
+    <button matButton="filled" type="submit" [disabled]="submitting()">{{ 'common.save' | translate }}</button>
+  </mat-dialog-actions>
+</form>

@@ -1,0 +1,75 @@
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (resident(); as r) {
+  <div class="page-header">
+    <div class="title-group">
+      <button matIconButton (click)="back()" [attr.aria-label]="'common.back' | translate">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>{{ r.firstName }} {{ r.lastName }}</h1>
+    </div>
+  </div>
+
+  <mat-card appearance="outlined" class="info-card">
+    <mat-card-content>
+      <div class="info-grid">
+        <div class="info-item">
+          <span class="info-label">{{ 'residents.fields.tcNo' | translate }}</span>
+          <span>{{ r.tcNo }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{{ 'residents.fields.email' | translate }}</span>
+          <span>{{ r.email }}</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">{{ 'residents.fields.phone' | translate }}</span>
+          <span>{{ r.phone }}</span>
+        </div>
+      </div>
+    </mat-card-content>
+    <mat-card-actions align="end">
+      <button matButton (click)="editContact()">
+        <mat-icon>edit</mat-icon>
+        {{ 'residents.contact.edit' | translate }}
+      </button>
+    </mat-card-actions>
+  </mat-card>
+
+  <div class="section-header">
+    <h2>{{ 'residents.vehicles.title' | translate }}</h2>
+    <button matButton="filled" (click)="addVehicle()">
+      <mat-icon>add</mat-icon>
+      {{ 'residents.vehicles.add' | translate }}
+    </button>
+  </div>
+
+  @if (r.vehicles.length === 0) {
+    <p class="empty-state">{{ 'residents.vehicles.empty' | translate }}</p>
+  } @else {
+    <table mat-table [dataSource]="r.vehicles" class="data-table">
+      <ng-container matColumnDef="plate">
+        <th mat-header-cell *matHeaderCellDef>{{ 'residents.vehicles.plate' | translate }}</th>
+        <td mat-cell *matCellDef="let v">{{ v.plate }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="note">
+        <th mat-header-cell *matHeaderCellDef>{{ 'residents.vehicles.note' | translate }}</th>
+        <td mat-cell *matCellDef="let v">{{ v.note }}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let v">
+          <button matIconButton (click)="removeVehicle(v)" [attr.aria-label]="'residents.vehicles.remove' | translate">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="vehicleColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: vehicleColumns"></tr>
+    </table>
+  }
+}

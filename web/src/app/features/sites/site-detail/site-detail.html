@@ -1,0 +1,89 @@
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+@if (site(); as s) {
+  <div class="page-header">
+    <div class="title-group">
+      <button matIconButton (click)="back()" [attr.aria-label]="'common.back' | translate">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div>
+        <h1>{{ s.name }}</h1>
+        <p class="subtitle">{{ s.address }}</p>
+      </div>
+    </div>
+    <button matButton="filled" (click)="addBlock()">
+      <mat-icon>add</mat-icon>
+      {{ 'sites.blocks.add' | translate }}
+    </button>
+  </div>
+
+  @if (s.blocks.length === 0) {
+    <p class="empty-state">{{ 'sites.blocks.empty' | translate }}</p>
+  } @else {
+    <mat-accordion multi>
+      @for (block of s.blocks; track block.id) {
+        <mat-expansion-panel>
+          <mat-expansion-panel-header>
+            <mat-panel-title>{{ block.name }}</mat-panel-title>
+            <mat-panel-description>
+              {{ 'sites.apartments.count' | translate: { count: block.apartments.length } }}
+            </mat-panel-description>
+          </mat-expansion-panel-header>
+
+          <div class="block-actions">
+            <button matButton (click)="addApartment(block)">
+              <mat-icon>add</mat-icon>
+              {{ 'sites.apartments.add' | translate }}
+            </button>
+          </div>
+
+          @if (block.apartments.length > 0) {
+            <table mat-table [dataSource]="block.apartments" class="data-table">
+              <ng-container matColumnDef="number">
+                <th mat-header-cell *matHeaderCellDef>{{ 'sites.apartments.number' | translate }}</th>
+                <td mat-cell *matCellDef="let a">{{ a.number }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="floor">
+                <th mat-header-cell *matHeaderCellDef>{{ 'sites.apartments.floor' | translate }}</th>
+                <td mat-cell *matCellDef="let a">{{ a.floor }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="type">
+                <th mat-header-cell *matHeaderCellDef>{{ 'sites.apartments.type' | translate }}</th>
+                <td mat-cell *matCellDef="let a">{{ a.type }}</td>
+              </ng-container>
+
+              <ng-container matColumnDef="status">
+                <th mat-header-cell *matHeaderCellDef>{{ 'sites.apartments.status' | translate }}</th>
+                <td mat-cell *matCellDef="let a">
+                  @if (a.status === occupied) {
+                    <mat-chip-set><mat-chip highlighted>{{ 'sites.status.occupied' | translate }}</mat-chip></mat-chip-set>
+                  } @else {
+                    <mat-chip-set><mat-chip>{{ 'sites.status.empty' | translate }}</mat-chip></mat-chip-set>
+                  }
+                </td>
+              </ng-container>
+
+              <ng-container matColumnDef="actions">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let a">
+                  <button matButton (click)="toggleOccupancy(a)">
+                    {{ (a.status === occupied ? 'sites.actions.vacate' : 'sites.actions.occupy') | translate }}
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="apartmentColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: apartmentColumns"></tr>
+            </table>
+          } @else {
+            <p class="empty-state">{{ 'sites.apartments.empty' | translate }}</p>
+          }
+        </mat-expansion-panel>
+      }
+    </mat-accordion>
+  }
+}

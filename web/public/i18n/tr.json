@@ -6,6 +6,8 @@
     "delete": "Sil",
     "edit": "Düzenle",
     "create": "Oluştur",
+    "add": "Ekle",
+    "back": "Geri",
     "loading": "Yükleniyor...",
     "logout": "Çıkış Yap",
     "language": "Dil",
@@ -28,6 +30,94 @@
     "sites": "Siteler",
     "residents": "Sakinler",
     "dashboard": "Panel"
+  },
+  "sites": {
+    "title": "Siteler",
+    "empty": "Henüz site eklenmemiş.",
+    "fields": {
+      "name": "Ad",
+      "address": "Adres",
+      "blocks": "Blok",
+      "apartments": "Daire"
+    },
+    "errors": {
+      "nameRequired": "Site adı zorunludur.",
+      "addressRequired": "Adres zorunludur."
+    },
+    "create": {
+      "title": "Yeni Site"
+    },
+    "delete": {
+      "title": "Siteyi sil",
+      "message": "Bu siteyi ve tüm bloklarını/dairelerini silmek istediğinize emin misiniz?"
+    },
+    "blocks": {
+      "add": "Blok Ekle",
+      "name": "Blok Adı",
+      "nameRequired": "Blok adı zorunludur.",
+      "empty": "Bu sitede henüz blok yok."
+    },
+    "apartments": {
+      "add": "Daire Ekle",
+      "number": "Daire No",
+      "numberInvalid": "Geçerli bir daire numarası girin.",
+      "floor": "Kat",
+      "floorRequired": "Kat zorunludur.",
+      "type": "Tip",
+      "status": "Durum",
+      "count": "{{count}} daire",
+      "empty": "Bu blokta henüz daire yok."
+    },
+    "status": {
+      "occupied": "Dolu",
+      "empty": "Boş"
+    },
+    "actions": {
+      "occupy": "Dolu işaretle",
+      "vacate": "Boşalt"
+    }
+  },
+  "residents": {
+    "title": "Sakinler",
+    "empty": "Henüz sakin eklenmemiş.",
+    "fields": {
+      "tcNo": "TC Kimlik No",
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "vehicles": "Araç"
+    },
+    "errors": {
+      "tcNoRequired": "TC Kimlik No zorunludur.",
+      "tcNoInvalid": "TC Kimlik No 11 haneli olmalıdır.",
+      "firstNameRequired": "Ad zorunludur.",
+      "lastNameRequired": "Soyad zorunludur.",
+      "emailRequired": "E-posta zorunludur.",
+      "emailInvalid": "Geçerli bir e-posta girin.",
+      "phoneRequired": "Telefon zorunludur."
+    },
+    "create": {
+      "title": "Yeni Sakin",
+      "note": "Sakin için geçici bir şifre oluşturulup e-posta ile gönderilir."
+    },
+    "delete": {
+      "title": "Sakini sil",
+      "message": "Bu sakini silmek istediğinize emin misiniz?"
+    },
+    "contact": {
+      "edit": "İletişim Bilgilerini Düzenle"
+    },
+    "vehicles": {
+      "title": "Araçlar",
+      "add": "Araç Ekle",
+      "plate": "Plaka",
+      "plateRequired": "Plaka zorunludur.",
+      "note": "Not",
+      "empty": "Kayıtlı araç yok.",
+      "remove": "Aracı sil",
+      "removeMessage": "Bu aracı silmek istediğinize emin misiniz?"
+    }
   },
   "errors": {
     "generic": "Bir hata oluştu.",

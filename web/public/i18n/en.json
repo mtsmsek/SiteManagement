@@ -6,6 +6,8 @@
     "delete": "Delete",
     "edit": "Edit",
     "create": "Create",
+    "add": "Add",
+    "back": "Back",
     "loading": "Loading...",
     "logout": "Log out",
     "language": "Language",
@@ -28,6 +30,94 @@
     "sites": "Sites",
     "residents": "Residents",
     "dashboard": "Dashboard"
+  },
+  "sites": {
+    "title": "Sites",
+    "empty": "No sites yet.",
+    "fields": {
+      "name": "Name",
+      "address": "Address",
+      "blocks": "Blocks",
+      "apartments": "Apartments"
+    },
+    "errors": {
+      "nameRequired": "Site name is required.",
+      "addressRequired": "Address is required."
+    },
+    "create": {
+      "title": "New Site"
+    },
+    "delete": {
+      "title": "Delete site",
+      "message": "Are you sure you want to delete this site and all its blocks/apartments?"
+    },
+    "blocks": {
+      "add": "Add Block",
+      "name": "Block Name",
+      "nameRequired": "Block name is required.",
+      "empty": "This site has no blocks yet."
+    },
+    "apartments": {
+      "add": "Add Apartment",
+      "number": "Number",
+      "numberInvalid": "Enter a valid apartment number.",
+      "floor": "Floor",
+      "floorRequired": "Floor is required.",
+      "type": "Type",
+      "status": "Status",
+      "count": "{{count}} apartments",
+      "empty": "This block has no apartments yet."
+    },
+    "status": {
+      "occupied": "Occupied",
+      "empty": "Empty"
+    },
+    "actions": {
+      "occupy": "Mark occupied",
+      "vacate": "Vacate"
+    }
+  },
+  "residents": {
+    "title": "Residents",
+    "empty": "No residents yet.",
+    "fields": {
+      "tcNo": "National ID",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Email",
+      "phone": "Phone",
+      "vehicles": "Vehicles"
+    },
+    "errors": {
+      "tcNoRequired": "National ID is required.",
+      "tcNoInvalid": "National ID must be 11 digits.",
+      "firstNameRequired": "First name is required.",
+      "lastNameRequired": "Last name is required.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email.",
+      "phoneRequired": "Phone is required."
+    },
+    "create": {
+      "title": "New Resident",
+      "note": "A temporary password is generated and emailed to the resident."
+    },
+    "delete": {
+      "title": "Delete resident",
+      "message": "Are you sure you want to delete this resident?"
+    },
+    "contact": {
+      "edit": "Edit Contact Info"
+    },
+    "vehicles": {
+      "title": "Vehicles",
+      "add": "Add Vehicle",
+      "plate": "Plate",
+      "plateRequired": "Plate is required.",
+      "note": "Note",
+      "empty": "No vehicles registered.",
+      "remove": "Remove vehicle",
+      "removeMessage": "Are you sure you want to remove this vehicle?"
+    }
   },
   "errors": {
     "generic": "An error occurred.",
