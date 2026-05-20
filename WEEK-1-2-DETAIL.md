@@ -445,23 +445,29 @@
 
 **Hedef:** Tarayıcıdan admin login + property/resident CRUD çalışıyor.
 
-**Gün 6:**
-- [ ] `web/` klasörü: `ng new site-management-web --standalone --routing --style=scss`
-- [ ] Angular Material kur (`ng add @angular/material`), Indigo/Pink theme
-- [ ] ngx-translate kur (`@ngx-translate/core`, `@ngx-translate/http-loader`)
-- [ ] `assets/i18n/tr.json`, `assets/i18n/en.json` (auth + common + sites + residents key'leri)
-- [ ] Language switcher component (topbar'a koymak için)
-- [ ] `core/services/auth.service.ts`:
-  - register, login, refresh, logout
-  - JWT'yi localStorage'a koy
-- [ ] `core/interceptors/auth.interceptor.ts` (HTTP'ye Bearer header ekle, 401'de refresh dene)
-- [ ] `core/guards/auth.guard.ts`, `core/guards/role.guard.ts`
-- [ ] `features/auth/login/login.component.ts` (reactive form)
-- [ ] `layouts/admin-layout.component.ts` (mat-sidenav + mat-toolbar)
-- [ ] Routing: `/login` (public), `/admin/*` (Admin role)
-- [ ] CORS backend'te Angular dev URL'i için açık (http://localhost:4200)
+**Gün 6 (Angular skeleton) ✅:**
 
-**Gün 7:**
+**Toolchain güncellemesi:** Node 17 (Unsupported) + Angular CLI 13 (2021) → **Node 24 LTS + Angular CLI 21** (winget + npm -g). Angular 21 = standalone + signals + **zoneless** default + functional guards/interceptors + `@if`/`@for` control flow.
+
+- [x] `web/` klasörü: `ng new site-management-web --directory web --style scss --routing --ssr=false`
+- [x] Angular Material kur (`ng add @angular/material`) — Material 3 theme (azure), `styles.scss`'te `mat.theme(...)` (yeni M3 API; `ng add` schematic theme bug'ı manuel çözüldü)
+- [x] ngx-translate 17 kur (`@ngx-translate/core` + `http-loader`) — yeni `provideTranslateService` + `provideTranslateHttpLoader` API
+- [x] `public/i18n/tr.json`, `public/i18n/en.json` (common + auth + nav + errors key'leri)
+- [x] Language switcher — admin-layout toolbar'da mat-menu (`translate.use(lang)`)
+- [x] `core/auth/auth.service.ts` — **signal-based**: `currentUser`, `isAuthenticated`, `isAdmin` computed signals; login / tryRefresh / logout; JWT decode (claim okuma, exp kontrolü); localStorage
+- [x] `core/auth/token.interceptor.ts` — functional; Bearer header ekler, 401'de tek-sefer refresh dener, başarısızsa /login
+- [x] `core/http/error.interceptor.ts` + `problem-details.ts` — RFC 7807 ProblemDetails parse, non-validation hataları snackbar'a (detail zaten lokalize)
+- [x] `core/auth/auth.guards.ts` — functional `authGuard` + `adminGuard` (returnUrl ile)
+- [x] `features/auth/login/login.ts` — reactive form (signals: submitting, invalidCredentials), Material card/form-field
+- [x] `layouts/admin-layout/` — `mat-sidenav` (Sites/Residents nav) + `mat-toolbar` (language switcher + logout)
+- [x] Routing: `/login` (public, lazy), `/admin/*` (adminGuard, lazy children: sites, residents)
+- [x] CORS backend'te `http://localhost:4200` için açık (W2 Gün 6'da eklendi) — preflight 204 + login 200 doğrulandı
+- [x] `ng build` yeşil, lazy chunks ayrı (login / admin-layout / site-list / resident-list)
+- [x] **Live smoke**: bootstrap admin credential'larıyla `POST /api/auth/login` Angular origin'inden 200 + ACAO header + JWT token
+
+**OpenAPI codegen** Gün 7'ye (Sites/Residents API client) bırakıldı — login manuel typed `AuthService` ile yeterli.
+
+**Gün 7 (admin sayfaları — sonraki commit):**
 - [ ] `features/admin/sites/`:
   - `site-list.component.ts` (mat-table + create/edit dialog)
   - `site-form.component.ts` (reactive form)

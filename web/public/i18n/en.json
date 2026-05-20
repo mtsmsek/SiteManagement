@@ -1,0 +1,35 @@
+{
+  "common": {
+    "appName": "Site Management",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "loading": "Loading...",
+    "logout": "Log out",
+    "language": "Language"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "invalidCredentials": "Invalid email or password.",
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email.",
+      "passwordRequired": "Password is required."
+    }
+  },
+  "nav": {
+    "sites": "Sites",
+    "residents": "Residents",
+    "dashboard": "Dashboard"
+  },
+  "errors": {
+    "generic": "An error occurred.",
+    "network": "Cannot reach the server.",
+    "unauthorized": "You are not authorized for this action."
+  }
+}

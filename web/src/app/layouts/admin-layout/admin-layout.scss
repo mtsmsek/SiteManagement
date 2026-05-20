@@ -1,0 +1,33 @@
+.admin-shell {
+  height: 100vh;
+}
+
+.admin-sidenav {
+  width: 240px;
+  border-right: 1px solid var(--mat-sys-outline-variant);
+}
+
+.brand {
+  padding: 1.25rem 1rem;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--mat-sys-primary);
+}
+
+.admin-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.admin-content {
+  padding: 1.5rem;
+}
+
+.active-link {
+  background: var(--mat-sys-secondary-container);
+}

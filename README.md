@@ -107,21 +107,40 @@ curl http://localhost:8080/health
 
 ### Auth smoke
 
+> Güvenlik: **public register endpoint'i yoktur.** İlk admin, startup'ta `.env`'deki `ADMIN_BOOTSTRAP_*` değerlerinden seed edilir. Sonraki kullanıcılar authenticated admin endpoint'leri üzerinden yaratılır.
+
 ```powershell
 $base = "http://localhost:8080"
 
-# Register
-$body = @{ email = "admin@local"; password = "Str0ng-P@ss"; fullName = "Admin" } | ConvertTo-Json
-Invoke-RestMethod -Uri "$base/api/auth/register" -Method Post -Body $body -ContentType "application/json"
+# Login as the bootstrap admin (.env'deki ADMIN_BOOTSTRAP_EMAIL/PASSWORD)
+$body = @{ email = "admin@sitemanagement.local"; password = "Str0ng-P@ss-Dev" } | ConvertTo-Json
+$tokens = Invoke-RestMethod -Uri "$base/api/auth/login" -Method Post -Body $body -ContentType "application/json"
+$headers = @{ Authorization = "Bearer $($tokens.accessToken)" }
 
-# Login (returns access + refresh tokens)
-$body = @{ email = "admin@local"; password = "Str0ng-P@ss" } | ConvertTo-Json
-Invoke-RestMethod -Uri "$base/api/auth/login" -Method Post -Body $body -ContentType "application/json"
+# Admin creates a site
+$site = @{ name = "Lavender Heights"; address = "Cumhuriyet Mah." } | ConvertTo-Json
+Invoke-RestMethod -Uri "$base/api/sites" -Method Post -Body $site -ContentType "application/json" -Headers $headers
 
-# Test localization: en-US
+# Localization: en-US header => İngilizce hata mesajı
 Invoke-WebRequest -Uri "$base/api/auth/login" -Method Post `
     -Body (@{ email = ""; password = "" } | ConvertTo-Json) -ContentType "application/json" `
     -Headers @{ "Accept-Language" = "en-US" } -SkipHttpErrorCheck | Select-Object -ExpandProperty Content
+```
+
+### Frontend (Angular admin UI)
+
+```powershell
+cd web
+npm install          # ilk sefer
+npm start            # ng serve -> http://localhost:4200
+```
+
+- **Stack:** Angular 21 (standalone, signals, zoneless), Angular Material 3, ngx-translate (tr/en)
+- **Mimari:** feature-based + `core/` (auth service, guards, interceptors) + `shared/` + `layouts/`
+- **Auth:** JWT localStorage, functional token interceptor (Bearer + 401 refresh), `adminGuard`
+- Login: bootstrap admin credential'larıyla gir → `/admin/sites`
+- API base URL: `web/src/environments/environment.ts` (`http://localhost:8080`)
+- Backend CORS dev policy `http://localhost:4200`'e açık
 # -> {"errors":{"Email":["Email is required."], ...}}
 ```
 
