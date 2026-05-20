@@ -8,11 +8,13 @@
     "create": "Create",
     "loading": "Loading...",
     "logout": "Log out",
-    "language": "Language"
+    "language": "Language",
+    "theme": "Theme"
   },
   "auth": {
     "login": {
       "title": "Sign in",
+      "subtitle": "Sign in to access the admin panel",
       "email": "Email",
       "password": "Password",
       "submit": "Sign in",

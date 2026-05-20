@@ -18,6 +18,10 @@
     <mat-toolbar class="admin-toolbar">
       <span class="spacer"></span>
 
+      <button matIconButton (click)="toggleTheme()" [attr.aria-label]="'common.theme' | translate">
+        <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+
       <button matIconButton [matMenuTriggerFor]="langMenu" [attr.aria-label]="'common.language' | translate">
         <mat-icon>language</mat-icon>
       </button>

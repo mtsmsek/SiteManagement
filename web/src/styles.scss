@@ -1,18 +1,31 @@
 @use '@angular/material' as mat;
 
-// Material 3 theme. Azure primary keeps the admin UI calm and neutral;
-// the density + typography come from Material's system defaults.
+// Material 3 theme. Azure primary keeps the admin UI calm and neutral; the
+// density + typography come from Material's system defaults. The single theme
+// declaration generates both light and dark system tokens; `color-scheme`
+// then selects which set is active, so a class toggle on <html> is enough to
+// flip the whole UI without recompiling a second theme.
 html {
-  color-scheme: light;
   @include mat.theme((
     color: (
-      theme-type: light,
       primary: mat.$azure-palette,
       tertiary: mat.$blue-palette,
     ),
     typography: Roboto,
     density: 0,
   ));
+
+  // Default to the OS preference; the theme service overrides this with an
+  // explicit choice via the `.theme-light` / `.theme-dark` classes below.
+  color-scheme: light dark;
+}
+
+html.theme-light {
+  color-scheme: light;
+}
+
+html.theme-dark {
+  color-scheme: dark;
 }
 
 html, body {

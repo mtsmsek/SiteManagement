@@ -7,8 +7,10 @@ import { MatListModule } from '@angular/material/list';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
-import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../core/auth/auth.service';
+import { ThemeService } from '../../core/theme/theme.service';
+import { LanguageService, SUPPORTED_LANGUAGES, Language } from '../../core/i18n/language.service';
 
 /**
  * Admin shell: a persistent sidenav with the section links plus a toolbar
@@ -36,14 +38,23 @@ import { AuthService } from '../../core/auth/auth.service';
 export class AdminLayout {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
-  private readonly translate = inject(TranslateService);
+  private readonly language = inject(LanguageService);
+  private readonly theme = inject(ThemeService);
 
   /** Languages offered by the topbar switcher. */
-  readonly languages = ['tr', 'en'] as const;
+  readonly languages = SUPPORTED_LANGUAGES;
+
+  /** Whether the dark scheme is currently active (drives the toggle icon). */
+  readonly isDark = this.theme.isDark;
 
   /** Switches the active UI language at runtime. */
-  setLanguage(lang: string): void {
-    this.translate.use(lang);
+  setLanguage(lang: Language): void {
+    void this.language.use(lang);
+  }
+
+  /** Flips between light and dark mode. */
+  toggleTheme(): void {
+    this.theme.toggle();
   }
 
   /** Clears the session and returns to the login page. */

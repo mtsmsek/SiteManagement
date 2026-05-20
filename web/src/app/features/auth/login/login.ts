@@ -6,9 +6,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../../core/auth/auth.service';
+import { ThemeService } from '../../../core/theme/theme.service';
 
 /**
  * Admin sign-in page. Reactive form, posts to AuthService.login, then
@@ -23,6 +25,7 @@ import { AuthService } from '../../../core/auth/auth.service';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatIconModule,
     MatProgressBarModule,
     TranslatePipe,
   ],
@@ -34,6 +37,10 @@ export class Login {
   private readonly auth = inject(AuthService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
+  private readonly theme = inject(ThemeService);
+
+  /** Whether the dark scheme is currently active (drives the toggle icon). */
+  readonly isDark = this.theme.isDark;
 
   /** True while the login request is in flight. */
   readonly submitting = signal(false);
@@ -66,5 +73,10 @@ export class Login {
     } finally {
       this.submitting.set(false);
     }
+  }
+
+  /** Flips between light and dark mode. */
+  toggleTheme(): void {
+    this.theme.toggle();
   }
 }

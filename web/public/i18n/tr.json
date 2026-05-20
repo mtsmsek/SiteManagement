@@ -8,11 +8,13 @@
     "create": "Oluştur",
     "loading": "Yükleniyor...",
     "logout": "Çıkış Yap",
-    "language": "Dil"
+    "language": "Dil",
+    "theme": "Tema"
   },
   "auth": {
     "login": {
       "title": "Giriş Yap",
+      "subtitle": "Yönetim paneline erişmek için giriş yapın",
       "email": "E-posta",
       "password": "Şifre",
       "submit": "Giriş Yap",
