@@ -99,14 +99,19 @@ public class GlobalExceptionMiddleware(
 
     /// <summary>
     /// Picks the right localizer for the typed exception. Validator-side keys
-    /// resolve against <see cref="ValidationMessages"/>; everything else
-    /// against <see cref="ErrorMessages"/>. A missing key falls back to the
-    /// raw value (developer-friendly diagnostic).
+    /// resolve against <see cref="ValidationMessages"/>. Business-rule
+    /// violations were already localized — with their format arguments
+    /// substituted — by the MediatR <c>ExceptionTranslationBehavior</c>, so we
+    /// use that ready message rather than re-localizing the bare key here
+    /// (which would lose the args and leak raw "{0}" placeholders). Auth keys
+    /// carry no args, so they are localized here against
+    /// <see cref="ErrorMessages"/>. A missing key falls back to the raw value
+    /// (developer-friendly diagnostic).
     /// </summary>
     private string LocalizeDetail(AppException ex) => ex switch
     {
         ValidationException => _errorLocalizer[ErrorMessageKeys.ValidationFailed].Value,
-        BusinessRuleViolationException business => Localize(_errorLocalizer, business.MessageKey),
+        BusinessRuleViolationException business => business.Message,
         AuthenticationException auth => Localize(_errorLocalizer, auth.MessageKey),
         _ => ex.Message,
     };

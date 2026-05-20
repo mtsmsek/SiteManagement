@@ -89,13 +89,19 @@ public sealed class PropertyFlowTests(PostgresFixture postgres) : IAsyncLifetime
         // act — adding "a" (case-insensitive duplicate) must fail
         var secondAdd = await client.PostAsJsonAsync($"/api/sites/{siteId}/blocks", new { name = "a" });
 
-        // assert
+        // assert — conflict, and the localized detail has the block name
+        // substituted (no leaked "{0}" placeholder). Guards the bug where the
+        // middleware re-localized the bare key, dropping the format args.
         secondAdd.StatusCode.Should().Be(HttpStatusCode.Conflict);
+        var problem = await secondAdd.Content.ReadFromJsonAsync<ProblemResponse>(AuthFlow.Json);
+        problem!.Detail.Should().NotContain("{0}");
+        problem.Detail.Should().Contain("a");
     }
 
     private sealed record CreateSiteResponse(Guid SiteId);
     private sealed record AddBlockResponse(Guid BlockId);
     private sealed record AddApartmentResponse(Guid ApartmentId);
+    private sealed record ProblemResponse(string? Detail, string? MessageKey);
 
     private sealed record SiteDetailDto(
         Guid Id,

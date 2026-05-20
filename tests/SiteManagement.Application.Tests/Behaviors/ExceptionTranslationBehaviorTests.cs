@@ -1,6 +1,9 @@
+using System.Globalization;
 using FluentAssertions;
 using MediatR;
 using Microsoft.Extensions.Localization;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using NSubstitute;
 using SiteManagement.Application.Behaviors;
 using SiteManagement.Application.Shared.Exceptions;
@@ -74,6 +77,43 @@ public class ExceptionTranslationBehaviorTests
         result.Should().Be(Unit.Value);
     }
 
+    /// <summary>
+    /// Regression for the parametric-message bug: a domain exception that
+    /// carries format arguments must come out with the placeholders filled in,
+    /// not as the raw "'{0}' ..." template. Uses the real resx-backed localizer
+    /// so it exercises the same lookup path as production.
+    /// </summary>
+    [Fact]
+    public async Task Handle_WhenDomainExceptionHasArgs_FillsPlaceholdersInLocalizedMessage()
+    {
+        // arrange
+        CultureInfo.CurrentUICulture = new CultureInfo("tr-TR");
+        var localizer = RealLocalizer();
+        var behavior = new ExceptionTranslationBehavior<SampleRequest, Unit>(localizer);
+        RequestHandlerDelegate<Unit> next =
+            (_) => throw new SampleDomainException("Property.Site.DuplicateBlockName", "A Blok");
+
+        // act
+        var act = () => behavior.Handle(new SampleRequest(), next, CancellationToken.None);
+
+        // assert
+        var ex = await act.Should().ThrowAsync<BusinessRuleViolationException>();
+        ex.Which.Message.Should().Contain("A Blok");
+        ex.Which.Message.Should().NotContain("{0}");
+    }
+
+    /// <summary>
+    /// Builds the production resx-backed localizer directly (no DI container),
+    /// so the test exercises the real ResourceManager lookup + string.Format
+    /// path that production uses.
+    /// </summary>
+    private static IStringLocalizer<ErrorMessages> RealLocalizer()
+    {
+        var options = Options.Create(new LocalizationOptions());
+        var factory = new ResourceManagerStringLocalizerFactory(options, NullLoggerFactory.Instance);
+        return new StringLocalizer<ErrorMessages>(factory);
+    }
+
     /// <summary>Builds an <see cref="IStringLocalizer{T}"/> that maps a single key to a value.</summary>
     private static IStringLocalizer<ErrorMessages> StubLocalizer(string key, string value)
     {
@@ -86,6 +126,6 @@ public class ExceptionTranslationBehaviorTests
 
     private sealed class SampleDomainException : DomainException
     {
-        public SampleDomainException(string messageKey) : base(messageKey) { }
+        public SampleDomainException(string messageKey, params object[] args) : base(messageKey, args) { }
     }
 }
