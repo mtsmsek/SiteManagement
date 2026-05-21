@@ -6,6 +6,7 @@ using SiteManagement.Application.Billing.Commands.CloseUtilityBillPeriod;
 using SiteManagement.Application.Billing.Commands.DistributeUtilityBill;
 using SiteManagement.Application.Billing.Commands.OpenUtilityBillPeriod;
 using SiteManagement.Application.Billing.Queries;
+using SiteManagement.Application.Billing.Queries.ListUtilityBillPeriodItems;
 using SiteManagement.Application.Billing.Queries.ListUtilityBillPeriods;
 using SiteManagement.Domain.Identity;
 
@@ -23,6 +24,7 @@ public class UtilityBillsController(ISender sender) : ControllerBase
 {
     private const string DistributeRoute = "{utilityBillPeriodId:guid}/distribute";
     private const string CloseRoute = "{utilityBillPeriodId:guid}/close";
+    private const string ItemsRoute = "{utilityBillPeriodId:guid}/items";
     private const string BySiteRoute = "sites/{siteId:guid}";
 
     private readonly ISender _sender = sender;
@@ -64,6 +66,12 @@ public class UtilityBillsController(ISender sender) : ControllerBase
         await _sender.Send(new CloseUtilityBillPeriodCommand(utilityBillPeriodId), ct);
         return NoContent();
     }
+
+    /// <summary>Lists the distributed per-apartment items of one utility bill period.</summary>
+    [HttpGet(ItemsRoute)]
+    [ProducesResponseType<IReadOnlyList<PeriodItemDto>>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IReadOnlyList<PeriodItemDto>>> ListItems(Guid utilityBillPeriodId, CancellationToken ct)
+        => Ok(await _sender.Send(new ListUtilityBillPeriodItemsQuery(utilityBillPeriodId), ct));
 
     /// <summary>Lists a site's utility bill periods (most recent month first).</summary>
     [HttpGet(BySiteRoute)]

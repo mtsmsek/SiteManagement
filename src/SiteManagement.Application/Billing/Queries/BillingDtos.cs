@@ -19,6 +19,20 @@ public sealed record UtilityBillPeriodListItemDto(
     int PaidCount,
     bool IsClosed);
 
+/// <summary>
+/// One distributed line within a period (dues or utility), enriched with the
+/// apartment label and occupant name the admin item table shows. Dues and
+/// utility items share this shape, so a single record serves both.
+/// </summary>
+public sealed record PeriodItemDto(
+    Guid ItemId,
+    Guid ApartmentId,
+    string Apartment,
+    Guid ResidentId,
+    string ResidentFullName,
+    decimal Amount,
+    string Status);
+
 /// <summary>A single billing line a resident owes (dues or a utility).</summary>
 public sealed record ResidentBillDto(
     Guid ItemId,

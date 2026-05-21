@@ -13,6 +13,12 @@ public interface IBillingQueries
     /// <summary>Lists a site's utility bill periods (most recent month first).</summary>
     Task<IReadOnlyList<UtilityBillPeriodListItemDto>> ListUtilityBillPeriodsAsync(Guid siteId, CancellationToken ct = default);
 
+    /// <summary>Lists the distributed per-apartment items of one dues period.</summary>
+    Task<IReadOnlyList<PeriodItemDto>> ListDuesPeriodItemsAsync(Guid duesPeriodId, CancellationToken ct = default);
+
+    /// <summary>Lists the distributed per-apartment items of one utility bill period.</summary>
+    Task<IReadOnlyList<PeriodItemDto>> ListUtilityBillPeriodItemsAsync(Guid utilityBillPeriodId, CancellationToken ct = default);
+
     /// <summary>Returns every outstanding + paid line owed by a resident.</summary>
     Task<IReadOnlyList<ResidentBillDto>> ListResidentBillsAsync(Guid residentId, CancellationToken ct = default);
 
