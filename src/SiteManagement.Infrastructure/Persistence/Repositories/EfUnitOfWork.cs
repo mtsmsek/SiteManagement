@@ -1,23 +1,78 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using SiteManagement.Application.Abstractions.Events;
 using SiteManagement.Application.Abstractions.Persistence;
+using SiteManagement.Domain.Shared;
 
 namespace SiteManagement.Infrastructure.Persistence.Repositories;
 
 /// <summary>
-/// EF Core-backed <see cref="IUnitOfWork"/>. Delegates
-/// <see cref="SaveChangesAsync"/> straight to the
-/// <see cref="AppDbContext"/> change tracker; <see cref="BeginScopeAsync"/>
-/// opens a real <see cref="IDbContextTransaction"/> so multiple writes
-/// (domain aggregate + Identity, multi-aggregate flows) land atomically.
+/// EF Core-backed <see cref="IUnitOfWork"/>. <see cref="SaveChangesAsync"/>
+/// persists the change tracker and then flushes the domain events raised by
+/// the tracked aggregates through the <see cref="IDomainEventDispatcher"/>;
+/// <see cref="BeginScopeAsync"/> opens a real <see cref="IDbContextTransaction"/>
+/// so multiple writes (domain aggregate + Identity, multi-aggregate flows)
+/// land atomically.
 /// </summary>
-public sealed class EfUnitOfWork(AppDbContext dbContext) : IUnitOfWork
+public sealed class EfUnitOfWork(AppDbContext dbContext, IDomainEventDispatcher eventDispatcher) : IUnitOfWork
 {
     private readonly AppDbContext _dbContext = dbContext;
+    private readonly IDomainEventDispatcher _eventDispatcher = eventDispatcher;
 
     /// <inheritdoc />
-    public Task<int> SaveChangesAsync(CancellationToken ct = default)
-        => _dbContext.SaveChangesAsync(ct);
+    /// <remarks>
+    /// Saves first, then dispatches. A handler may mutate another aggregate
+    /// (e.g. assigning a resident marks the apartment occupied), which raises
+    /// further events and requires another save — so we loop until no tracked
+    /// aggregate has pending events. Within a <see cref="BeginScopeAsync"/>
+    /// transaction this stays atomic; the bounded loop guards against an event
+    /// cycle.
+    /// </remarks>
+    public async Task<int> SaveChangesAsync(CancellationToken ct = default)
+    {
+        const int maxDispatchRounds = 10;
+
+        var totalWritten = await _dbContext.SaveChangesAsync(ct);
+
+        for (var round = 0; round < maxDispatchRounds; round++)
+        {
+            var events = DrainDomainEvents();
+            if (events.Count == 0)
+            {
+                break;
+            }
+
+            await _eventDispatcher.DispatchAsync(events, ct);
+
+            if (_dbContext.ChangeTracker.HasChanges())
+            {
+                totalWritten += await _dbContext.SaveChangesAsync(ct);
+            }
+        }
+
+        return totalWritten;
+    }
+
+    /// <summary>
+    /// Collects and clears the domain events from every tracked aggregate root.
+    /// Cleared eagerly so a follow-up save in the same flow doesn't re-dispatch.
+    /// </summary>
+    private IReadOnlyList<IDomainEvent> DrainDomainEvents()
+    {
+        var roots = _dbContext.ChangeTracker
+            .Entries<AggregateRoot<Guid>>()
+            .Select(e => e.Entity)
+            .Where(a => a.DomainEvents.Count > 0)
+            .ToList();
+
+        var events = roots.SelectMany(a => a.DomainEvents).ToList();
+        foreach (var root in roots)
+        {
+            root.ClearDomainEvents();
+        }
+
+        return events;
+    }
 
     /// <inheritdoc />
     public void MarkAsAdded<TEntity>(TEntity entity) where TEntity : class

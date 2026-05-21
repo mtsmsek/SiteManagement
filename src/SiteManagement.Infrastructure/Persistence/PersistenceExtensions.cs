@@ -1,9 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using SiteManagement.Application.Abstractions.Events;
 using SiteManagement.Application.Abstractions.Persistence;
 using SiteManagement.Application.Property.Queries;
 using SiteManagement.Application.Residency.Queries;
+using SiteManagement.Infrastructure.Events;
 using SiteManagement.Infrastructure.Persistence.Queries;
 using SiteManagement.Infrastructure.Persistence.Repositories;
 
@@ -33,6 +35,10 @@ public static class PersistenceExtensions
         services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(
             connectionString,
             npg => npg.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
+
+        // Domain events: aggregates raise them, the unit of work flushes them
+        // through this dispatcher after each save.
+        services.AddScoped<IDomainEventDispatcher, MediatRDomainEventDispatcher>();
 
         // Command-side: aggregate repositories + unit of work.
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();

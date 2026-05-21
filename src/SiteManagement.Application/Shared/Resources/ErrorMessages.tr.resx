@@ -104,4 +104,7 @@
   <data name="Residency.DuplicateEmail" xml:space="preserve">
     <value>Bu e-posta adresi ile zaten bir kullanıcı kayıtlı.</value>
   </data>
+  <data name="Shared.Money.Negative" xml:space="preserve">
+    <value>Tutar negatif olamaz: {0}.</value>
+  </data>
 </root>
