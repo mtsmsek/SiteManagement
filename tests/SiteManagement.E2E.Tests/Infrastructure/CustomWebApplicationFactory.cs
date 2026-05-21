@@ -77,7 +77,9 @@ public sealed class CustomWebApplicationFactory(PostgresFixture postgres) : WebA
         var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
         await db.Database.ExecuteSqlRawAsync(
-            "TRUNCATE TABLE \"ResidentVehicles\", \"Apartments\", \"Blocks\", \"Sites\", \"Residents\" RESTART IDENTITY CASCADE;",
+            "TRUNCATE TABLE \"DuesItems\", \"DuesPeriods\", \"UtilityBillItems\", \"UtilityBillPeriods\", "
+            + "\"ApartmentAssignments\", \"ResidentVehicles\", \"Apartments\", \"Blocks\", \"Sites\", \"Residents\" "
+            + "RESTART IDENTITY CASCADE;",
             cancellationToken: ct);
 
         // The bootstrap admin lives in the Users table and stays — login still works.

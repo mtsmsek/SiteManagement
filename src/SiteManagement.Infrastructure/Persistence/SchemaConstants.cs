@@ -17,6 +17,15 @@ public static class SchemaConstants
         public const string Residents = "Residents";
         public const string ResidentVehicles = "ResidentVehicles";
 
+        // Tenancy
+        public const string ApartmentAssignments = "ApartmentAssignments";
+
+        // Billing — Approach A: dues and utility bills are separate aggregates.
+        public const string DuesPeriods = "DuesPeriods";
+        public const string DuesItems = "DuesItems";
+        public const string UtilityBillPeriods = "UtilityBillPeriods";
+        public const string UtilityBillItems = "UtilityBillItems";
+
         // Identity tables — flattened from the default AspNet* prefixes.
         public const string Users = "Users";
         public const string Roles = "Roles";
@@ -33,6 +42,16 @@ public static class SchemaConstants
         public const string SiteId = "SiteId";
         public const string BlockId = "BlockId";
         public const string ResidentId = "ResidentId";
+        public const string DuesPeriodId = "DuesPeriodId";
+        public const string UtilityBillPeriodId = "UtilityBillPeriodId";
+    }
+
+    /// <summary>Owned/child entity column names mapped by the Billing configurations.</summary>
+    public static class Columns
+    {
+        public const string ApartmentId = "ApartmentId";
+        public const string ResidentId = "ResidentId";
+        public const string Amount = "Amount";
     }
 
     /// <summary>
@@ -44,6 +63,8 @@ public static class SchemaConstants
         public const string SiteBlocks = "_blocks";
         public const string BlockApartments = "_apartments";
         public const string ResidentVehicles = "_vehicles";
+        public const string DuesPeriodItems = "_items";
+        public const string UtilityBillPeriodItems = "_items";
     }
 
     /// <summary>Shadow property name used as the synthetic PK on owned-collection rows.</summary>

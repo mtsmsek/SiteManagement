@@ -1,0 +1,67 @@
+using Microsoft.EntityFrameworkCore;
+using SiteManagement.Application.Tenancy.Queries;
+using SiteManagement.Domain.Property;
+
+namespace SiteManagement.Infrastructure.Persistence.Queries;
+
+/// <summary>
+/// EF Core-backed <see cref="ITenancyQueries"/>. Projects assignments joined to
+/// the resident's name straight into DTOs — no domain materialisation, no
+/// change tracking. The resident name join is a read-side concern only; the
+/// command side still references residents by id.
+/// </summary>
+public sealed class TenancyQueries(AppDbContext dbContext) : ITenancyQueries
+{
+    private readonly AppDbContext _dbContext = dbContext;
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ApartmentOccupantDto>> GetActiveOccupantsForSiteAsync(
+        Guid siteId, CancellationToken ct = default)
+    {
+        // Apartment ids belonging to the site (through its blocks).
+        var apartmentIds = await _dbContext.Sites
+            .AsNoTracking()
+            .Where(s => s.Id == siteId)
+            .SelectMany(s => s.Blocks.SelectMany(b => b.Apartments.Select(a => a.Id)))
+            .ToListAsync(ct);
+
+        return await ActiveOccupantQuery()
+            .Where(o => apartmentIds.Contains(o.ApartmentId))
+            .ToListAsync(ct);
+    }
+
+    /// <inheritdoc />
+    public Task<ApartmentOccupantDto?> GetActiveOccupantAsync(Guid apartmentId, CancellationToken ct = default)
+        => ActiveOccupantQuery()
+            .Where(o => o.ApartmentId == apartmentId)
+            .FirstOrDefaultAsync(ct);
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyList<ResidentAssignmentDto>> GetAssignmentsForResidentAsync(
+        Guid residentId, CancellationToken ct = default)
+        => await _dbContext.ApartmentAssignments
+            .AsNoTracking()
+            .Where(a => a.ResidentId == residentId)
+            .OrderByDescending(a => a.Period.StartDate)
+            .Select(a => new ResidentAssignmentDto(
+                a.Id,
+                a.ApartmentId,
+                a.TenantType.ToString(),
+                a.Period.StartDate,
+                a.Period.EndDate,
+                a.Period.EndDate == null))
+            .ToListAsync(ct);
+
+    /// <summary>Active assignments joined to the resident's name, projected to the occupant DTO.</summary>
+    private IQueryable<ApartmentOccupantDto> ActiveOccupantQuery()
+        => from a in _dbContext.ApartmentAssignments.AsNoTracking()
+           where a.Period.EndDate == null
+           join r in _dbContext.Residents.AsNoTracking() on a.ResidentId equals r.Id
+           select new ApartmentOccupantDto(
+               a.Id,
+               a.ApartmentId,
+               a.ResidentId,
+               r.FullName.FirstName + " " + r.FullName.LastName,
+               a.TenantType.ToString(),
+               a.Period.StartDate);
+}

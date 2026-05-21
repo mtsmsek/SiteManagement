@@ -2,8 +2,10 @@ using System.Reflection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using SiteManagement.Domain.Billing;
 using SiteManagement.Domain.Property;
 using SiteManagement.Domain.Residency;
+using SiteManagement.Domain.Tenancy;
 using SiteManagement.Infrastructure.Identity;
 
 namespace SiteManagement.Infrastructure.Persistence;
@@ -23,6 +25,15 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
     /// <summary>Residency bounded context root set.</summary>
     public DbSet<Resident> Residents => Set<Resident>();
+
+    /// <summary>Tenancy bounded context root set.</summary>
+    public DbSet<ApartmentAssignment> ApartmentAssignments => Set<ApartmentAssignment>();
+
+    /// <summary>Billing — dues period root set.</summary>
+    public DbSet<DuesPeriod> DuesPeriods => Set<DuesPeriod>();
+
+    /// <summary>Billing — utility bill period root set.</summary>
+    public DbSet<UtilityBillPeriod> UtilityBillPeriods => Set<UtilityBillPeriod>();
 
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)

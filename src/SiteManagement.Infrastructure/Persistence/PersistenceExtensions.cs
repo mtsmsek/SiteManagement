@@ -3,8 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SiteManagement.Application.Abstractions.Events;
 using SiteManagement.Application.Abstractions.Persistence;
+using SiteManagement.Application.Billing.Queries;
 using SiteManagement.Application.Property.Queries;
 using SiteManagement.Application.Residency.Queries;
+using SiteManagement.Application.Tenancy.Queries;
 using SiteManagement.Infrastructure.Events;
 using SiteManagement.Infrastructure.Persistence.Queries;
 using SiteManagement.Infrastructure.Persistence.Repositories;
@@ -44,10 +46,15 @@ public static class PersistenceExtensions
         services.AddScoped<IUnitOfWork, EfUnitOfWork>();
         services.AddScoped<ISiteRepository, SiteRepository>();
         services.AddScoped<IResidentRepository, ResidentRepository>();
+        services.AddScoped<IApartmentAssignmentRepository, ApartmentAssignmentRepository>();
+        services.AddScoped<IDuesPeriodRepository, DuesPeriodRepository>();
+        services.AddScoped<IUtilityBillPeriodRepository, UtilityBillPeriodRepository>();
 
         // Read-side: per-context query services, scoped to the same DbContext.
         services.AddScoped<ISiteQueries, SiteQueries>();
         services.AddScoped<IResidentQueries, ResidentQueries>();
+        services.AddScoped<ITenancyQueries, TenancyQueries>();
+        services.AddScoped<IBillingQueries, BillingQueries>();
 
         return services;
     }
