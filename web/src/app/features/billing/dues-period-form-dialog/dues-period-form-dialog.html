@@ -1,0 +1,38 @@
+<h2 mat-dialog-title>{{ 'billing.dues.openTitle' | translate }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <div class="period-row">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'billing.fields.year' | translate }}</mat-label>
+        <input matInput type="number" formControlName="year" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'billing.fields.month' | translate }}</mat-label>
+        <input matInput type="number" min="1" max="12" formControlName="month" />
+        @if (form.controls.month.touched && form.controls.month.invalid) {
+          <mat-error>{{ 'billing.fields.monthInvalid' | translate }}</mat-error>
+        }
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'billing.fields.perApartmentAmount' | translate }}</mat-label>
+      <input matInput type="number" formControlName="perApartmentAmount" />
+      @if (form.controls.perApartmentAmount.touched && form.controls.perApartmentAmount.invalid) {
+        <mat-error>{{ 'billing.fields.amountInvalid' | translate }}</mat-error>
+      }
+      @if (form.controls.perApartmentAmount.hasError('server')) {
+        <mat-error>{{ form.controls.perApartmentAmount.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
+    <button matButton="filled" type="submit" [disabled]="submitting()">
+      {{ 'billing.dues.open' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>

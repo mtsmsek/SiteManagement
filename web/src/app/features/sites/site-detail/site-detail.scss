@@ -24,3 +24,51 @@
   justify-content: flex-end;
   padding: 0.5rem 0;
 }
+
+.billing-section {
+  margin-top: 2rem;
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 1rem;
+  }
+}
+
+.debt-card {
+  margin-bottom: 1rem;
+
+  .debt-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  .debt-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .debt-label {
+    font-size: 0.8125rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .debt-value {
+    font-size: 1.25rem;
+    font-weight: 600;
+  }
+}
+
+.tab-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 0;
+}
+
+.period-actions {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+}

@@ -119,6 +119,80 @@
       "removeMessage": "Bu aracı silmek istediğinize emin misiniz?"
     }
   },
+  "tenancy": {
+    "occupant": "Sakin",
+    "assign": {
+      "action": "Sakin Ata",
+      "title": "Sakin Ata",
+      "resident": "Sakin",
+      "residentRequired": "Sakin seçimi zorunludur.",
+      "tenantType": "Tip",
+      "startDate": "Başlangıç Tarihi",
+      "startDateRequired": "Başlangıç tarihi zorunludur.",
+      "submit": "Ata"
+    },
+    "tenantType": {
+      "owner": "Malik",
+      "tenant": "Kiracı"
+    },
+    "vacate": {
+      "action": "Boşalt",
+      "title": "Daireyi boşalt",
+      "message": "Bu dairedeki sakin atamasını sonlandırmak istediğinize emin misiniz?",
+      "confirm": "Boşalt"
+    }
+  },
+  "billing": {
+    "title": "Faturalandırma",
+    "itemsPaid": "{{paid}}/{{total}} ödendi",
+    "noItems": "Henüz dağıtım yapılmadı.",
+    "fields": {
+      "year": "Yıl",
+      "month": "Ay",
+      "monthInvalid": "Ay 1-12 arasında olmalıdır.",
+      "perApartmentAmount": "Daire Başı Tutar",
+      "totalAmount": "Toplam Tutar",
+      "utilityType": "Fatura Tipi",
+      "amountInvalid": "Geçerli bir tutar girin."
+    },
+    "dues": {
+      "tab": "Aidat",
+      "openTitle": "Aidat Dönemi Aç",
+      "open": "Dönem Aç",
+      "empty": "Henüz aidat dönemi yok."
+    },
+    "utility": {
+      "tab": "Fatura",
+      "openTitle": "Fatura Dönemi Aç",
+      "open": "Dönem Aç",
+      "empty": "Henüz fatura dönemi yok."
+    },
+    "utilityType": {
+      "Electricity": "Elektrik",
+      "Water": "Su",
+      "NaturalGas": "Doğalgaz"
+    },
+    "actions": {
+      "distribute": "Dağıt",
+      "close": "Kapat"
+    },
+    "status": {
+      "closed": "Kapalı",
+      "Unpaid": "Ödenmedi",
+      "Paid": "Ödendi"
+    },
+    "item": {
+      "apartment": "Daire",
+      "resident": "Sakin",
+      "amount": "Tutar",
+      "status": "Durum"
+    },
+    "debt": {
+      "accrued": "Tahakkuk",
+      "collected": "Tahsil",
+      "outstanding": "Bakiye"
+    }
+  },
   "errors": {
     "generic": "Bir hata oluştu.",
     "network": "Sunucuya ulaşılamıyor.",

@@ -29,8 +29,67 @@ export type RegisterResidentResponse = Schemas['RegisterResidentResponse'];
 export type UpdateContactRequest = Schemas['UpdateContactRequest'];
 export type AddVehicleRequest = Schemas['AddVehicleRequest'];
 
+// Tenancy (assignments / occupants)
+export type ApartmentOccupant = Schemas['ApartmentOccupantDto'];
+export type ResidentAssignment = Schemas['ResidentAssignmentDto'];
+export type AssignResidentRequest = Schemas['AssignResidentRequest'];
+export type AssignResidentResponse = Schemas['AssignResidentResult'];
+export type EndAssignmentRequest = Schemas['EndAssignmentRequest'];
+
+// Billing (dues / utility periods + items)
+export type DuesPeriodListItem = Schemas['DuesPeriodListItemDto'];
+export type UtilityBillPeriodListItem = Schemas['UtilityBillPeriodListItemDto'];
+export type PeriodItem = Schemas['PeriodItemDto'];
+export type SiteDebtSummary = Schemas['SiteDebtSummaryDto'];
+export type OpenDuesPeriodRequest = Schemas['OpenDuesPeriodRequest'];
+export type OpenDuesPeriodResponse = Schemas['OpenDuesPeriodResult'];
+export type OpenUtilityBillRequest = Schemas['OpenUtilityBillRequest'];
+export type OpenUtilityBillResponse = Schemas['OpenUtilityBillPeriodResult'];
+
 // Shared
 export type ProblemDetails = Schemas['ProblemDetails'];
+
+/**
+ * Tenant type as the API binds it on assignment requests — an integer enum
+ * (Owner=0, Tenant=1). The read DTOs serialise it back as the name string.
+ */
+export const TenantType = {
+  owner: 0,
+  tenant: 1,
+} as const;
+
+/** Picklist of tenant types with i18n label keys for the assignment dialog. */
+export const TenantTypeOptions = [
+  { value: TenantType.owner, labelKey: 'tenancy.tenantType.owner' },
+  { value: TenantType.tenant, labelKey: 'tenancy.tenantType.tenant' },
+] as const;
+
+/**
+ * Utility type as the API binds it on utility-bill requests — an integer enum
+ * (Electricity=0, Water=1, NaturalGas=2). Read DTOs serialise it as the name.
+ */
+export const UtilityType = {
+  electricity: 0,
+  water: 1,
+  naturalGas: 2,
+} as const;
+
+/**
+ * Picklist of utility types with i18n label keys for the bill dialog. The key
+ * suffixes match the API enum names (Electricity/Water/NaturalGas) so the same
+ * keys translate both the dialog options and the period header labels.
+ */
+export const UtilityTypeOptions = [
+  { value: UtilityType.electricity, labelKey: 'billing.utilityType.Electricity' },
+  { value: UtilityType.water, labelKey: 'billing.utilityType.Water' },
+  { value: UtilityType.naturalGas, labelKey: 'billing.utilityType.NaturalGas' },
+] as const;
+
+/** Billing item payment-status values as the API serialises them. */
+export const BillingItemStatus = {
+  unpaid: 'Unpaid',
+  paid: 'Paid',
+} as const;
 
 /** Apartment occupancy status values as the API serialises them. */
 export const ApartmentStatus = {

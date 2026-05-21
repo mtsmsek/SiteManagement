@@ -81,6 +81,17 @@ body {
   width: 100%;
 }
 
+// Two equal-width fields side by side — used for the year + month inputs in
+// the billing period dialogs.
+.period-row {
+  display: flex;
+  gap: 1rem;
+
+  > * {
+    flex: 1;
+  }
+}
+
 .dialog-note {
   display: flex;
   align-items: center;

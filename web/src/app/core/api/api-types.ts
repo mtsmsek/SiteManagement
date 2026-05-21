@@ -37,6 +37,238 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/assignments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Assigns a resident to an apartment as owner or tenant. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["AssignResidentRequest"];
+                    "text/json": components["schemas"]["AssignResidentRequest"];
+                    "application/*+json": components["schemas"]["AssignResidentRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AssignResidentResult"];
+                        "application/json": components["schemas"]["AssignResidentResult"];
+                        "text/json": components["schemas"]["AssignResidentResult"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assignments/{assignmentId}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ends an apartment assignment (move-out) on the given date. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    assignmentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["EndAssignmentRequest"];
+                    "text/json": components["schemas"]["EndAssignmentRequest"];
+                    "application/*+json": components["schemas"]["EndAssignmentRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assignments/sites/{siteId}/occupants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns the active occupants of every apartment in a site. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    siteId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ApartmentOccupantDto"][];
+                        "application/json": components["schemas"]["ApartmentOccupantDto"][];
+                        "text/json": components["schemas"]["ApartmentOccupantDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/assignments/residents/{residentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns a resident's assignment history (most recent first). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    residentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ResidentAssignmentDto"][];
+                        "application/json": components["schemas"]["ResidentAssignmentDto"][];
+                        "text/json": components["schemas"]["ResidentAssignmentDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/sites": {
         parameters: {
             query?: never;
@@ -269,6 +501,46 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/residents/{residentId}/bills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns every outstanding + paid line owed by the resident. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    residentId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ResidentBillDto"][];
+                        "application/json": components["schemas"]["ResidentBillDto"][];
+                        "text/json": components["schemas"]["ResidentBillDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -607,6 +879,592 @@ export interface paths {
                 };
             };
         };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Opens an empty dues period for a site at a fixed per-apartment amount. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["OpenDuesPeriodRequest"];
+                    "text/json": components["schemas"]["OpenDuesPeriodRequest"];
+                    "application/*+json": components["schemas"]["OpenDuesPeriodRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["OpenDuesPeriodResult"];
+                        "application/json": components["schemas"]["OpenDuesPeriodResult"];
+                        "text/json": components["schemas"]["OpenDuesPeriodResult"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dues/{duesPeriodId}/distribute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Distributes dues items to every occupied apartment in the period's site. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    duesPeriodId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dues/{duesPeriodId}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Closes a dues period (no further items can be added). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    duesPeriodId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dues/sites/{siteId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists a site's dues periods (most recent month first). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    siteId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["DuesPeriodListItemDto"][];
+                        "application/json": components["schemas"]["DuesPeriodListItemDto"][];
+                        "text/json": components["schemas"]["DuesPeriodListItemDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dues/{duesPeriodId}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the distributed per-apartment items of one dues period. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    duesPeriodId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PeriodItemDto"][];
+                        "application/json": components["schemas"]["PeriodItemDto"][];
+                        "text/json": components["schemas"]["PeriodItemDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dues/sites/{siteId}/debt-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns the accrued / collected / outstanding totals for a site. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    siteId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["SiteDebtSummaryDto"];
+                        "application/json": components["schemas"]["SiteDebtSummaryDto"];
+                        "text/json": components["schemas"]["SiteDebtSummaryDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/utility-bills": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Opens an empty utility bill period for a site at a fixed total amount. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["OpenUtilityBillRequest"];
+                    "text/json": components["schemas"]["OpenUtilityBillRequest"];
+                    "application/*+json": components["schemas"]["OpenUtilityBillRequest"];
+                };
+            };
+            responses: {
+                /** @description Created */
+                201: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["OpenUtilityBillPeriodResult"];
+                        "application/json": components["schemas"]["OpenUtilityBillPeriodResult"];
+                        "text/json": components["schemas"]["OpenUtilityBillPeriodResult"];
+                    };
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/utility-bills/{utilityBillPeriodId}/distribute": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Distributes the total across every occupied apartment in the period's site. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    utilityBillPeriodId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/utility-bills/{utilityBillPeriodId}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Closes a utility bill period (no further items can be added). */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    utilityBillPeriodId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/utility-bills/{utilityBillPeriodId}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the distributed per-apartment items of one utility bill period. */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    utilityBillPeriodId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["PeriodItemDto"][];
+                        "application/json": components["schemas"]["PeriodItemDto"][];
+                        "text/json": components["schemas"]["PeriodItemDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/utility-bills/sites/{siteId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists a site's utility bill periods (most recent month first). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    siteId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["UtilityBillPeriodListItemDto"][];
+                        "application/json": components["schemas"]["UtilityBillPeriodListItemDto"][];
+                        "text/json": components["schemas"]["UtilityBillPeriodListItemDto"][];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -970,6 +1828,18 @@ export interface components {
             plate: string;
             note: null | string;
         };
+        ApartmentOccupantDto: {
+            /** Format: uuid */
+            assignmentId: string;
+            /** Format: uuid */
+            apartmentId: string;
+            /** Format: uuid */
+            residentId: string;
+            residentFullName: string;
+            tenantType: string;
+            /** Format: date */
+            startDate: string;
+        };
         ApartmentSummaryDto: {
             /** Format: uuid */
             id: string;
@@ -979,6 +1849,20 @@ export interface components {
             floor: number | string;
             type: string;
             status: string;
+        };
+        /** @description Request body for `POST /api/assignments`. */
+        AssignResidentRequest: {
+            /** Format: uuid */
+            apartmentId: string;
+            /** Format: uuid */
+            residentId: string;
+            tenantType: components["schemas"]["TenantType"];
+            /** Format: date */
+            startDate: string;
+        };
+        AssignResidentResult: {
+            /** Format: uuid */
+            assignmentId: string;
         };
         BlockSummaryDto: {
             /** Format: uuid */
@@ -996,10 +1880,71 @@ export interface components {
             /** Format: uuid */
             siteId: string;
         };
+        DuesPeriodListItemDto: {
+            /** Format: uuid */
+            id: string;
+            month: string;
+            /** Format: double */
+            perApartmentAmount: number | string;
+            /** Format: int32 */
+            itemCount: number | string;
+            /** Format: int32 */
+            paidCount: number | string;
+            isClosed: boolean;
+        };
+        /** @description Request body for `POST /api/assignments/{assignmentId}/end`. */
+        EndAssignmentRequest: {
+            /** Format: date */
+            endDate: string;
+        };
         /** @description Request body for `POST /api/auth/login`. */
         LoginRequest: {
             email: string;
             password: string;
+        };
+        /** @description Request body for `POST /api/dues`. */
+        OpenDuesPeriodRequest: {
+            /** Format: uuid */
+            siteId: string;
+            /** Format: int32 */
+            year: number | string;
+            /** Format: int32 */
+            month: number | string;
+            /** Format: double */
+            perApartmentAmount: number | string;
+        };
+        OpenDuesPeriodResult: {
+            /** Format: uuid */
+            duesPeriodId: string;
+        };
+        OpenUtilityBillPeriodResult: {
+            /** Format: uuid */
+            utilityBillPeriodId: string;
+        };
+        /** @description Request body for `POST /api/utility-bills`. */
+        OpenUtilityBillRequest: {
+            /** Format: uuid */
+            siteId: string;
+            /** Format: int32 */
+            year: number | string;
+            /** Format: int32 */
+            month: number | string;
+            utilityType: components["schemas"]["UtilityType"];
+            /** Format: double */
+            totalAmount: number | string;
+        };
+        PeriodItemDto: {
+            /** Format: uuid */
+            itemId: string;
+            /** Format: uuid */
+            apartmentId: string;
+            apartment: string;
+            /** Format: uuid */
+            residentId: string;
+            residentFullName: string;
+            /** Format: double */
+            amount: number | string;
+            status: string;
         };
         ProblemDetails: {
             type?: null | string;
@@ -1026,6 +1971,30 @@ export interface components {
             /** Format: uuid */
             residentId: string;
         };
+        ResidentAssignmentDto: {
+            /** Format: uuid */
+            assignmentId: string;
+            /** Format: uuid */
+            apartmentId: string;
+            tenantType: string;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: null | string;
+            isActive: boolean;
+        };
+        ResidentBillDto: {
+            /** Format: uuid */
+            itemId: string;
+            /** Format: uuid */
+            periodId: string;
+            kind: string;
+            month: string;
+            detail: string;
+            /** Format: double */
+            amount: number | string;
+            status: string;
+        };
         ResidentDetailsDto: {
             /** Format: uuid */
             id: string;
@@ -1047,6 +2016,16 @@ export interface components {
             /** Format: int32 */
             vehicleCount: number | string;
         };
+        SiteDebtSummaryDto: {
+            /** Format: uuid */
+            siteId: string;
+            /** Format: double */
+            totalAccrued: number | string;
+            /** Format: double */
+            totalCollected: number | string;
+            /** Format: double */
+            totalOutstanding: number | string;
+        };
         SiteDetailsDto: {
             /** Format: uuid */
             id: string;
@@ -1064,6 +2043,7 @@ export interface components {
             /** Format: int32 */
             apartmentCount: number | string;
         };
+        TenantType: number;
         /** @description Response body shared by login and refresh endpoints. */
         TokensResponse: {
             accessToken: string;
@@ -1078,6 +2058,20 @@ export interface components {
             email: string;
             phone: string;
         };
+        UtilityBillPeriodListItemDto: {
+            /** Format: uuid */
+            id: string;
+            month: string;
+            utilityType: string;
+            /** Format: double */
+            totalAmount: number | string;
+            /** Format: int32 */
+            itemCount: number | string;
+            /** Format: int32 */
+            paidCount: number | string;
+            isClosed: boolean;
+        };
+        UtilityType: number;
         VehicleDto: {
             plate: string;
             note: null | string;

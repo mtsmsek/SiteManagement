@@ -119,6 +119,80 @@
       "removeMessage": "Are you sure you want to remove this vehicle?"
     }
   },
+  "tenancy": {
+    "occupant": "Occupant",
+    "assign": {
+      "action": "Assign Resident",
+      "title": "Assign Resident",
+      "resident": "Resident",
+      "residentRequired": "A resident must be selected.",
+      "tenantType": "Type",
+      "startDate": "Start Date",
+      "startDateRequired": "Start date is required.",
+      "submit": "Assign"
+    },
+    "tenantType": {
+      "owner": "Owner",
+      "tenant": "Tenant"
+    },
+    "vacate": {
+      "action": "Move Out",
+      "title": "Vacate apartment",
+      "message": "Are you sure you want to end the resident assignment for this apartment?",
+      "confirm": "Move Out"
+    }
+  },
+  "billing": {
+    "title": "Billing",
+    "itemsPaid": "{{paid}}/{{total}} paid",
+    "noItems": "Not distributed yet.",
+    "fields": {
+      "year": "Year",
+      "month": "Month",
+      "monthInvalid": "Month must be between 1 and 12.",
+      "perApartmentAmount": "Per-Apartment Amount",
+      "totalAmount": "Total Amount",
+      "utilityType": "Utility Type",
+      "amountInvalid": "Enter a valid amount."
+    },
+    "dues": {
+      "tab": "Dues",
+      "openTitle": "Open Dues Period",
+      "open": "Open Period",
+      "empty": "No dues periods yet."
+    },
+    "utility": {
+      "tab": "Utility",
+      "openTitle": "Open Utility Bill Period",
+      "open": "Open Period",
+      "empty": "No utility bill periods yet."
+    },
+    "utilityType": {
+      "Electricity": "Electricity",
+      "Water": "Water",
+      "NaturalGas": "Natural Gas"
+    },
+    "actions": {
+      "distribute": "Distribute",
+      "close": "Close"
+    },
+    "status": {
+      "closed": "Closed",
+      "Unpaid": "Unpaid",
+      "Paid": "Paid"
+    },
+    "item": {
+      "apartment": "Apartment",
+      "resident": "Resident",
+      "amount": "Amount",
+      "status": "Status"
+    },
+    "debt": {
+      "accrued": "Accrued",
+      "collected": "Collected",
+      "outstanding": "Outstanding"
+    }
+  },
   "errors": {
     "generic": "An error occurred.",
     "network": "Cannot reach the server.",

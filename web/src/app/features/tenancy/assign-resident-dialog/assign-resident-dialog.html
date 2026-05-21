@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>{{ 'tenancy.assign.title' | translate }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'tenancy.assign.resident' | translate }}</mat-label>
+      <mat-select formControlName="residentId">
+        @for (resident of residents(); track resident.id) {
+          <mat-option [value]="resident.id">
+            {{ resident.firstName }} {{ resident.lastName }}
+          </mat-option>
+        }
+      </mat-select>
+      @if (form.controls.residentId.touched && form.controls.residentId.invalid) {
+        <mat-error>{{ 'tenancy.assign.residentRequired' | translate }}</mat-error>
+      }
+      @if (form.controls.residentId.hasError('server')) {
+        <mat-error>{{ form.controls.residentId.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'tenancy.assign.tenantType' | translate }}</mat-label>
+      <mat-select formControlName="tenantType">
+        @for (option of tenantTypeOptions; track option.value) {
+          <mat-option [value]="option.value">{{ option.labelKey | translate }}</mat-option>
+        }
+      </mat-select>
+      @if (form.controls.tenantType.hasError('server')) {
+        <mat-error>{{ form.controls.tenantType.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'tenancy.assign.startDate' | translate }}</mat-label>
+      <input matInput type="date" formControlName="startDate" />
+      @if (form.controls.startDate.touched && form.controls.startDate.hasError('required')) {
+        <mat-error>{{ 'tenancy.assign.startDateRequired' | translate }}</mat-error>
+      }
+      @if (form.controls.startDate.hasError('server')) {
+        <mat-error>{{ form.controls.startDate.getError('server') }}</mat-error>
+      }
+    </mat-form-field>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
+    <button matButton="filled" type="submit" [disabled]="submitting()">
+      {{ 'tenancy.assign.submit' | translate }}
+    </button>
+  </mat-dialog-actions>
+</form>
