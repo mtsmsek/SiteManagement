@@ -53,11 +53,13 @@ public sealed class DuesPeriod : AggregateRoot<Guid>
 
     /// <summary>
     /// Adds a dues item for an occupied apartment at the period's per-apartment
-    /// amount.
+    /// amount and returns it, so the caller can register the brand-new inner
+    /// entity with the persistence tracker.
     /// </summary>
+    /// <returns>The freshly created dues item.</returns>
     /// <exception cref="PeriodAlreadyClosedException">Thrown when the period is closed.</exception>
     /// <exception cref="DuplicateBillingItemException">Thrown when the apartment already has an item.</exception>
-    public void AddItemFor(Guid apartmentId, Guid residentId)
+    public DuesItem AddItemFor(Guid apartmentId, Guid residentId)
     {
         EnsureOpen();
 
@@ -66,7 +68,9 @@ public sealed class DuesPeriod : AggregateRoot<Guid>
             throw new DuplicateBillingItemException(apartmentId);
         }
 
-        _items.Add(DuesItem.Create(apartmentId, residentId, PerApartmentAmount));
+        var item = DuesItem.Create(apartmentId, residentId, PerApartmentAmount);
+        _items.Add(item);
+        return item;
     }
 
     /// <summary>Locks the period and raises <see cref="DuesPeriodClosed"/>.</summary>

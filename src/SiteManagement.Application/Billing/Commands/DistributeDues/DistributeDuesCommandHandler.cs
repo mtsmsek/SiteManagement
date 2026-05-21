@@ -31,7 +31,10 @@ public sealed class DistributeDuesCommandHandler(
 
         foreach (var occupant in occupants)
         {
-            period.AddItemFor(occupant.ApartmentId, occupant.ResidentId);
+            // Brand-new inner entity added through a loaded aggregate is tracked
+            // as "modified" by default; force it to "added" so EF INSERTs it.
+            var item = period.AddItemFor(occupant.ApartmentId, occupant.ResidentId);
+            _unitOfWork.MarkAsAdded(item);
         }
 
         await _unitOfWork.SaveChangesAsync(cancellationToken);

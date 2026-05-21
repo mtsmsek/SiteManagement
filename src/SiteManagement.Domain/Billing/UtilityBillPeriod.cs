@@ -58,11 +58,14 @@ public sealed class UtilityBillPeriod : AggregateRoot<Guid>
 
     /// <summary>
     /// Splits the total equally across the supplied occupied apartments,
-    /// creating one item each. Replaces any prior distribution.
+    /// creating one item each and returning them so the caller can register the
+    /// brand-new inner entities with the persistence tracker. Replaces any prior
+    /// distribution.
     /// </summary>
+    /// <returns>The freshly created per-apartment items.</returns>
     /// <exception cref="PeriodAlreadyClosedException">Thrown when the period is closed.</exception>
     /// <exception cref="EmptyDistributionException">Thrown when there are no occupants to split between.</exception>
-    public void DistributeEqually(IReadOnlyList<(Guid ApartmentId, Guid ResidentId)> occupants)
+    public IReadOnlyList<UtilityBillItem> DistributeEqually(IReadOnlyList<(Guid ApartmentId, Guid ResidentId)> occupants)
     {
         EnsureOpen();
 
@@ -78,6 +81,8 @@ public sealed class UtilityBillPeriod : AggregateRoot<Guid>
         {
             _items.Add(UtilityBillItem.Create(occupants[i].ApartmentId, occupants[i].ResidentId, shares[i]));
         }
+
+        return _items.ToList();
     }
 
     /// <summary>Locks the period and raises <see cref="UtilityBillPeriodClosed"/>.</summary>

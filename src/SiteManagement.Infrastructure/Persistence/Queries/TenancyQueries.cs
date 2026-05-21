@@ -1,6 +1,7 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using SiteManagement.Application.Tenancy.Queries;
-using SiteManagement.Domain.Property;
+using SiteManagement.Domain.Tenancy;
 
 namespace SiteManagement.Infrastructure.Persistence.Queries;
 
@@ -25,15 +26,13 @@ public sealed class TenancyQueries(AppDbContext dbContext) : ITenancyQueries
             .SelectMany(s => s.Blocks.SelectMany(b => b.Apartments.Select(a => a.Id)))
             .ToListAsync(ct);
 
-        return await ActiveOccupantQuery()
-            .Where(o => apartmentIds.Contains(o.ApartmentId))
+        return await ActiveOccupantQuery(a => apartmentIds.Contains(a.ApartmentId))
             .ToListAsync(ct);
     }
 
     /// <inheritdoc />
     public Task<ApartmentOccupantDto?> GetActiveOccupantAsync(Guid apartmentId, CancellationToken ct = default)
-        => ActiveOccupantQuery()
-            .Where(o => o.ApartmentId == apartmentId)
+        => ActiveOccupantQuery(a => a.ApartmentId == apartmentId)
             .FirstOrDefaultAsync(ct);
 
     /// <inheritdoc />
@@ -52,9 +51,15 @@ public sealed class TenancyQueries(AppDbContext dbContext) : ITenancyQueries
                 a.Period.EndDate == null))
             .ToListAsync(ct);
 
-    /// <summary>Active assignments joined to the resident's name, projected to the occupant DTO.</summary>
-    private IQueryable<ApartmentOccupantDto> ActiveOccupantQuery()
-        => from a in _dbContext.ApartmentAssignments.AsNoTracking()
+    /// <summary>
+    /// Active assignments matching <paramref name="apartmentFilter"/>, joined to the
+    /// resident's name and projected to the occupant DTO. The filter is applied to
+    /// the assignment entity <em>before</em> projection so it stays translatable —
+    /// filtering the projected DTO (with its joined name concatenation) does not.
+    /// </summary>
+    private IQueryable<ApartmentOccupantDto> ActiveOccupantQuery(
+        Expression<Func<ApartmentAssignment, bool>> apartmentFilter)
+        => from a in _dbContext.ApartmentAssignments.AsNoTracking().Where(apartmentFilter)
            where a.Period.EndDate == null
            join r in _dbContext.Residents.AsNoTracking() on a.ResidentId equals r.Id
            select new ApartmentOccupantDto(
