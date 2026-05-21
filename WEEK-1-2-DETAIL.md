@@ -246,11 +246,11 @@
 
 ## HAFTA 2 — Property & Residency
 
-### Gün 1-2 (Pazartesi-Salı) — Property Domain (TDD)
+### Gün 1-2 (Pazartesi-Salı) — Property Domain (TDD) ✅
 
 **Hedef:** Property bounded context — rich aggregate'lar, invariant test'leri tam, %85+ domain coverage.
 
-- [ ] `Domain/Property/ValueObjects/`:
+- [x] `Domain/Property/ValueObjects/`:
   - `ApartmentType` (string, format: `[1-9]+\+[0-9]+`, factory `ApartmentType.From("2+1")`)
   - `ApartmentNumber` (int, range 1-999)
   - `Floor` (int, range -5 to 50, negatif = bodrum)
@@ -288,7 +288,7 @@
 
 ---
 
-### Gün 3 (Çarşamba) — Residency Domain (TDD)
+### Gün 3 (Çarşamba) — Residency Domain (TDD) ✅
 
 **Hedef:** Resident aggregate ve value object'ler tamam, TC validation çalışıyor. ✅
 
@@ -467,22 +467,29 @@
 
 **OpenAPI codegen** Gün 7'ye (Sites/Residents API client) bırakıldı — login manuel typed `AuthService` ile yeterli.
 
-**Gün 7 (admin sayfaları — sonraki commit):**
-- [ ] `features/admin/sites/`:
-  - `site-list.component.ts` (mat-table + create/edit dialog)
-  - `site-form.component.ts` (reactive form)
-- [ ] `features/admin/blocks/` (site detayında)
-- [ ] `features/admin/apartments/`:
-  - `apartment-list.component.ts` (filter by block, status badge)
-  - `apartment-form.component.ts`
-- [ ] `features/admin/residents/`:
-  - `resident-list.component.ts`
-  - `resident-form.component.ts` (TcNo input + validation feedback)
-- [ ] Backend'den hata gelirken (RFC 7807 ProblemDetails) Angular'da güzel toast/snackbar göster
-- [ ] Manuel test: admin oluştur → login → site oluştur → blok ekle → daire ekle → sakin oluştur → şifre console'dan al (mail simülasyonu sonraki haftada)
+**Gün 7 (admin sayfaları) ✅:**
 
-**Commit (Gün 6):** `feat(web): angular setup with material, auth and i18n`
-**Commit (Gün 7):** `feat(web): admin pages for property and residency`
+Klasör yapısı feature-bazlı (`features/sites/`, `features/residents/` — `admin/` alt-klasörü yerine, route zaten `/admin/*` altında). Her feature 3 katman: `*.api.ts` (HTTP) → `*.store.ts` (signal state) → component'ler. OpenAPI codegen bu turda yapıldı.
+
+- [x] **OpenAPI codegen**: `openapi-typescript` ile `/openapi/v1.json` → `core/api/api-types.ts` (`npm run gen:api`); `api.models.ts` temiz alias'lar; `ApiClient` tipli HttpClient wrapper
+- [x] `features/sites/`:
+  - `site-list` (mat-table + create dialog + delete confirm + satır → detay)
+  - `site-form-dialog` (reactive form, ProblemDetails inline alan hataları)
+  - `site-detail` (bloklar expansion panel + daireler tablosu + occupy/vacate toggle)
+  - `block-form-dialog`, `apartment-form-dialog` (`"N+M"` tip picklist + status chip)
+- [x] `features/residents/`:
+  - `resident-list` (mat-table + register dialog + satır → detay)
+  - `resident-form-dialog` (TcNo 11-hane client + checksum server-side, inline feedback)
+  - `resident-detail` (iletişim kartı + edit dialog + araç ekle/sil)
+  - `contact-form-dialog`, `vehicle-form-dialog`
+- [x] `shared/confirm-dialog` (silme onayları) + `styles.scss` ortak sayfa/tablo/dialog primitive'leri
+- [x] `SitesStore` / `ResidentsStore` — signal-based (list/detail/loading/empty), yazma sonrası refetch
+- [x] Backend hata (RFC 7807 ProblemDetails) → `error.interceptor` snackbar (validation dışı) + dialog'larda inline alan hataları
+- [x] **Parametrik mesaj fix** (yan bulgu): `GlobalExceptionMiddleware` business-rule mesajını behavior'ın hazır lokalize ettiği `Message`'tan alıyor (eskiden bare key'i argümansız re-localize edip `{0}` sızdırıyordu) + E2E/unit regresyon testi
+- [x] Manuel uçtan uca test: admin login → site → blok → daire → **occupy** → sakin (geçerli TcNo) → welcome mail + geçici şifre **MailHog'dan** (localhost:8025) → sakin geçici şifreyle login → admin endpoint'e 403 (escalation yok)
+
+**Commit (Gün 6):** `feat(web): angular 21 skeleton with material, auth, i18n` → `028ba03` (+ `e698f39` i18n fix + login redesign + dark mode)
+**Commit (Gün 7):** `feat(web): sites + residents admin CRUD with OpenAPI-typed client` → `81ef762` (+ `8f17e59` parametrik mesaj fix)
 
 ---
 
@@ -528,18 +535,18 @@
 
 ### Hafta 2 Çıktısı
 
-- Admin tarayıcıdan tam property + residency CRUD yapabiliyor
-- Domain coverage %80+
-- E2E test infrastructure yerinde + ilk akış yeşil
-- Deploy edilmiş, live URL'de Angular UI çalışıyor
+- [x] Admin tarayıcıdan tam property + residency CRUD yapabiliyor
+- [x] Domain coverage %80+ (Domain.Tests 149, toplam 178 test yeşil)
+- [x] E2E test infrastructure yerinde + ilk akış yeşil
+- [ ] ~~Deploy edilmiş, live URL'de Angular UI çalışıyor~~ → **W6'ya ertelendi** (W1'de Railway "şimdilik gerek yok" denildi; lokal Docker Compose ile çalışıyor)
 
-**Hafta 2 sonu self-review:**
-- Aggregate root'lar collection'ları read-only mu expose ediyor?
-- Setter'lar private mi?
-- Domain'de IServiceProvider, DbContext veya ASP.NET reference var mı? (Sıfır olmalı)
-- Frontend hardcoded Türkçe string içeriyor mu? (Sıfır olmalı)
-- Handler'lar try/catch içermiyor (EntityNotFound dışında)?
-- TcNo gerçekten checksum doğrulaması yapıyor mu?
+**Hafta 2 sonu self-review** (hepsi ✅ — kodda doğrulandı):
+- [x] Aggregate root'lar collection'ları read-only mu expose ediyor? → `IReadOnlyCollection` + `AsReadOnly()` (Site.Blocks, Resident.Vehicles)
+- [x] Setter'lar private mi? → tek `protected set` (Entity.Id); public set yok
+- [x] Domain'de IServiceProvider, DbContext veya ASP.NET reference var mı? → Sıfır; csproj BCL-only, ArchitectureTests doğruluyor
+- [x] Frontend hardcoded Türkçe string içeriyor mu? → Sıfır; tüm metin i18n (`translate` pipe)
+- [x] Handler'lar try/catch içermiyor (EntityNotFound dışında)? → Sıfır try/catch; exception'lar pipeline behavior'da, transaction `IUnitOfWorkScope` ile
+- [x] TcNo gerçekten checksum doğrulaması yapıyor mu? → Evet, resmi 10+11. hane algoritması + testli
 
 ---
 
