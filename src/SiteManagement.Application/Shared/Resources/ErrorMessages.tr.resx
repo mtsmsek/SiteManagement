@@ -113,4 +113,19 @@
   <data name="Tenancy.Assignment.AlreadyEnded" xml:space="preserve">
     <value>Bu atama zaten sonlandırılmış.</value>
   </data>
+  <data name="Billing.BillingMonth.Invalid" xml:space="preserve">
+    <value>Geçersiz fatura dönemi: {0}-{1}. Ay 1-12 arasında olmalı.</value>
+  </data>
+  <data name="Billing.Period.AlreadyClosed" xml:space="preserve">
+    <value>Bu dönem zaten kapatılmış; değişiklik yapılamaz.</value>
+  </data>
+  <data name="Billing.Item.Duplicate" xml:space="preserve">
+    <value>Bu daire için dönemde zaten bir kalem mevcut.</value>
+  </data>
+  <data name="Billing.Item.NotFound" xml:space="preserve">
+    <value>Belirtilen ödeme kalemi bu dönemde bulunamadı.</value>
+  </data>
+  <data name="Billing.Distribution.Empty" xml:space="preserve">
+    <value>Dağıtım yapılacak dolu daire yok.</value>
+  </data>
 </root>

@@ -113,4 +113,19 @@
   <data name="Tenancy.Assignment.AlreadyEnded" xml:space="preserve">
     <value>This assignment has already ended.</value>
   </data>
+  <data name="Billing.BillingMonth.Invalid" xml:space="preserve">
+    <value>Invalid billing month: {0}-{1}. Month must be between 1 and 12.</value>
+  </data>
+  <data name="Billing.Period.AlreadyClosed" xml:space="preserve">
+    <value>This period is already closed and cannot be changed.</value>
+  </data>
+  <data name="Billing.Item.Duplicate" xml:space="preserve">
+    <value>This apartment already has an item in the period.</value>
+  </data>
+  <data name="Billing.Item.NotFound" xml:space="preserve">
+    <value>The specified billing item was not found in this period.</value>
+  </data>
+  <data name="Billing.Distribution.Empty" xml:space="preserve">
+    <value>There are no occupied apartments to distribute across.</value>
+  </data>
 </root>
