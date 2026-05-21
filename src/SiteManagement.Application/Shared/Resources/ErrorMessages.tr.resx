@@ -107,4 +107,10 @@
   <data name="Shared.Money.Negative" xml:space="preserve">
     <value>Tutar negatif olamaz: {0}.</value>
   </data>
+  <data name="Tenancy.AssignmentPeriod.Invalid" xml:space="preserve">
+    <value>Atama bitiş tarihi ({1}) başlangıç tarihinden ({0}) önce olamaz.</value>
+  </data>
+  <data name="Tenancy.Assignment.AlreadyEnded" xml:space="preserve">
+    <value>Bu atama zaten sonlandırılmış.</value>
+  </data>
 </root>

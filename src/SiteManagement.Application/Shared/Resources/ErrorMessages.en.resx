@@ -107,4 +107,10 @@
   <data name="Shared.Money.Negative" xml:space="preserve">
     <value>Amount cannot be negative: {0}.</value>
   </data>
+  <data name="Tenancy.AssignmentPeriod.Invalid" xml:space="preserve">
+    <value>Assignment end date ({1}) cannot precede the start date ({0}).</value>
+  </data>
+  <data name="Tenancy.Assignment.AlreadyEnded" xml:space="preserve">
+    <value>This assignment has already ended.</value>
+  </data>
 </root>
