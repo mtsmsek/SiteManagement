@@ -1,4 +1,4 @@
-using MediatR;
+using SiteManagement.Application.Abstractions.Messaging;
 
 namespace SiteManagement.Application.Residency.Commands.RegisterResident;
 
@@ -13,7 +13,7 @@ public sealed record RegisterResidentCommand(
     string FirstName,
     string LastName,
     string Email,
-    string Phone) : IRequest<RegisterResidentResult>;
+    string Phone) : ICommand<RegisterResidentResult>;
 
 /// <summary>Result carrying the new resident's identifier.</summary>
 public sealed record RegisterResidentResult(Guid ResidentId);

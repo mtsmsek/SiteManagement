@@ -25,19 +25,56 @@ public sealed class SmtpEmailSender(IOptions<SmtpOptions> options) : IEmailSende
         Please log in and change the password as soon as possible.
         """;
 
+    private const string BillingSubjectTemplate = "SiteManagement — {0} for {1}";
+    private const string BillingBodyTemplate =
+        """
+        Hello,
+
+        Your {0} for {1} has been finalised.
+
+        Amount due: {2:0.00} TRY
+
+        Please log in to view and pay your balance.
+        """;
+
     private readonly SmtpOptions _options = options.Value;
 
     /// <inheritdoc />
-    public async Task SendResidentWelcomeAsync(
+    public Task SendResidentWelcomeAsync(
         string toEmail,
         string fullName,
         string temporaryPassword,
         CancellationToken ct = default)
+        => SendAsync(
+            toEmail,
+            WelcomeSubjectFormat,
+            string.Format(WelcomeBodyTemplate, fullName, toEmail, temporaryPassword),
+            ct);
+
+    /// <inheritdoc />
+    public async Task SendBillingNotificationsAsync(
+        IReadOnlyCollection<BillingNotification> notifications,
+        CancellationToken ct = default)
+    {
+        // One SMTP message per recipient (contents differ); the per-recipient
+        // loop lives here, in the sender, not in the Application handler.
+        foreach (var n in notifications)
+        {
+            await SendAsync(
+                n.ToEmail,
+                string.Format(BillingSubjectTemplate, n.BillingKind, n.Month),
+                string.Format(BillingBodyTemplate, n.BillingKind, n.Month, n.Amount),
+                ct);
+        }
+    }
+
+    /// <summary>Sends one plain-text message through the configured SMTP host.</summary>
+    private async Task SendAsync(string toEmail, string subject, string body, CancellationToken ct)
     {
         using var message = new MailMessage(_options.FromAddress, toEmail)
         {
-            Subject = WelcomeSubjectFormat,
-            Body = string.Format(WelcomeBodyTemplate, fullName, toEmail, temporaryPassword),
+            Subject = subject,
+            Body = body,
             IsBodyHtml = false,
         };
 

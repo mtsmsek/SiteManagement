@@ -1,0 +1,73 @@
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using SiteManagement.Api.Configuration;
+using SiteManagement.Application.Billing.Commands.CloseUtilityBillPeriod;
+using SiteManagement.Application.Billing.Commands.DistributeUtilityBill;
+using SiteManagement.Application.Billing.Commands.OpenUtilityBillPeriod;
+using SiteManagement.Application.Billing.Queries;
+using SiteManagement.Application.Billing.Queries.ListUtilityBillPeriods;
+using SiteManagement.Domain.Identity;
+
+namespace SiteManagement.Api.Controllers.Billing;
+
+/// <summary>
+/// Admin endpoints for the utility-bill side of the Billing bounded context. A
+/// utility bill period is opened with a total amount for a utility type,
+/// distributed across occupants, then closed. Reads pivot on the owning site.
+/// </summary>
+[ApiController]
+[Authorize(Roles = Roles.Admin)]
+[Route($"{ApiConstants.RoutePrefix}/utility-bills")]
+public class UtilityBillsController(ISender sender) : ControllerBase
+{
+    private const string DistributeRoute = "{utilityBillPeriodId:guid}/distribute";
+    private const string CloseRoute = "{utilityBillPeriodId:guid}/close";
+    private const string BySiteRoute = "sites/{siteId:guid}";
+
+    private readonly ISender _sender = sender;
+
+    /// <summary>Opens an empty utility bill period for a site at a fixed total amount.</summary>
+    [HttpPost]
+    [ProducesResponseType<OpenUtilityBillPeriodResult>(StatusCodes.Status201Created)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<ActionResult<OpenUtilityBillPeriodResult>> Open(
+        [FromBody] OpenUtilityBillRequest body,
+        CancellationToken ct)
+    {
+        var result = await _sender.Send(
+            new OpenUtilityBillPeriodCommand(body.SiteId, body.Year, body.Month, body.UtilityType, body.TotalAmount), ct);
+
+        return StatusCode(StatusCodes.Status201Created, result);
+    }
+
+    /// <summary>Distributes the total across every occupied apartment in the period's site.</summary>
+    [HttpPost(DistributeRoute)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Distribute(Guid utilityBillPeriodId, CancellationToken ct)
+    {
+        await _sender.Send(new DistributeUtilityBillCommand(utilityBillPeriodId), ct);
+        return NoContent();
+    }
+
+    /// <summary>Closes a utility bill period (no further items can be added).</summary>
+    [HttpPost(CloseRoute)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> Close(Guid utilityBillPeriodId, CancellationToken ct)
+    {
+        await _sender.Send(new CloseUtilityBillPeriodCommand(utilityBillPeriodId), ct);
+        return NoContent();
+    }
+
+    /// <summary>Lists a site's utility bill periods (most recent month first).</summary>
+    [HttpGet(BySiteRoute)]
+    [ProducesResponseType<IReadOnlyList<UtilityBillPeriodListItemDto>>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<IReadOnlyList<UtilityBillPeriodListItemDto>>> ListForSite(Guid siteId, CancellationToken ct)
+        => Ok(await _sender.Send(new ListUtilityBillPeriodsQuery(siteId), ct));
+}

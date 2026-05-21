@@ -62,4 +62,19 @@ public sealed class ResidentQueries(AppDbContext dbContext) : IResidentQueries
             resident.Phone.Value,
             vehicles);
     }
+
+    /// <inheritdoc />
+    public async Task<IReadOnlyDictionary<Guid, string>> GetEmailsByIdsAsync(
+        IReadOnlyCollection<Guid> residentIds, CancellationToken ct = default)
+    {
+        if (residentIds.Count == 0)
+        {
+            return new Dictionary<Guid, string>();
+        }
+
+        return await _dbContext.Residents
+            .AsNoTracking()
+            .Where(r => residentIds.Contains(r.Id))
+            .ToDictionaryAsync(r => r.Id, r => r.Email.Value, ct);
+    }
 }

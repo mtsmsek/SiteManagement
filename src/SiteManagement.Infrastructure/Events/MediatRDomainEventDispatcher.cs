@@ -4,6 +4,10 @@ using SiteManagement.Domain.Shared;
 
 namespace SiteManagement.Infrastructure.Events;
 
+// DomainEventNotification<> now lives in the Application layer
+// (Abstractions/Events) so handlers can reference it without a back-dependency
+// on Infrastructure; this dispatcher just publishes it.
+
 /// <summary>
 /// <see cref="IDomainEventDispatcher"/> backed by MediatR. Each domain event is
 /// wrapped in a <see cref="DomainEventNotification{TDomainEvent}"/> (built via

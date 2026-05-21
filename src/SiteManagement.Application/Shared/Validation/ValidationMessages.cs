@@ -21,4 +21,7 @@ public sealed class ValidationMessages
 
     /// <summary>"Password must be at least {MinLength} characters." (password-specific copy)</summary>
     public const string PasswordTooShort = "Validation.PasswordTooShort";
+
+    /// <summary>"{PropertyName} must be greater than zero."</summary>
+    public const string AmountNotPositive = "Validation.AmountNotPositive";
 }

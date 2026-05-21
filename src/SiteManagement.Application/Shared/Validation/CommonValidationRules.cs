@@ -89,6 +89,15 @@ public static class CommonValidationRules
         => ruleBuilder.InclusiveBetween(min, max).WithMessage(ValidationMessages.Required);
 
     /// <summary>
+    /// A monetary amount that must be strictly positive. Shared by every
+    /// billing command that takes an amount (dues, utility totals) so the
+    /// "greater than zero" rule and its message live in one place rather than
+    /// repeating <c>.GreaterThan(0)</c> with a magic literal across validators.
+    /// </summary>
+    public static IRuleBuilderOptions<T, decimal> PositiveAmount<T>(this IRuleBuilder<T, decimal> ruleBuilder)
+        => ruleBuilder.GreaterThan(decimal.Zero).WithMessage(ValidationMessages.AmountNotPositive);
+
+    /// <summary>
     /// Required Turkish citizenship number — surface-level check only
     /// (non-empty, exactly <see cref="ResidencyLimits.TcNoLength"/> digits).
     /// The checksum validation lives on the <c>TcNo</c> value object.

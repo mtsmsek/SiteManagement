@@ -56,8 +56,8 @@ public sealed class RegisterResidentCommandHandler(
         var password = _passwordGenerator.Generate();
         var displayName = fullName.ToString();
 
-        await using var scope = await _unitOfWork.BeginScopeAsync(cancellationToken);
-
+        // TransactionBehavior wraps this command in a scope, so the inserts +
+        // the welcome email all run inside one transaction (see remarks).
         await _residentRepository.AddAsync(resident, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -70,8 +70,6 @@ public sealed class RegisterResidentCommandHandler(
 
         // Inside the transaction on purpose — see remarks.
         await _emailSender.SendResidentWelcomeAsync(email.Value, displayName, password, cancellationToken);
-
-        await scope.CommitAsync(cancellationToken);
 
         return new RegisterResidentResult(resident.Id);
     }

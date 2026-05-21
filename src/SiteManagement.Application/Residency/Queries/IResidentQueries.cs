@@ -13,4 +13,12 @@ public interface IResidentQueries
     /// <summary>Returns the full detail projection for a single resident.</summary>
     /// <returns><c>null</c> when no resident has that id.</returns>
     Task<ResidentDetailsDto?> GetByIdAsync(Guid id, CancellationToken ct = default);
+
+    /// <summary>
+    /// Maps the given resident ids to their email addresses in one query.
+    /// Used by billing notifications to email a batch of residents without an
+    /// N+1 lookup.
+    /// </summary>
+    Task<IReadOnlyDictionary<Guid, string>> GetEmailsByIdsAsync(
+        IReadOnlyCollection<Guid> residentIds, CancellationToken ct = default);
 }

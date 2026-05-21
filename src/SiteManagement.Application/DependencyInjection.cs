@@ -33,12 +33,15 @@ public static class DependencyInjection
         {
             cfg.RegisterServicesFromAssembly(assembly);
 
-            // Order matters: logging wraps the whole call, validation runs
-            // before the handler, exception translation catches anything the
-            // handler (or domain) throws.
+            // Order matters (outermost first): logging wraps the whole call,
+            // validation runs before the handler, exception translation catches
+            // anything the handler (or domain) throws, then the transaction sits
+            // closest to the handler so a thrown-and-translated error still
+            // leaves the scope uncommitted (rolled back on dispose).
             cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
             cfg.AddOpenBehavior(typeof(ExceptionTranslationBehavior<,>));
+            cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
         });
 
         services.AddValidatorsFromAssembly(assembly, includeInternalTypes: false);

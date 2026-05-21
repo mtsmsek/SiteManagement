@@ -27,4 +27,7 @@
   <data name="Validation.PasswordTooShort" xml:space="preserve">
     <value>Şifre en az {MinLength} karakter olmalıdır.</value>
   </data>
+  <data name="Validation.AmountNotPositive" xml:space="preserve">
+    <value>{PropertyName} sıfırdan büyük olmalıdır.</value>
+  </data>
 </root>

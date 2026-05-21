@@ -27,4 +27,7 @@
   <data name="Validation.PasswordTooShort" xml:space="preserve">
     <value>Password must be at least {MinLength} characters.</value>
   </data>
+  <data name="Validation.AmountNotPositive" xml:space="preserve">
+    <value>{PropertyName} must be greater than zero.</value>
+  </data>
 </root>
