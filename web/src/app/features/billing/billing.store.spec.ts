@@ -56,7 +56,9 @@ describe('BillingStore', () => {
     | 'closeDues'
     | 'openUtility'
     | 'distributeUtility'
-    | 'closeUtility',
+    | 'closeUtility'
+    | 'payDuesItem'
+    | 'payUtilityItem',
     ReturnType<typeof vi.fn>
   >;
   let api: ApiMock;
@@ -76,6 +78,8 @@ describe('BillingStore', () => {
       openUtility: vi.fn().mockReturnValue(of({ utilityBillPeriodId: 'util-1' })),
       distributeUtility: vi.fn().mockReturnValue(of(void 0)),
       closeUtility: vi.fn().mockReturnValue(of(void 0)),
+      payDuesItem: vi.fn().mockReturnValue(of(void 0)),
+      payUtilityItem: vi.fn().mockReturnValue(of(void 0)),
     };
     TestBed.configureTestingModule({
       providers: [BillingStore, { provide: BillingApi, useValue: api }],
@@ -112,6 +116,17 @@ describe('BillingStore', () => {
     expect(api.duesItems).toHaveBeenCalledWith('dues-1');
     expect(api.debtSummary).toHaveBeenCalledWith(siteId);
     expect(store.duesItems('dues-1')).toEqual([item]);
+  });
+
+  it('pays a dues item then reloads its items, the period list and the debt summary', async () => {
+    // act
+    await store.payDuesItem(siteId, 'dues-1', 'item-1');
+
+    // assert
+    expect(api.payDuesItem).toHaveBeenCalledWith('dues-1', 'item-1');
+    expect(api.duesItems).toHaveBeenCalledWith('dues-1');
+    expect(api.duesPeriods).toHaveBeenCalledWith(siteId);
+    expect(api.debtSummary).toHaveBeenCalledWith(siteId);
   });
 
   it('opens a utility bill period then reloads the site billing', async () => {

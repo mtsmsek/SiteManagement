@@ -77,6 +77,56 @@ body {
   color: var(--mat-sys-on-surface-variant);
 }
 
+// --- Card grid for list pages ----------------------------------------------
+// Responsive auto-fill grid of entity cards (sites, …). Cards lift on hover to
+// signal they're clickable; the delete action sits in the card footer.
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1rem;
+}
+
+.entity-card {
+  cursor: pointer;
+  transition:
+    box-shadow 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover {
+    box-shadow: var(--mat-sys-level2);
+    transform: translateY(-2px);
+  }
+
+  .card-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--mat-sys-primary-container);
+    color: var(--mat-sys-on-primary-container);
+  }
+
+  .stat-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .stat {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+
+    mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+  }
+}
+
 .full-width {
   width: 100%;
 }

@@ -13,37 +13,40 @@
 @if (isEmpty()) {
   <p class="empty-state">{{ 'sites.empty' | translate }}</p>
 } @else {
-  <table mat-table [dataSource]="sites()" class="data-table">
-    <ng-container matColumnDef="name">
-      <th mat-header-cell *matHeaderCellDef>{{ 'sites.fields.name' | translate }}</th>
-      <td mat-cell *matCellDef="let site">{{ site.name }}</td>
-    </ng-container>
+  <div class="card-grid">
+    @for (site of sites(); track site.id) {
+      <mat-card class="entity-card" appearance="outlined" (click)="open(site)">
+        <mat-card-header>
+          <div mat-card-avatar class="card-avatar">
+            <mat-icon>apartment</mat-icon>
+          </div>
+          <mat-card-title>{{ site.name }}</mat-card-title>
+          <mat-card-subtitle>{{ site.address }}</mat-card-subtitle>
+        </mat-card-header>
 
-    <ng-container matColumnDef="address">
-      <th mat-header-cell *matHeaderCellDef>{{ 'sites.fields.address' | translate }}</th>
-      <td mat-cell *matCellDef="let site">{{ site.address }}</td>
-    </ng-container>
+        <mat-card-content>
+          <div class="stat-row">
+            <span class="stat">
+              <mat-icon>domain</mat-icon>
+              {{ site.blockCount }} {{ 'sites.fields.blocks' | translate }}
+            </span>
+            <span class="stat">
+              <mat-icon>meeting_room</mat-icon>
+              {{ site.apartmentCount }} {{ 'sites.fields.apartments' | translate }}
+            </span>
+          </div>
+        </mat-card-content>
 
-    <ng-container matColumnDef="blocks">
-      <th mat-header-cell *matHeaderCellDef>{{ 'sites.fields.blocks' | translate }}</th>
-      <td mat-cell *matCellDef="let site">{{ site.blockCount }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="apartments">
-      <th mat-header-cell *matHeaderCellDef>{{ 'sites.fields.apartments' | translate }}</th>
-      <td mat-cell *matCellDef="let site">{{ site.apartmentCount }}</td>
-    </ng-container>
-
-    <ng-container matColumnDef="actions">
-      <th mat-header-cell *matHeaderCellDef></th>
-      <td mat-cell *matCellDef="let site">
-        <button matIconButton (click)="confirmDelete(site, $event)" [attr.aria-label]="'common.delete' | translate">
-          <mat-icon>delete</mat-icon>
-        </button>
-      </td>
-    </ng-container>
-
-    <tr mat-header-row *matHeaderRowDef="columns"></tr>
-    <tr mat-row *matRowDef="let row; columns: columns" class="clickable-row" (click)="open(row)"></tr>
-  </table>
+        <mat-card-actions align="end">
+          <button
+            matIconButton
+            (click)="confirmDelete(site, $event)"
+            [attr.aria-label]="'common.delete' | translate"
+          >
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    }
+  </div>
 }

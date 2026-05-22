@@ -144,6 +144,7 @@
   },
   "billing": {
     "title": "Billing",
+    "newPeriod": "New Period",
     "itemsPaid": "{{paid}}/{{total}} paid",
     "noItems": "Not distributed yet.",
     "fields": {
@@ -159,6 +160,7 @@
       "tab": "Dues",
       "openTitle": "Open Dues Period",
       "open": "Open Period",
+      "perApartment": "per apartment",
       "empty": "No dues periods yet."
     },
     "utility": {
@@ -174,9 +176,13 @@
     },
     "actions": {
       "distribute": "Distribute",
-      "close": "Close"
+      "close": "Close",
+      "showItems": "Items",
+      "hideItems": "Hide",
+      "markPaid": "Mark Paid"
     },
     "status": {
+      "open": "Open",
       "closed": "Closed",
       "Unpaid": "Unpaid",
       "Paid": "Paid"

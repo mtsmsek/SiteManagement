@@ -100,22 +100,29 @@
     <h2>{{ 'billing.title' | translate }}</h2>
 
     @if (debtSummary(); as debt) {
-      <mat-card class="debt-card" appearance="outlined">
-        <mat-card-content class="debt-grid">
-          <div class="debt-cell">
+      <div class="debt-tiles">
+        <div class="debt-tile">
+          <mat-icon>request_quote</mat-icon>
+          <div class="debt-text">
             <span class="debt-label">{{ 'billing.debt.accrued' | translate }}</span>
             <span class="debt-value">{{ debt.totalAccrued | number: '1.2-2' }} ₺</span>
           </div>
-          <div class="debt-cell">
+        </div>
+        <div class="debt-tile">
+          <mat-icon>payments</mat-icon>
+          <div class="debt-text">
             <span class="debt-label">{{ 'billing.debt.collected' | translate }}</span>
             <span class="debt-value">{{ debt.totalCollected | number: '1.2-2' }} ₺</span>
           </div>
-          <div class="debt-cell">
+        </div>
+        <div class="debt-tile outstanding">
+          <mat-icon>account_balance_wallet</mat-icon>
+          <div class="debt-text">
             <span class="debt-label">{{ 'billing.debt.outstanding' | translate }}</span>
             <span class="debt-value">{{ debt.totalOutstanding | number: '1.2-2' }} ₺</span>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
     }
 
     <mat-tab-group>
@@ -123,39 +130,63 @@
         <div class="tab-actions">
           <button matButton="filled" (click)="openDuesPeriod()">
             <mat-icon>add</mat-icon>
-            {{ 'billing.dues.open' | translate }}
+            {{ 'billing.newPeriod' | translate }}
           </button>
         </div>
 
         @if (duesPeriods().length === 0) {
           <p class="empty-state">{{ 'billing.dues.empty' | translate }}</p>
         } @else {
-          <mat-accordion multi>
+          <div class="period-list">
             @for (period of duesPeriods(); track period.id) {
-              <mat-expansion-panel (opened)="loadDuesItems(period)">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>{{ period.month }}</mat-panel-title>
-                  <mat-panel-description>
-                    {{ period.perApartmentAmount | number: '1.2-2' }} ₺ ·
-                    {{ 'billing.itemsPaid' | translate: { paid: period.paidCount, total: period.itemCount } }}
+              <mat-card class="period-card" appearance="outlined">
+                <div class="period-head">
+                  <div class="period-title">
+                    <span class="period-month">{{ period.month }}</span>
+                    <span class="period-sub">
+                      {{ period.perApartmentAmount | number: '1.2-2' }} ₺ ·
+                      {{ 'billing.dues.perApartment' | translate }}
+                    </span>
+                  </div>
+                  <mat-chip-set>
                     @if (period.isClosed) {
-                      <mat-chip-set><mat-chip>{{ 'billing.status.closed' | translate }}</mat-chip></mat-chip-set>
+                      <mat-chip>{{ 'billing.status.closed' | translate }}</mat-chip>
+                    } @else {
+                      <mat-chip highlighted>{{ 'billing.status.open' | translate }}</mat-chip>
                     }
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
+                  </mat-chip-set>
+                </div>
 
-                @if (!period.isClosed) {
-                  <div class="period-actions">
-                    <button matButton (click)="distributeDues(period)">
-                      {{ 'billing.actions.distribute' | translate }}
-                    </button>
-                    <button matButton (click)="closeDues(period)">
-                      {{ 'billing.actions.close' | translate }}
-                    </button>
+                @if (hasItems(period)) {
+                  <div class="period-progress">
+                    <span class="progress-label">
+                      {{ 'billing.itemsPaid' | translate: { paid: period.paidCount, total: period.itemCount } }}
+                    </span>
+                    <mat-progress-bar mode="determinate" [value]="paidRatio(period.paidCount, period.itemCount)" />
                   </div>
                 }
 
-                @if (duesItems(period).length > 0) {
+                <div class="period-actions">
+                  @if (!period.isClosed && !hasItems(period)) {
+                    <button matButton="filled" (click)="distributeDues(period)">
+                      <mat-icon>call_split</mat-icon>
+                      {{ 'billing.actions.distribute' | translate }}
+                    </button>
+                  }
+                  @if (hasItems(period)) {
+                    <button matButton (click)="toggleDuesItems(period)">
+                      {{ (isDuesExpanded(period) ? 'billing.actions.hideItems' : 'billing.actions.showItems') | translate }}
+                    </button>
+                  }
+                  @if (!period.isClosed && hasItems(period)) {
+                    <button matButton (click)="closeDues(period)">
+                      <mat-icon>lock</mat-icon>
+                      {{ 'billing.actions.close' | translate }}
+                    </button>
+                  }
+                </div>
+
+                @if (isDuesExpanded(period)) {
                   <table mat-table [dataSource]="duesItems(period)" class="data-table">
                     <ng-container matColumnDef="apartment">
                       <th mat-header-cell *matHeaderCellDef>{{ 'billing.item.apartment' | translate }}</th>
@@ -173,15 +204,25 @@
                       <th mat-header-cell *matHeaderCellDef>{{ 'billing.item.status' | translate }}</th>
                       <td mat-cell *matCellDef="let i">{{ 'billing.status.' + i.status | translate }}</td>
                     </ng-container>
+                    <ng-container matColumnDef="actions">
+                      <th mat-header-cell *matHeaderCellDef></th>
+                      <td mat-cell *matCellDef="let i">
+                        @if (i.status === unpaid) {
+                          <button matButton (click)="payDuesItem(period, i)">
+                            {{ 'billing.actions.markPaid' | translate }}
+                          </button>
+                        } @else {
+                          <mat-icon class="paid-check">check_circle</mat-icon>
+                        }
+                      </td>
+                    </ng-container>
                     <tr mat-header-row *matHeaderRowDef="itemColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: itemColumns"></tr>
                   </table>
-                } @else {
-                  <p class="empty-state">{{ 'billing.noItems' | translate }}</p>
                 }
-              </mat-expansion-panel>
+              </mat-card>
             }
-          </mat-accordion>
+          </div>
         }
       </mat-tab>
 
@@ -189,41 +230,62 @@
         <div class="tab-actions">
           <button matButton="filled" (click)="openUtilityPeriod()">
             <mat-icon>add</mat-icon>
-            {{ 'billing.utility.open' | translate }}
+            {{ 'billing.newPeriod' | translate }}
           </button>
         </div>
 
         @if (utilityPeriods().length === 0) {
           <p class="empty-state">{{ 'billing.utility.empty' | translate }}</p>
         } @else {
-          <mat-accordion multi>
+          <div class="period-list">
             @for (period of utilityPeriods(); track period.id) {
-              <mat-expansion-panel (opened)="loadUtilityItems(period)">
-                <mat-expansion-panel-header>
-                  <mat-panel-title>
-                    {{ period.month }} · {{ 'billing.utilityType.' + period.utilityType | translate }}
-                  </mat-panel-title>
-                  <mat-panel-description>
-                    {{ period.totalAmount | number: '1.2-2' }} ₺ ·
-                    {{ 'billing.itemsPaid' | translate: { paid: period.paidCount, total: period.itemCount } }}
+              <mat-card class="period-card" appearance="outlined">
+                <div class="period-head">
+                  <div class="period-title">
+                    <span class="period-month">
+                      {{ period.month }} · {{ 'billing.utilityType.' + period.utilityType | translate }}
+                    </span>
+                    <span class="period-sub">{{ period.totalAmount | number: '1.2-2' }} ₺</span>
+                  </div>
+                  <mat-chip-set>
                     @if (period.isClosed) {
-                      <mat-chip-set><mat-chip>{{ 'billing.status.closed' | translate }}</mat-chip></mat-chip-set>
+                      <mat-chip>{{ 'billing.status.closed' | translate }}</mat-chip>
+                    } @else {
+                      <mat-chip highlighted>{{ 'billing.status.open' | translate }}</mat-chip>
                     }
-                  </mat-panel-description>
-                </mat-expansion-panel-header>
+                  </mat-chip-set>
+                </div>
 
-                @if (!period.isClosed) {
-                  <div class="period-actions">
-                    <button matButton (click)="distributeUtility(period)">
-                      {{ 'billing.actions.distribute' | translate }}
-                    </button>
-                    <button matButton (click)="closeUtility(period)">
-                      {{ 'billing.actions.close' | translate }}
-                    </button>
+                @if (hasItems(period)) {
+                  <div class="period-progress">
+                    <span class="progress-label">
+                      {{ 'billing.itemsPaid' | translate: { paid: period.paidCount, total: period.itemCount } }}
+                    </span>
+                    <mat-progress-bar mode="determinate" [value]="paidRatio(period.paidCount, period.itemCount)" />
                   </div>
                 }
 
-                @if (utilityItems(period).length > 0) {
+                <div class="period-actions">
+                  @if (!period.isClosed && !hasItems(period)) {
+                    <button matButton="filled" (click)="distributeUtility(period)">
+                      <mat-icon>call_split</mat-icon>
+                      {{ 'billing.actions.distribute' | translate }}
+                    </button>
+                  }
+                  @if (hasItems(period)) {
+                    <button matButton (click)="toggleUtilityItems(period)">
+                      {{ (isUtilityExpanded(period) ? 'billing.actions.hideItems' : 'billing.actions.showItems') | translate }}
+                    </button>
+                  }
+                  @if (!period.isClosed && hasItems(period)) {
+                    <button matButton (click)="closeUtility(period)">
+                      <mat-icon>lock</mat-icon>
+                      {{ 'billing.actions.close' | translate }}
+                    </button>
+                  }
+                </div>
+
+                @if (isUtilityExpanded(period)) {
                   <table mat-table [dataSource]="utilityItems(period)" class="data-table">
                     <ng-container matColumnDef="apartment">
                       <th mat-header-cell *matHeaderCellDef>{{ 'billing.item.apartment' | translate }}</th>
@@ -241,15 +303,25 @@
                       <th mat-header-cell *matHeaderCellDef>{{ 'billing.item.status' | translate }}</th>
                       <td mat-cell *matCellDef="let i">{{ 'billing.status.' + i.status | translate }}</td>
                     </ng-container>
+                    <ng-container matColumnDef="actions">
+                      <th mat-header-cell *matHeaderCellDef></th>
+                      <td mat-cell *matCellDef="let i">
+                        @if (i.status === unpaid) {
+                          <button matButton (click)="payUtilityItem(period, i)">
+                            {{ 'billing.actions.markPaid' | translate }}
+                          </button>
+                        } @else {
+                          <mat-icon class="paid-check">check_circle</mat-icon>
+                        }
+                      </td>
+                    </ng-container>
                     <tr mat-header-row *matHeaderRowDef="itemColumns"></tr>
                     <tr mat-row *matRowDef="let row; columns: itemColumns"></tr>
                   </table>
-                } @else {
-                  <p class="empty-state">{{ 'billing.noItems' | translate }}</p>
                 }
-              </mat-expansion-panel>
+              </mat-card>
             }
-          </mat-accordion>
+          </div>
         }
       </mat-tab>
     </mat-tab-group>

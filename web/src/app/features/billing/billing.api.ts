@@ -64,4 +64,12 @@ export class BillingApi {
   closeUtility(utilityBillPeriodId: string): Observable<void> {
     return this.api.post<void>(`/utility-bills/${utilityBillPeriodId}/close`);
   }
+
+  payDuesItem(duesPeriodId: string, itemId: string): Observable<void> {
+    return this.api.post<void>(`/dues/${duesPeriodId}/items/${itemId}/pay`);
+  }
+
+  payUtilityItem(utilityBillPeriodId: string, itemId: string): Observable<void> {
+    return this.api.post<void>(`/utility-bills/${utilityBillPeriodId}/items/${itemId}/pay`);
+  }
 }

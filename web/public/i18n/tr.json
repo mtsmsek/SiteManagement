@@ -144,6 +144,7 @@
   },
   "billing": {
     "title": "Faturalandırma",
+    "newPeriod": "Yeni Dönem",
     "itemsPaid": "{{paid}}/{{total}} ödendi",
     "noItems": "Henüz dağıtım yapılmadı.",
     "fields": {
@@ -159,6 +160,7 @@
       "tab": "Aidat",
       "openTitle": "Aidat Dönemi Aç",
       "open": "Dönem Aç",
+      "perApartment": "daire başı",
       "empty": "Henüz aidat dönemi yok."
     },
     "utility": {
@@ -174,9 +176,13 @@
     },
     "actions": {
       "distribute": "Dağıt",
-      "close": "Kapat"
+      "close": "Kapat",
+      "showItems": "Kalemler",
+      "hideItems": "Gizle",
+      "markPaid": "Ödendi"
     },
     "status": {
+      "open": "Açık",
       "closed": "Kapalı",
       "Unpaid": "Ödenmedi",
       "Paid": "Ödendi"

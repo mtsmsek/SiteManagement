@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { DecimalPipe, Location } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
@@ -34,9 +34,11 @@ import {
 import { ConfirmDialog, ConfirmDialogData } from '../../../shared/confirm-dialog/confirm-dialog';
 import {
   ApartmentStatus,
+  BillingItemStatus,
   type ApartmentSummary,
   type BlockSummary,
   type DuesPeriodListItem,
+  type PeriodItem,
   type UtilityBillPeriodListItem,
 } from '../../../core/api/api.models';
 
@@ -83,9 +85,12 @@ export class SiteDetail implements OnInit {
   readonly debtSummary = this.billing.debtSummary;
 
   readonly apartmentColumns = ['number', 'floor', 'type', 'status', 'occupant', 'actions'] as const;
-  readonly duesColumns = ['month', 'amount', 'items', 'status', 'actions'] as const;
-  readonly utilityColumns = ['month', 'type', 'amount', 'items', 'status', 'actions'] as const;
-  readonly itemColumns = ['apartment', 'resident', 'amount', 'status'] as const;
+  readonly itemColumns = ['apartment', 'resident', 'amount', 'status', 'actions'] as const;
+  readonly unpaid = BillingItemStatus.unpaid;
+
+  // Which period cards have their item table revealed (loaded lazily on first open).
+  private readonly expandedDuesIds = signal(new Set<string>());
+  private readonly expandedUtilityIds = signal(new Set<string>());
 
   ngOnInit(): void {
     void this.store.loadDetail(this.siteId());
@@ -172,27 +177,78 @@ export class SiteDetail implements OnInit {
     return this.billing.utilityItems(period.id);
   }
 
-  loadDuesItems(period: DuesPeriodListItem): void {
-    void this.billing.loadDuesItems(period.id);
+  /** True once a period has been distributed into items. */
+  hasItems(period: DuesPeriodListItem | UtilityBillPeriodListItem): boolean {
+    return Number(period.itemCount) > 0;
   }
 
-  loadUtilityItems(period: UtilityBillPeriodListItem): void {
-    void this.billing.loadUtilityItems(period.id);
+  /** Paid-to-total ratio of a period as a 0-100 percentage for the progress bar. */
+  paidRatio(paid: number | string, total: number | string): number {
+    const totalCount = Number(total);
+    return totalCount > 0 ? (Number(paid) / totalCount) * 100 : 0;
   }
 
-  distributeDues(period: DuesPeriodListItem): void {
-    void this.billing.distributeDues(this.siteId(), period.id);
+  isDuesExpanded(period: DuesPeriodListItem): boolean {
+    return this.expandedDuesIds().has(period.id);
+  }
+
+  isUtilityExpanded(period: UtilityBillPeriodListItem): boolean {
+    return this.expandedUtilityIds().has(period.id);
+  }
+
+  /** Reveals/hides a dues period's item table, loading the items the first time. */
+  toggleDuesItems(period: DuesPeriodListItem): void {
+    this.expandedDuesIds.update((ids) => {
+      const next = new Set(ids);
+      if (next.has(period.id)) {
+        next.delete(period.id);
+      } else {
+        next.add(period.id);
+        void this.billing.loadDuesItems(period.id);
+      }
+      return next;
+    });
+  }
+
+  /** Reveals/hides a utility period's item table, loading the items the first time. */
+  toggleUtilityItems(period: UtilityBillPeriodListItem): void {
+    this.expandedUtilityIds.update((ids) => {
+      const next = new Set(ids);
+      if (next.has(period.id)) {
+        next.delete(period.id);
+      } else {
+        next.add(period.id);
+        void this.billing.loadUtilityItems(period.id);
+      }
+      return next;
+    });
+  }
+
+  /** Distributes a dues period and reveals the resulting items right away. */
+  async distributeDues(period: DuesPeriodListItem): Promise<void> {
+    await this.billing.distributeDues(this.siteId(), period.id);
+    this.expandedDuesIds.update((ids) => new Set(ids).add(period.id));
   }
 
   closeDues(period: DuesPeriodListItem): void {
     void this.billing.closeDues(this.siteId(), period.id);
   }
 
-  distributeUtility(period: UtilityBillPeriodListItem): void {
-    void this.billing.distributeUtility(this.siteId(), period.id);
+  /** Distributes a utility period and reveals the resulting items right away. */
+  async distributeUtility(period: UtilityBillPeriodListItem): Promise<void> {
+    await this.billing.distributeUtility(this.siteId(), period.id);
+    this.expandedUtilityIds.update((ids) => new Set(ids).add(period.id));
   }
 
   closeUtility(period: UtilityBillPeriodListItem): void {
     void this.billing.closeUtility(this.siteId(), period.id);
+  }
+
+  payDuesItem(period: DuesPeriodListItem, item: PeriodItem): void {
+    void this.billing.payDuesItem(this.siteId(), period.id, item.itemId);
+  }
+
+  payUtilityItem(period: UtilityBillPeriodListItem, item: PeriodItem): void {
+    void this.billing.payUtilityItem(this.siteId(), period.id, item.itemId);
   }
 }

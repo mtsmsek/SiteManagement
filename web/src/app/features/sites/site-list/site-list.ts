@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { MatTableModule } from '@angular/material/table';
+import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
@@ -13,13 +13,14 @@ import { ConfirmDialog, ConfirmDialogData } from '../../../shared/confirm-dialog
 import type { SiteListItem } from '../../../core/api/api.models';
 
 /**
- * Admin sites list. mat-table over the SitesStore's signal, with create
- * (dialog), delete (confirm dialog), and row navigation to the detail page.
+ * Admin sites list. A responsive card grid over the SitesStore's signal, with
+ * create (dialog), delete (confirm dialog), and card navigation to the detail
+ * page.
  */
 @Component({
   selector: 'app-site-list',
   imports: [
-    MatTableModule,
+    MatCardModule,
     MatButtonModule,
     MatIconModule,
     MatProgressBarModule,
@@ -36,8 +37,6 @@ export class SiteList implements OnInit {
   readonly sites = this.store.sites;
   readonly loading = this.store.loading;
   readonly isEmpty = this.store.isEmpty;
-
-  readonly columns = ['name', 'address', 'blocks', 'apartments', 'actions'] as const;
 
   ngOnInit(): void {
     void this.store.loadList();

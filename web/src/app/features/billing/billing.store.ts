@@ -122,6 +122,26 @@ export class BillingStore {
     this.utilityItemsSignal.update((map) => new Map(map).set(utilityBillPeriodId, items));
   }
 
+  /** Marks a dues item paid, then refreshes its items, the period list and the debt summary. */
+  async payDuesItem(siteId: string, duesPeriodId: string, itemId: string): Promise<void> {
+    await firstValueFrom(this.api.payDuesItem(duesPeriodId, itemId));
+    await Promise.all([
+      this.loadDuesItems(duesPeriodId),
+      this.refreshDuesPeriods(siteId),
+      this.refreshDebtSummary(siteId),
+    ]);
+  }
+
+  /** Marks a utility bill item paid, then refreshes its items, the period list and the debt summary. */
+  async payUtilityItem(siteId: string, utilityBillPeriodId: string, itemId: string): Promise<void> {
+    await firstValueFrom(this.api.payUtilityItem(utilityBillPeriodId, itemId));
+    await Promise.all([
+      this.loadUtilityItems(utilityBillPeriodId),
+      this.refreshUtilityPeriods(siteId),
+      this.refreshDebtSummary(siteId),
+    ]);
+  }
+
   private async refreshDuesPeriods(siteId: string): Promise<void> {
     this.duesPeriodsSignal.set(await firstValueFrom(this.api.duesPeriods(siteId)));
   }
