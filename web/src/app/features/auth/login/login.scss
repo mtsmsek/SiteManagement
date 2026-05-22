@@ -14,10 +14,12 @@
     var(--mat-sys-surface);
 }
 
-.theme-toggle {
+.login-actions {
   position: absolute;
   top: 1rem;
   right: 1rem;
+  display: flex;
+  gap: 0.25rem;
 }
 
 .login-card {

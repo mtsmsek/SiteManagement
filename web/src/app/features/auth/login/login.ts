@@ -1,4 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
+import { UpperCasePipe } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -7,10 +8,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AuthService } from '../../../core/auth/auth.service';
 import { ThemeService } from '../../../core/theme/theme.service';
+import { LanguageService, SUPPORTED_LANGUAGES, Language } from '../../../core/i18n/language.service';
 
 /**
  * Admin sign-in page. Reactive form, posts to AuthService.login, then
@@ -26,8 +29,10 @@ import { ThemeService } from '../../../core/theme/theme.service';
     MatInputModule,
     MatButtonModule,
     MatIconModule,
+    MatMenuModule,
     MatProgressBarModule,
     TranslatePipe,
+    UpperCasePipe,
   ],
   templateUrl: './login.html',
   styleUrl: './login.scss',
@@ -38,9 +43,13 @@ export class Login {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly theme = inject(ThemeService);
+  private readonly language = inject(LanguageService);
 
   /** Whether the dark scheme is currently active (drives the toggle icon). */
   readonly isDark = this.theme.isDark;
+
+  /** Languages offered by the switcher. */
+  readonly languages = SUPPORTED_LANGUAGES;
 
   /** True while the login request is in flight. */
   readonly submitting = signal(false);
@@ -78,5 +87,10 @@ export class Login {
   /** Flips between light and dark mode. */
   toggleTheme(): void {
     this.theme.toggle();
+  }
+
+  /** Switches the active UI language. */
+  setLanguage(lang: Language): void {
+    void this.language.use(lang);
   }
 }

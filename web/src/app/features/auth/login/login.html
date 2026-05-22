@@ -1,12 +1,18 @@
 <div class="login-page">
-  <button
-    matIconButton
-    class="theme-toggle"
-    (click)="toggleTheme()"
-    [attr.aria-label]="'common.theme' | translate"
-  >
-    <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
-  </button>
+  <div class="login-actions">
+    <button matIconButton [matMenuTriggerFor]="langMenu" [attr.aria-label]="'common.language' | translate">
+      <mat-icon>language</mat-icon>
+    </button>
+    <mat-menu #langMenu="matMenu">
+      @for (lang of languages; track lang) {
+        <button mat-menu-item (click)="setLanguage(lang)">{{ lang | uppercase }}</button>
+      }
+    </mat-menu>
+
+    <button matIconButton (click)="toggleTheme()" [attr.aria-label]="'common.theme' | translate">
+      <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+    </button>
+  </div>
 
   <mat-card class="login-card" appearance="outlined">
     @if (submitting()) {

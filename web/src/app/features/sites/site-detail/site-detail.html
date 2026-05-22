@@ -141,13 +141,7 @@
             @for (period of duesPeriods(); track period.id) {
               <mat-card class="period-card" appearance="outlined">
                 <div class="period-head">
-                  <div class="period-title">
-                    <span class="period-month">{{ period.month }}</span>
-                    <span class="period-sub">
-                      {{ period.perApartmentAmount | number: '1.2-2' }} ₺ ·
-                      {{ 'billing.dues.perApartment' | translate }}
-                    </span>
-                  </div>
+                  <span class="period-month">{{ period.month }}</span>
                   <mat-chip-set>
                     @if (period.isClosed) {
                       <mat-chip>{{ 'billing.status.closed' | translate }}</mat-chip>
@@ -155,6 +149,10 @@
                       <mat-chip highlighted>{{ 'billing.status.open' | translate }}</mat-chip>
                     }
                   </mat-chip-set>
+                </div>
+                <div class="period-amount">
+                  {{ period.perApartmentAmount | number: '1.2-2' }} ₺
+                  <span class="period-amount-note">{{ 'billing.dues.perApartment' | translate }}</span>
                 </div>
 
                 @if (hasItems(period)) {
@@ -241,12 +239,9 @@
             @for (period of utilityPeriods(); track period.id) {
               <mat-card class="period-card" appearance="outlined">
                 <div class="period-head">
-                  <div class="period-title">
-                    <span class="period-month">
-                      {{ period.month }} · {{ 'billing.utilityType.' + period.utilityType | translate }}
-                    </span>
-                    <span class="period-sub">{{ period.totalAmount | number: '1.2-2' }} ₺</span>
-                  </div>
+                  <span class="period-month">
+                    {{ period.month }} · {{ 'billing.utilityType.' + period.utilityType | translate }}
+                  </span>
                   <mat-chip-set>
                     @if (period.isClosed) {
                       <mat-chip>{{ 'billing.status.closed' | translate }}</mat-chip>
@@ -255,6 +250,7 @@
                     }
                   </mat-chip-set>
                 </div>
+                <div class="period-amount">{{ period.totalAmount | number: '1.2-2' }} ₺</div>
 
                 @if (hasItems(period)) {
                   <div class="period-progress">

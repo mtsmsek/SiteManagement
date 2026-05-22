@@ -113,34 +113,42 @@
 }
 
 .period-card {
+  display: flex;
+  flex-direction: column;
+  padding: 1.25rem 1.5rem;
+
   .period-head {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 1rem;
   }
 
-  .period-title {
-    display: flex;
-    flex-direction: column;
-    gap: 0.125rem;
-  }
-
   .period-month {
-    font-size: 1.125rem;
+    font-size: 1.05rem;
     font-weight: 600;
+    color: var(--mat-sys-on-surface-variant);
   }
 
-  .period-sub {
-    font-size: 0.875rem;
+  .period-amount {
+    margin-top: 0.5rem;
+    font-size: 1.875rem;
+    font-weight: 700;
+    line-height: 1.1;
+  }
+
+  .period-amount-note {
+    font-size: 0.8125rem;
+    font-weight: 400;
     color: var(--mat-sys-on-surface-variant);
+    margin-left: 0.375rem;
   }
 
   .period-progress {
     display: flex;
     flex-direction: column;
     gap: 0.375rem;
-    margin: 0.875rem 0;
+    margin-top: 1rem;
 
     .progress-label {
       font-size: 0.8125rem;
@@ -156,10 +164,10 @@
     display: flex;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
   }
 
   .data-table {
-    margin-top: 0.75rem;
+    margin-top: 1rem;
   }
 }
