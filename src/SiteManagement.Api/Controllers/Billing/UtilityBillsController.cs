@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SiteManagement.Api.Configuration;
 using SiteManagement.Application.Billing.Commands.CloseUtilityBillPeriod;
 using SiteManagement.Application.Billing.Commands.DistributeUtilityBill;
+using SiteManagement.Application.Billing.Commands.MarkUtilityBillItemPaid;
 using SiteManagement.Application.Billing.Commands.OpenUtilityBillPeriod;
 using SiteManagement.Application.Billing.Queries;
 using SiteManagement.Application.Billing.Queries.ListUtilityBillPeriodItems;
@@ -25,6 +26,7 @@ public class UtilityBillsController(ISender sender) : ControllerBase
     private const string DistributeRoute = "{utilityBillPeriodId:guid}/distribute";
     private const string CloseRoute = "{utilityBillPeriodId:guid}/close";
     private const string ItemsRoute = "{utilityBillPeriodId:guid}/items";
+    private const string PayItemRoute = "{utilityBillPeriodId:guid}/items/{itemId:guid}/pay";
     private const string BySiteRoute = "sites/{siteId:guid}";
 
     private readonly ISender _sender = sender;
@@ -64,6 +66,16 @@ public class UtilityBillsController(ISender sender) : ControllerBase
     public async Task<IActionResult> Close(Guid utilityBillPeriodId, CancellationToken ct)
     {
         await _sender.Send(new CloseUtilityBillPeriodCommand(utilityBillPeriodId), ct);
+        return NoContent();
+    }
+
+    /// <summary>Marks one utility bill item paid.</summary>
+    [HttpPost(PayItemRoute)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> PayItem(Guid utilityBillPeriodId, Guid itemId, CancellationToken ct)
+    {
+        await _sender.Send(new MarkUtilityBillItemPaidCommand(utilityBillPeriodId, itemId), ct);
         return NoContent();
     }
 

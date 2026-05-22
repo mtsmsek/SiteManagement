@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using SiteManagement.Api.Configuration;
 using SiteManagement.Application.Billing.Commands.CloseDuesPeriod;
 using SiteManagement.Application.Billing.Commands.DistributeDues;
+using SiteManagement.Application.Billing.Commands.MarkDuesItemPaid;
 using SiteManagement.Application.Billing.Commands.OpenDuesPeriod;
 using SiteManagement.Application.Billing.Queries;
 using SiteManagement.Application.Billing.Queries.GetSiteDebtSummary;
@@ -26,6 +27,7 @@ public class DuesController(ISender sender) : ControllerBase
     private const string DistributeRoute = "{duesPeriodId:guid}/distribute";
     private const string CloseRoute = "{duesPeriodId:guid}/close";
     private const string ItemsRoute = "{duesPeriodId:guid}/items";
+    private const string PayItemRoute = "{duesPeriodId:guid}/items/{itemId:guid}/pay";
     private const string BySiteRoute = "sites/{siteId:guid}";
     private const string DebtSummaryRoute = "sites/{siteId:guid}/debt-summary";
 
@@ -74,6 +76,16 @@ public class DuesController(ISender sender) : ControllerBase
     [ProducesResponseType<IReadOnlyList<DuesPeriodListItemDto>>(StatusCodes.Status200OK)]
     public async Task<ActionResult<IReadOnlyList<DuesPeriodListItemDto>>> ListForSite(Guid siteId, CancellationToken ct)
         => Ok(await _sender.Send(new ListDuesPeriodsQuery(siteId), ct));
+
+    /// <summary>Marks one dues item paid.</summary>
+    [HttpPost(PayItemRoute)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> PayItem(Guid duesPeriodId, Guid itemId, CancellationToken ct)
+    {
+        await _sender.Send(new MarkDuesItemPaidCommand(duesPeriodId, itemId), ct);
+        return NoContent();
+    }
 
     /// <summary>Lists the distributed per-apartment items of one dues period.</summary>
     [HttpGet(ItemsRoute)]

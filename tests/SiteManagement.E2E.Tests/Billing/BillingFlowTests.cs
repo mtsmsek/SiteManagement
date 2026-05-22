@@ -90,6 +90,38 @@ public sealed class BillingFlowTests(PostgresFixture postgres) : IAsyncLifetime
         item.Status.Should().Be("Unpaid");
     }
 
+    /// <summary>
+    /// Paying a distributed dues item flips it to Paid and makes it count as
+    /// collected in the site debt summary (outstanding drops to zero).
+    /// </summary>
+    [Fact]
+    public async Task PayDuesItem_MarksItPaid_AndCountsAsCollected()
+    {
+        // arrange — distribute a dues period over the single occupied apartment
+        var client = await CreateAdminClientAsync();
+        var siteId = await SeedOccupiedApartmentAsync(client);
+        var duesPeriodId = await OpenDuesPeriodAsync(client, siteId, perApartmentAmount: 500m);
+        (await client.PostAsync($"/api/dues/{duesPeriodId}/distribute", content: null))
+            .StatusCode.Should().Be(HttpStatusCode.NoContent);
+        var items = await client.GetFromJsonAsync<List<PeriodItem>>(
+            $"/api/dues/{duesPeriodId}/items", AuthFlow.Json);
+        var itemId = items![0].ItemId;
+
+        // act — pay that item
+        var payResponse = await client.PostAsync(
+            $"/api/dues/{duesPeriodId}/items/{itemId}/pay", content: null);
+
+        // assert — 204, the item is Paid, and it now counts as collected
+        payResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        var afterItems = await client.GetFromJsonAsync<List<PeriodItem>>(
+            $"/api/dues/{duesPeriodId}/items", AuthFlow.Json);
+        afterItems!.Single().Status.Should().Be("Paid");
+        var debt = await client.GetFromJsonAsync<DebtSummary>(
+            $"/api/dues/sites/{siteId}/debt-summary", AuthFlow.Json);
+        debt!.TotalCollected.Should().Be(500m);
+        debt.TotalOutstanding.Should().Be(0m);
+    }
+
     private async Task<HttpClient> CreateAdminClientAsync()
     {
         var client = _factory.CreateClient();
@@ -168,4 +200,10 @@ public sealed class BillingFlowTests(PostgresFixture postgres) : IAsyncLifetime
         string ResidentFullName,
         decimal Amount,
         string Status);
+
+    private sealed record DebtSummary(
+        Guid SiteId,
+        decimal TotalAccrued,
+        decimal TotalCollected,
+        decimal TotalOutstanding);
 }
