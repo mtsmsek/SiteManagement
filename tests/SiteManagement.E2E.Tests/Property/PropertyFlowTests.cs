@@ -154,6 +154,26 @@ public sealed class PropertyFlowTests(PostgresFixture postgres) : IAsyncLifetime
         (await db.Set<Apartment>().CountAsync()).Should().Be(0);
     }
 
+    /// <summary>Restoring an archived site brings it back into the read list.</summary>
+    [Fact]
+    public async Task RestoreSite_BringsAnArchivedSiteBackIntoReads()
+    {
+        // arrange — build then archive a site, confirm it's hidden
+        var client = await CreateAdminClientAsync();
+        var siteId = await BuildSiteWithApartmentAsync(client);
+        (await client.DeleteAsync($"/api/sites/{siteId}")).EnsureSuccessStatusCode();
+        var hidden = await client.GetFromJsonAsync<List<SiteRow>>("/api/sites", AuthFlow.Json);
+        hidden!.Should().NotContain(s => s.Id == siteId);
+
+        // act — restore it
+        var restore = await client.PostAsync($"/api/sites/{siteId}/restore", content: null);
+
+        // assert — back in the list
+        restore.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        var visible = await client.GetFromJsonAsync<List<SiteRow>>("/api/sites", AuthFlow.Json);
+        visible!.Should().Contain(s => s.Id == siteId);
+    }
+
     private async Task<HttpClient> CreateAdminClientAsync()
     {
         var client = _factory.CreateClient();

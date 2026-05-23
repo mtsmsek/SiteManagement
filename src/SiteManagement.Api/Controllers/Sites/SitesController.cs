@@ -6,6 +6,7 @@ using SiteManagement.Application.Property.Commands.AddBlock;
 using SiteManagement.Application.Property.Commands.CreateSite;
 using SiteManagement.Application.Property.Commands.DeleteSite;
 using SiteManagement.Application.Property.Commands.PurgeSite;
+using SiteManagement.Application.Property.Commands.RestoreSite;
 using SiteManagement.Application.Property.Queries;
 using SiteManagement.Application.Property.Queries.GetSiteById;
 using SiteManagement.Application.Property.Queries.ListSites;
@@ -27,6 +28,7 @@ public class SitesController(ISender sender) : ControllerBase
     private const string ByIdRoute = "{siteId:guid}";
     private const string BlocksRoute = "{siteId:guid}/blocks";
     private const string PurgeRoute = "{siteId:guid}/permanent";
+    private const string RestoreRoute = "{siteId:guid}/restore";
 
     private readonly ISender _sender = sender;
 
@@ -87,6 +89,16 @@ public class SitesController(ISender sender) : ControllerBase
     public async Task<IActionResult> Purge(Guid siteId, CancellationToken ct)
     {
         await _sender.Send(new PurgeSiteCommand(siteId), ct);
+        return NoContent();
+    }
+
+    /// <summary>Restores a previously archived site, bringing it back into reads.</summary>
+    [HttpPost(RestoreRoute)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Restore(Guid siteId, CancellationToken ct)
+    {
+        await _sender.Send(new RestoreSiteCommand(siteId), ct);
         return NoContent();
     }
 }

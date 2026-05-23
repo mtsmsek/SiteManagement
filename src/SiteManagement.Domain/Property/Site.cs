@@ -122,4 +122,11 @@ public sealed class Site : AggregateRoot<Guid>, ISoftDeletable
         IsDeleted = true;
         DeletedOnUtc = whenUtc;
     }
+
+    /// <summary>Restores a previously archived site, bringing it back into reads. Idempotent.</summary>
+    public void Restore()
+    {
+        IsDeleted = false;
+        DeletedOnUtc = null;
+    }
 }

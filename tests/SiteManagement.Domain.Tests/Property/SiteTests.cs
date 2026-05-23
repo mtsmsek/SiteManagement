@@ -188,4 +188,19 @@ public class SiteTests
         // assert
         site.DeletedOnUtc.Should().Be(first);
     }
+
+    [Fact]
+    public void Restore_ClearsTheArchivedFlag()
+    {
+        // arrange
+        var site = Site.Create(SampleSiteName, SampleSiteAddress);
+        site.Archive(new DateTime(2026, 5, 24, 9, 0, 0, DateTimeKind.Utc));
+
+        // act
+        site.Restore();
+
+        // assert
+        site.IsDeleted.Should().BeFalse();
+        site.DeletedOnUtc.Should().BeNull();
+    }
 }
