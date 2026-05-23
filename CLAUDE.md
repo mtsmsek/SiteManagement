@@ -4,6 +4,11 @@
 > current status. **Memory (`~/.claude`) does NOT travel between machines — this
 > file does.** Read it fully before working; it exists so a fresh session on any
 > machine doesn't break the patterns already in place.
+>
+> **Authority:** if this file disagrees with anything in your local `~/.claude`
+> memory (e.g. older notes claiming .NET 8 / SQL Server / Carter), **this file
+> wins** — the stack/patterns below are current; update or ignore stale memory.
+> First time on a machine? Provision tools via `docs/SETUP-MACHINE.md` first.
 
 ## Project
 Apartment-site management system. **Portfolio/showcase** project — code quality,
