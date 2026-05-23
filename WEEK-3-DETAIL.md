@@ -1,5 +1,18 @@
 # Hafta 3 — Tenancy & Billing Domain (Detaylı Plan)
 
+## 📌 DURUM (son oturum sonu)
+
+- **Gün 1–6: ✅ tamamlandı** ve `main`'e push'landı.
+- **Gün 7 (E2E + Self-Review + Doc): ⏳ KALAN İŞ** — tek kalan W3 maddesi. Aşağıdaki Gün 7 bölümüne bak.
+  - Yapıldı: `BillingFlowTests` E2E (aç → ata → dağıt → kalemler → öde) var.
+  - Kalan: özel `TenancyFlowTests` + **failure-path** testleri (kapalı döneme dağıtım → 409, boş dağıtım, çift aktif atama → 409); **self-review**; **`IQuery` marker + "her request `ICommand` veya `IQuery` olmalı" architecture testi** (şu an sadece Command tarafı marker'lı); `WEEK-3-DETAIL.md` + `ROADMAP.md` W3 ✅ işaretle.
+- **PLAN DIŞI — bu hafta fazladan yapıldı** (backend sağlamlaştırma; detay `CLAUDE.md`):
+  item **payment recording** · **UI modernizasyon** (kart tabanlı siteler/billing, login dil switcher) · **transactional Outbox** (mail/event commit sonrası) · **soft delete + restore + hard purge** (Site) · **audit** (created/modified by+at, interceptor) · **tüm Application command-handler unit testleri**. ~283 test yeşil.
+
+> Yarın: `git pull` → `CLAUDE.md`'yi oku (konvansiyonlar + gotchas) → Gün 7'yi bitir.
+
+---
+
 > **Hedef:** "Admin bir sakini daireye atayabiliyor; bir ayı açıp tüm dolu dairelere aidat + fatura toplu dağıtabiliyor; bildirimler MailHog'a düşüyor."
 >
 > **Definition of Done:** Bir admin sıfırdan başlayıp bir ayı tamamen kurabiliyor (ata → dönem aç → toplu dağıt → kapat); mailler MailHog'a düşüyor; full E2E akışı + failure-path testleri yeşil; mimari testler (Clean Architecture sınırları) hâlâ yeşil.
