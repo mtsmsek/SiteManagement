@@ -7,13 +7,25 @@ namespace SiteManagement.Domain.Shared;
 /// root is persisted as a unit.
 /// </summary>
 /// <typeparam name="TId">Identifier type (currently <see cref="Guid"/>).</typeparam>
-public abstract class AggregateRoot<TId> : Entity<TId>
+public abstract class AggregateRoot<TId> : Entity<TId>, IAuditableEntity
     where TId : notnull
 {
     private readonly List<IDomainEvent> _domainEvents = [];
 
     /// <summary>Events raised since the last call to <see cref="ClearDomainEvents"/>.</summary>
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+
+    /// <inheritdoc />
+    public DateTime CreatedAtUtc { get; private set; }
+
+    /// <inheritdoc />
+    public Guid? CreatedBy { get; private set; }
+
+    /// <inheritdoc />
+    public DateTime? ModifiedAtUtc { get; private set; }
+
+    /// <inheritdoc />
+    public Guid? ModifiedBy { get; private set; }
 
     /// <inheritdoc />
     protected AggregateRoot() { }

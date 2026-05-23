@@ -8,6 +8,7 @@ using SiteManagement.Application.Property.Queries;
 using SiteManagement.Application.Residency.Queries;
 using SiteManagement.Application.Tenancy.Queries;
 using SiteManagement.Infrastructure.Events;
+using SiteManagement.Infrastructure.Persistence.Interceptors;
 using SiteManagement.Infrastructure.Persistence.Queries;
 using SiteManagement.Infrastructure.Persistence.Repositories;
 
@@ -34,9 +35,14 @@ public static class PersistenceExtensions
             ?? throw new InvalidOperationException(
                 $"Connection string '{ConnectionStringName}' is missing from configuration.");
 
-        services.AddDbContext<AppDbContext>(opts => opts.UseNpgsql(
-            connectionString,
-            npg => npg.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName)));
+        // Stamps created/modified audit metadata on every aggregate root at save.
+        services.AddScoped<AuditSaveChangesInterceptor>();
+
+        services.AddDbContext<AppDbContext>((sp, opts) => opts
+            .UseNpgsql(
+                connectionString,
+                npg => npg.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName))
+            .AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>()));
 
         // Domain events: aggregates raise them, the unit of work flushes them
         // through this dispatcher after each save.

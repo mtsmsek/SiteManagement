@@ -174,6 +174,28 @@ public sealed class PropertyFlowTests(PostgresFixture postgres) : IAsyncLifetime
         visible!.Should().Contain(s => s.Id == siteId);
     }
 
+    /// <summary>Creating a site stamps audit metadata with the acting admin + a fresh timestamp.</summary>
+    [Fact]
+    public async Task CreateSite_StampsAuditMetadataWithTheActingAdmin()
+    {
+        // arrange
+        var client = await CreateAdminClientAsync();
+
+        // act
+        var response = await client.PostAsJsonAsync("/api/sites", new { name = "Audited", address = "Addr" });
+        var siteId = (await response.Content.ReadFromJsonAsync<CreateSiteResponse>(AuthFlow.Json))!.SiteId;
+
+        // assert — CreatedBy is the bootstrap admin, CreatedAtUtc is recent, not yet modified
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var adminId = (await db.Users.FirstAsync(u => u.Email == CustomWebApplicationFactory.BootstrapAdminEmail)).Id;
+        var site = await db.Sites.FirstAsync(s => s.Id == siteId);
+
+        site.CreatedBy.Should().Be(adminId);
+        site.CreatedAtUtc.Should().BeAfter(DateTime.UtcNow.AddMinutes(-5));
+        site.ModifiedAtUtc.Should().BeNull();
+    }
+
     private async Task<HttpClient> CreateAdminClientAsync()
     {
         var client = _factory.CreateClient();
