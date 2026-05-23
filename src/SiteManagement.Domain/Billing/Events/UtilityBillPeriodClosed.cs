@@ -12,7 +12,7 @@ namespace SiteManagement.Domain.Billing.Events;
 public sealed record UtilityBillPeriodClosed(
     Guid UtilityBillPeriodId,
     Guid SiteId,
-    UtilityType UtilityType) : IDomainEvent
+    UtilityType UtilityType) : IIntegrationEvent
 {
     /// <inheritdoc />
     public DateTime OccurredOnUtc { get; } = DateTime.UtcNow;

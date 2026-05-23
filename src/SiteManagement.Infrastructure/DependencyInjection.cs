@@ -3,8 +3,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using SiteManagement.Application.Abstractions.Auth;
 using SiteManagement.Application.Abstractions.Email;
+using SiteManagement.Application.Abstractions.Events;
 using SiteManagement.Infrastructure.Auth;
 using SiteManagement.Infrastructure.Email;
+using SiteManagement.Infrastructure.Events;
 using SiteManagement.Infrastructure.Identity;
 using SiteManagement.Infrastructure.Persistence;
 
@@ -49,12 +51,19 @@ public static class DependencyInjection
         services.AddOptions<SmtpOptions>()
             .Bind(configuration.GetSection(SmtpOptions.SectionName));
 
+        services.AddOptions<OutboxOptions>()
+            .Bind(configuration.GetSection(OutboxOptions.SectionName));
+
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserAuthService, UserAuthService>();
         services.AddSingleton<IRefreshTokenStore, InMemoryRefreshTokenStore>();
         services.AddSingleton<IPasswordGenerator, PasswordGenerator>();
         services.AddScoped<IEmailSender, SmtpEmailSender>();
+
+        // Outbox: after-commit delivery of integration events.
+        services.AddScoped<IOutboxProcessor, OutboxProcessor>();
+        services.AddHostedService<OutboxBackgroundService>();
 
         return services;
     }

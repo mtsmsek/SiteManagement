@@ -7,6 +7,7 @@ using SiteManagement.Domain.Property;
 using SiteManagement.Domain.Residency;
 using SiteManagement.Domain.Tenancy;
 using SiteManagement.Infrastructure.Identity;
+using SiteManagement.Infrastructure.Persistence.Outbox;
 
 namespace SiteManagement.Infrastructure.Persistence;
 
@@ -34,6 +35,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
     /// <summary>Billing — utility bill period root set.</summary>
     public DbSet<UtilityBillPeriod> UtilityBillPeriods => Set<UtilityBillPeriod>();
+
+    /// <summary>Outbox — integration events awaiting after-commit delivery.</summary>
+    public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 
     /// <inheritdoc />
     protected override void OnModelCreating(ModelBuilder modelBuilder)

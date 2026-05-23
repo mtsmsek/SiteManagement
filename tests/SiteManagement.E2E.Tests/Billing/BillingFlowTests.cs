@@ -122,6 +122,41 @@ public sealed class BillingFlowTests(PostgresFixture postgres) : IAsyncLifetime
         debt.TotalOutstanding.Should().Be(0m);
     }
 
+    /// <summary>
+    /// Closing a dues period does not send the billing email inside the
+    /// transaction; it queues an integration event in the outbox, and the
+    /// processor delivers it after commit. Re-processing is idempotent.
+    /// </summary>
+    [Fact]
+    public async Task CloseDuesPeriod_DefersNotificationToOutbox_ThenProcessorDelivers()
+    {
+        // arrange — a distributed dues period so closing has someone to notify
+        var client = await CreateAdminClientAsync();
+        var siteId = await SeedOccupiedApartmentAsync(client);
+        var duesPeriodId = await OpenDuesPeriodAsync(client, siteId, perApartmentAmount: 500m);
+        (await client.PostAsync($"/api/dues/{duesPeriodId}/distribute", content: null))
+            .EnsureSuccessStatusCode();
+
+        // act — close the period
+        var closeResponse = await client.PostAsync($"/api/dues/{duesPeriodId}/close", content: null);
+
+        // assert — close committed, but the billing email did NOT ride the transaction
+        closeResponse.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        _factory.Emails.BillingNotifications.Should().BeEmpty();
+
+        // act — the outbox processor delivers it after commit
+        var delivered = await _factory.ProcessOutboxAsync();
+
+        // assert — exactly one notification reaches the occupant
+        delivered.Should().BeGreaterThan(0);
+        _factory.Emails.BillingNotifications.Should().ContainSingle()
+            .Which.ToEmail.Should().Be("ada@e2e.local");
+
+        // act + assert — re-processing delivers nothing new (idempotent)
+        await _factory.ProcessOutboxAsync();
+        _factory.Emails.BillingNotifications.Should().ContainSingle();
+    }
+
     private async Task<HttpClient> CreateAdminClientAsync()
     {
         var client = _factory.CreateClient();

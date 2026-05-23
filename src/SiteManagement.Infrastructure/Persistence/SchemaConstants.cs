@@ -26,6 +26,9 @@ public static class SchemaConstants
         public const string UtilityBillPeriods = "UtilityBillPeriods";
         public const string UtilityBillItems = "UtilityBillItems";
 
+        // Messaging — after-commit integration event delivery.
+        public const string OutboxMessages = "OutboxMessages";
+
         // Identity tables — flattened from the default AspNet* prefixes.
         public const string Users = "Users";
         public const string Roles = "Roles";

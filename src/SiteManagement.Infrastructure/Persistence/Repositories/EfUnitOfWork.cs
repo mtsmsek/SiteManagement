@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Storage;
 using SiteManagement.Application.Abstractions.Events;
 using SiteManagement.Application.Abstractions.Persistence;
 using SiteManagement.Domain.Shared;
+using SiteManagement.Infrastructure.Persistence.Outbox;
 
 namespace SiteManagement.Infrastructure.Persistence.Repositories;
 
@@ -36,13 +37,18 @@ public sealed class EfUnitOfWork(AppDbContext dbContext, IDomainEventDispatcher 
 
         for (var round = 0; round < maxDispatchRounds; round++)
         {
+            // Drains in-transaction events for dispatch and queues integration
+            // events into the outbox (a pending change) in the same pass.
             var events = DrainDomainEvents();
-            if (events.Count == 0)
+            if (events.Count == 0 && !_dbContext.ChangeTracker.HasChanges())
             {
                 break;
             }
 
-            await _eventDispatcher.DispatchAsync(events, ct);
+            if (events.Count > 0)
+            {
+                await _eventDispatcher.DispatchAsync(events, ct);
+            }
 
             if (_dbContext.ChangeTracker.HasChanges())
             {
@@ -56,6 +62,9 @@ public sealed class EfUnitOfWork(AppDbContext dbContext, IDomainEventDispatcher 
     /// <summary>
     /// Collects and clears the domain events from every tracked aggregate root.
     /// Cleared eagerly so a follow-up save in the same flow doesn't re-dispatch.
+    /// Integration events are split off and persisted to the outbox (committed in
+    /// this same transaction); only the in-transaction events are returned for
+    /// immediate dispatch, so a side effect like email never rides the write.
     /// </summary>
     private IReadOnlyList<IDomainEvent> DrainDomainEvents()
     {
@@ -71,7 +80,20 @@ public sealed class EfUnitOfWork(AppDbContext dbContext, IDomainEventDispatcher 
             root.ClearDomainEvents();
         }
 
-        return events;
+        var inTransactionEvents = new List<IDomainEvent>(events.Count);
+        foreach (var domainEvent in events)
+        {
+            if (domainEvent is IIntegrationEvent integrationEvent)
+            {
+                _dbContext.OutboxMessages.Add(OutboxMessage.From(integrationEvent));
+            }
+            else
+            {
+                inTransactionEvents.Add(domainEvent);
+            }
+        }
+
+        return inTransactionEvents;
     }
 
     /// <inheritdoc />

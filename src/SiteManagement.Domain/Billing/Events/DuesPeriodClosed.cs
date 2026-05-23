@@ -9,7 +9,7 @@ namespace SiteManagement.Domain.Billing.Events;
 /// </summary>
 /// <param name="DuesPeriodId">The closed period.</param>
 /// <param name="SiteId">The site the period belongs to.</param>
-public sealed record DuesPeriodClosed(Guid DuesPeriodId, Guid SiteId) : IDomainEvent
+public sealed record DuesPeriodClosed(Guid DuesPeriodId, Guid SiteId) : IIntegrationEvent
 {
     /// <inheritdoc />
     public DateTime OccurredOnUtc { get; } = DateTime.UtcNow;

@@ -51,6 +51,9 @@ public sealed class CustomWebApplicationFactory(PostgresFixture postgres) : WebA
                 // (registered below) takes over on the test side.
                 ["Smtp:Host"] = "localhost",
                 ["Smtp:Port"] = "2525",
+                // Keep the background outbox poller effectively idle during tests
+                // so it never races an explicit ProcessOutboxAsync call.
+                ["Outbox:PollSeconds"] = "3600",
             });
         });
 
@@ -78,7 +81,8 @@ public sealed class CustomWebApplicationFactory(PostgresFixture postgres) : WebA
 
         await db.Database.ExecuteSqlRawAsync(
             "TRUNCATE TABLE \"DuesItems\", \"DuesPeriods\", \"UtilityBillItems\", \"UtilityBillPeriods\", "
-            + "\"ApartmentAssignments\", \"ResidentVehicles\", \"Apartments\", \"Blocks\", \"Sites\", \"Residents\" "
+            + "\"ApartmentAssignments\", \"ResidentVehicles\", \"Apartments\", \"Blocks\", \"Sites\", \"Residents\", "
+            + "\"OutboxMessages\" "
             + "RESTART IDENTITY CASCADE;",
             cancellationToken: ct);
 
@@ -106,4 +110,16 @@ public sealed class CustomWebApplicationFactory(PostgresFixture postgres) : WebA
 
     /// <summary>Convenience: gives every test a recording email sender already plugged in.</summary>
     public RecordingEmailSender Emails => Services.GetRequiredService<RecordingEmailSender>();
+
+    /// <summary>
+    /// Runs the outbox processor once, deterministically, so tests can assert
+    /// after-commit delivery without waiting on the background poller's timer.
+    /// </summary>
+    public async Task<int> ProcessOutboxAsync(CancellationToken ct = default)
+    {
+        using var scope = Services.CreateScope();
+        var processor = scope.ServiceProvider
+            .GetRequiredService<SiteManagement.Application.Abstractions.Events.IOutboxProcessor>();
+        return await processor.ProcessPendingAsync(ct);
+    }
 }
