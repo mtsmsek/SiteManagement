@@ -48,6 +48,10 @@ public sealed class SiteConfiguration : IEntityTypeConfiguration<Site>
             .HasField(SchemaConstants.BackingFields.SiteBlocks)
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
+        // Soft delete: archived sites (Site.Archive) are hidden from every read.
+        // A hard purge bypasses this with IgnoreQueryFilters + a real delete.
+        builder.HasQueryFilter(s => !s.IsDeleted);
+
         builder.Ignore(s => s.DomainEvents);
     }
 }

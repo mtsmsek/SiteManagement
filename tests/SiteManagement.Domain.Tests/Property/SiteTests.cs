@@ -158,4 +158,34 @@ public class SiteTests
         // assert
         act.Should().Throw<BlockNotFoundInSiteException>();
     }
+
+    [Fact]
+    public void Archive_FlagsTheSiteWithATimestamp()
+    {
+        // arrange
+        var site = Site.Create(SampleSiteName, SampleSiteAddress);
+        var when = new DateTime(2026, 5, 24, 9, 0, 0, DateTimeKind.Utc);
+
+        // act
+        site.Archive(when);
+
+        // assert
+        site.IsDeleted.Should().BeTrue();
+        site.DeletedOnUtc.Should().Be(when);
+    }
+
+    [Fact]
+    public void Archive_Twice_KeepsTheFirstTimestamp()
+    {
+        // arrange
+        var site = Site.Create(SampleSiteName, SampleSiteAddress);
+        var first = new DateTime(2026, 5, 24, 9, 0, 0, DateTimeKind.Utc);
+        site.Archive(first);
+
+        // act
+        site.Archive(first.AddDays(1));
+
+        // assert
+        site.DeletedOnUtc.Should().Be(first);
+    }
 }

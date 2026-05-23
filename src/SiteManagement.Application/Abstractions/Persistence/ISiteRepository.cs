@@ -18,4 +18,10 @@ public interface ISiteRepository : IRepository<Site>
     /// <summary>Loads the site (with blocks + apartments) that contains the given apartment.</summary>
     /// <returns><c>null</c> when no site contains an apartment with that id.</returns>
     Task<Site?> FindContainingApartmentAsync(Guid apartmentId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Loads the site (with children) bypassing the soft-delete query filter, so
+    /// an already-archived site can be hard-purged. Returns <c>null</c> if absent.
+    /// </summary>
+    Task<Site?> FindIncludingArchivedAsync(Guid id, CancellationToken ct = default);
 }

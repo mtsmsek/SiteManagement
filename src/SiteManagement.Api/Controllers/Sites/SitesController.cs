@@ -5,6 +5,7 @@ using SiteManagement.Api.Configuration;
 using SiteManagement.Application.Property.Commands.AddBlock;
 using SiteManagement.Application.Property.Commands.CreateSite;
 using SiteManagement.Application.Property.Commands.DeleteSite;
+using SiteManagement.Application.Property.Commands.PurgeSite;
 using SiteManagement.Application.Property.Queries;
 using SiteManagement.Application.Property.Queries.GetSiteById;
 using SiteManagement.Application.Property.Queries.ListSites;
@@ -25,6 +26,7 @@ public class SitesController(ISender sender) : ControllerBase
 {
     private const string ByIdRoute = "{siteId:guid}";
     private const string BlocksRoute = "{siteId:guid}/blocks";
+    private const string PurgeRoute = "{siteId:guid}/permanent";
 
     private readonly ISender _sender = sender;
 
@@ -68,13 +70,23 @@ public class SitesController(ISender sender) : ControllerBase
         return CreatedAtAction(nameof(GetById), new { siteId }, new AddBlockResponse(result.BlockId));
     }
 
-    /// <summary>Deletes a site (cascades to its blocks + apartments).</summary>
+    /// <summary>Soft-deletes (archives) a site; it disappears from reads but its data is kept.</summary>
     [HttpDelete(ByIdRoute)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> Delete(Guid siteId, CancellationToken ct)
     {
         await _sender.Send(new DeleteSiteCommand(siteId), ct);
+        return NoContent();
+    }
+
+    /// <summary>Permanently deletes a site (and its blocks + apartments). Irreversible.</summary>
+    [HttpDelete(PurgeRoute)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Purge(Guid siteId, CancellationToken ct)
+    {
+        await _sender.Send(new PurgeSiteCommand(siteId), ct);
         return NoContent();
     }
 }

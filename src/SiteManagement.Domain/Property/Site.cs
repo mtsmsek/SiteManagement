@@ -11,9 +11,15 @@ namespace SiteManagement.Domain.Property;
 /// modified through methods on the root or on the root's children, but the
 /// persistence boundary stays here.
 /// </summary>
-public sealed class Site : AggregateRoot<Guid>
+public sealed class Site : AggregateRoot<Guid>, ISoftDeletable
 {
     private readonly List<Block> _blocks = [];
+
+    /// <inheritdoc />
+    public bool IsDeleted { get; private set; }
+
+    /// <inheritdoc />
+    public DateTime? DeletedOnUtc { get; private set; }
 
     /// <summary>Display name of the site (e.g. <c>"Lavender Heights"</c>).</summary>
     public string Name { get; private set; }
@@ -99,5 +105,21 @@ public sealed class Site : AggregateRoot<Guid>
         }
 
         return trimmed;
+    }
+
+    /// <summary>
+    /// Archives the site (soft delete). The aggregate's blocks and apartments
+    /// are reached only through the site, so hiding the archived root hides the
+    /// whole tree — no per-child flag needed. Idempotent.
+    /// </summary>
+    public void Archive(DateTime whenUtc)
+    {
+        if (IsDeleted)
+        {
+            return;
+        }
+
+        IsDeleted = true;
+        DeletedOnUtc = whenUtc;
     }
 }

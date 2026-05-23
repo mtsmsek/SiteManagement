@@ -29,6 +29,10 @@ public sealed class SiteRepository(AppDbContext dbContext) : ISiteRepository
             s => s.Blocks.Any(b => b.Apartments.Any(a => a.Id == apartmentId)), ct);
 
     /// <inheritdoc />
+    public Task<Site?> FindIncludingArchivedAsync(Guid id, CancellationToken ct = default)
+        => HydratedSites().IgnoreQueryFilters().FirstOrDefaultAsync(s => s.Id == id, ct);
+
+    /// <inheritdoc />
     public async Task AddAsync(Site site, CancellationToken ct = default)
     {
         await _dbContext.Sites.AddAsync(site, ct);

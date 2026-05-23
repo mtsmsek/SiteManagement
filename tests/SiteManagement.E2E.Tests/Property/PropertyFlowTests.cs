@@ -1,7 +1,11 @@
 using System.Net;
 using System.Net.Http.Json;
 using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using SiteManagement.Domain.Property;
 using SiteManagement.E2E.Tests.Infrastructure;
+using SiteManagement.Infrastructure.Persistence;
 
 namespace SiteManagement.E2E.Tests.Property;
 
@@ -97,6 +101,83 @@ public sealed class PropertyFlowTests(PostgresFixture postgres) : IAsyncLifetime
         problem!.Detail.Should().NotContain("{0}");
         problem.Detail.Should().Contain("a");
     }
+
+    /// <summary>
+    /// The trash-can delete is a soft delete: the site vanishes from reads but
+    /// its row (and its blocks/apartments) stay in the database, flagged.
+    /// </summary>
+    [Fact]
+    public async Task DeleteSite_ArchivesIt_HiddenFromReadsButKept()
+    {
+        // arrange
+        var client = await CreateAdminClientAsync();
+        var siteId = await BuildSiteWithApartmentAsync(client);
+
+        // act
+        var delete = await client.DeleteAsync($"/api/sites/{siteId}");
+
+        // assert — gone from the list, but still in the DB with the flag set
+        delete.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        var list = await client.GetFromJsonAsync<List<SiteRow>>("/api/sites", AuthFlow.Json);
+        list!.Should().NotContain(s => s.Id == siteId);
+
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var archived = await db.Sites.IgnoreQueryFilters().FirstOrDefaultAsync(s => s.Id == siteId);
+        archived.Should().NotBeNull();
+        archived!.IsDeleted.Should().BeTrue();
+        archived.DeletedOnUtc.Should().NotBeNull();
+        (await db.Set<Apartment>().IgnoreQueryFilters().CountAsync()).Should().Be(1);
+    }
+
+    /// <summary>
+    /// The permanent purge hard-deletes an (already archived) site and cascades
+    /// to its blocks + apartments — the rows are gone for good.
+    /// </summary>
+    [Fact]
+    public async Task PurgeSite_HardDeletes_RemovingTheRowsForGood()
+    {
+        // arrange — build then archive a site
+        var client = await CreateAdminClientAsync();
+        var siteId = await BuildSiteWithApartmentAsync(client);
+        (await client.DeleteAsync($"/api/sites/{siteId}")).EnsureSuccessStatusCode();
+
+        // act — purge the archived site
+        var purge = await client.DeleteAsync($"/api/sites/{siteId}/permanent");
+
+        // assert — nothing left, even ignoring the soft-delete filter
+        purge.StatusCode.Should().Be(HttpStatusCode.NoContent);
+        using var scope = _factory.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        (await db.Sites.IgnoreQueryFilters().AnyAsync(s => s.Id == siteId)).Should().BeFalse();
+        (await db.Set<Block>().CountAsync()).Should().Be(0);
+        (await db.Set<Apartment>().CountAsync()).Should().Be(0);
+    }
+
+    private async Task<HttpClient> CreateAdminClientAsync()
+    {
+        var client = _factory.CreateClient();
+        var token = await AuthFlow.LoginAsBootstrapAdminAsync(client);
+        client.UseBearerToken(token);
+        return client;
+    }
+
+    private static async Task<Guid> BuildSiteWithApartmentAsync(HttpClient client)
+    {
+        var siteResponse = await client.PostAsJsonAsync(
+            "/api/sites", new { name = "Soft Delete Demo", address = "Addr" });
+        var siteId = (await siteResponse.Content.ReadFromJsonAsync<CreateSiteResponse>(AuthFlow.Json))!.SiteId;
+
+        var blockResponse = await client.PostAsJsonAsync($"/api/sites/{siteId}/blocks", new { name = "A" });
+        var blockId = (await blockResponse.Content.ReadFromJsonAsync<AddBlockResponse>(AuthFlow.Json))!.BlockId;
+
+        await client.PostAsJsonAsync(
+            $"/api/blocks/{blockId}/apartments", new { number = 1, floor = 1, type = "2+1" });
+
+        return siteId;
+    }
+
+    private sealed record SiteRow(Guid Id);
 
     private sealed record CreateSiteResponse(Guid SiteId);
     private sealed record AddBlockResponse(Guid BlockId);
