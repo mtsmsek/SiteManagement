@@ -3,6 +3,7 @@ using NSubstitute;
 using SiteManagement.Application.Abstractions.Persistence;
 using SiteManagement.Application.Shared.Exceptions;
 using SiteManagement.Application.Tenancy.Commands.AssignResident;
+using SiteManagement.Application.Tenancy.Queries;
 using SiteManagement.Domain.Property;
 using SiteManagement.Domain.Residency;
 using SiteManagement.Domain.Residency.ValueObjects;
@@ -12,13 +13,15 @@ namespace SiteManagement.Application.Tests.Tenancy;
 
 /// <summary>
 /// Unit tests for <see cref="AssignResidentCommandHandler"/>: both referenced
-/// aggregates must exist before the assignment is created, added, and saved.
+/// aggregates must exist and the apartment must be free before the assignment
+/// is created, added, and saved.
 /// </summary>
 public class AssignResidentCommandHandlerTests
 {
     private readonly IApartmentAssignmentRepository _assignmentRepository = Substitute.For<IApartmentAssignmentRepository>();
     private readonly ISiteRepository _siteRepository = Substitute.For<ISiteRepository>();
     private readonly IResidentRepository _residentRepository = Substitute.For<IResidentRepository>();
+    private readonly ITenancyQueries _tenancyQueries = Substitute.For<ITenancyQueries>();
     private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
 
     private static Resident SampleResident()
@@ -79,6 +82,26 @@ public class AssignResidentCommandHandlerTests
         await act.Should().ThrowAsync<EntityNotFoundException>();
     }
 
+    [Fact]
+    public async Task Handle_ApartmentAlreadyOccupied_Throws()
+    {
+        // arrange — both aggregates resolve, but the apartment already has an occupant
+        _siteRepository.FindContainingApartmentAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(Site.Create("Lavender Heights", "Address"));
+        _residentRepository.GetByIdAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>()).Returns(SampleResident());
+        _tenancyQueries.GetActiveOccupantAsync(Arg.Any<Guid>(), Arg.Any<CancellationToken>())
+            .Returns(new ApartmentOccupantDto(
+                Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Grace Hopper", "Tenant", new DateOnly(2026, 1, 1)));
+        var sut = CreateHandler();
+
+        // act
+        var act = () => sut.Handle(SampleCommand(), CancellationToken.None);
+
+        // assert — rejected before any write
+        await act.Should().ThrowAsync<BusinessRuleViolationException>();
+        await _assignmentRepository.DidNotReceive().AddAsync(Arg.Any<ApartmentAssignment>(), Arg.Any<CancellationToken>());
+    }
+
     private AssignResidentCommandHandler CreateHandler()
-        => new(_assignmentRepository, _siteRepository, _residentRepository, _unitOfWork);
+        => new(_assignmentRepository, _siteRepository, _residentRepository, _tenancyQueries, _unitOfWork);
 }

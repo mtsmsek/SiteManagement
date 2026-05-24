@@ -99,25 +99,27 @@ cd web; npm install; npm start       # Angular dev server :4200
   if `:4200` or `:8080` is down, restart them; it's environmental.
 
 ## Current status (updated end of last session)
-**Done:** W1–W3 core (Property, Residency, Tenancy, Billing dues+utility);
-Day-6 Angular tenancy + billing admin pages; item payment recording;
-modernized sites/billing UI + login language switcher; **transactional outbox**;
-**soft delete + restore + hard purge** (Site); **audit metadata** (all roots);
-**full Application command-handler unit tests**. ~283 tests green.
+**Done:** **W1–W3 complete.** Property, Residency, Tenancy, Billing (dues+utility);
+Angular tenancy + billing admin pages; item payment recording; modernized
+sites/billing UI + login language switcher; **transactional outbox**; **soft
+delete + restore + hard purge** (Site); **audit metadata** (all roots); **full
+Application command-handler unit tests**. W3 Day 7 closed: **`IQuery<T>` marker +
+architecture test "every request is `ICommand` or `IQuery`"** (bare `IRequest`
+now fails the build; Auth Login/Refresh are `ICommand`), **`TenancyFlowTests` +
+failure-path E2E** (double active assignment / closed-period distribute / empty
+distribution all → 409), and a fix so a double active assignment returns a clean
+**409** (`Tenancy.Apartment.AlreadyAssigned`, checked via `ITenancyQueries` up
+front) instead of the DB unique index surfacing as a 500. **290 tests green**
+(Domain 200, Application 51, Architecture 17, E2E 22).
 
 **Pending / next:**
-- **W3: only Day 7 remains** (`WEEK-3-DETAIL.md` — Days 1–6 done). Day 7 =
-  E2E failure-paths (closed-period distribute → 409, empty distribution,
-  double active assignment → 409), a manual end-to-end pass, the **self-review**,
-  and marking `WEEK-3-DETAIL.md` / `ROADMAP.md` W3 ✅. A `BillingFlowTests` E2E
-  already exists; a dedicated `TenancyFlowTests` + the failure-path cases do not.
-- **Day-7 self-review (Level-2):** add an `IQuery` marker + an architecture test
-  asserting "every MediatR request is `ICommand` or `IQuery`" (only the Command
-  side is fully marked today).
+- **W4 — MongoDB PaymentService** (`ROADMAP.md`): separate .NET solution + Mongo,
+  rich payment aggregates, Refit/Polly integration from the main API,
+  `PayInvoiceCommand` flipping `BillingItemStatus` to `Paid`, Angular pay flow,
+  two-container E2E.
 - **IDOR:** not yet relevant — all endpoints are `[Authorize(Roles = Admin)]`.
   Becomes important when a **resident-facing portal** is added (a resident must
   not read another resident's bills via `/residents/{id}/bills`). Design for it then.
-- Then **W4** (MongoDB PaymentService) per `ROADMAP.md`.
 - Optional UI polish (flow hints on the billing "Distribute/Close" actions).
 
 ## Collaboration style (author preferences)

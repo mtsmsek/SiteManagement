@@ -1,15 +1,18 @@
 # Hafta 3 — Tenancy & Billing Domain (Detaylı Plan)
 
-## 📌 DURUM (son oturum sonu)
+## 📌 DURUM — HAFTA 3 ✅ TAMAMLANDI
 
-- **Gün 1–6: ✅ tamamlandı** ve `main`'e push'landı.
-- **Gün 7 (E2E + Self-Review + Doc): ⏳ KALAN İŞ** — tek kalan W3 maddesi. Aşağıdaki Gün 7 bölümüne bak.
-  - Yapıldı: `BillingFlowTests` E2E (aç → ata → dağıt → kalemler → öde) var.
-  - Kalan: özel `TenancyFlowTests` + **failure-path** testleri (kapalı döneme dağıtım → 409, boş dağıtım, çift aktif atama → 409); **self-review**; **`IQuery` marker + "her request `ICommand` veya `IQuery` olmalı" architecture testi** (şu an sadece Command tarafı marker'lı); `WEEK-3-DETAIL.md` + `ROADMAP.md` W3 ✅ işaretle.
+- **Gün 1–7: ✅ tamamlandı** ve `main`'e push'landı. **290 test yeşil** (Domain 200, Application 51, Architecture 17, E2E 22).
+- **Gün 7'de yapılanlar:**
+  - **`IQuery<T>` marker** + architecture testi `Every_RequestType_IsCommandOrQuery` — artık her MediatR request ya `ICommand`/`ICommand<T>` ya `IQuery<T>`; düz `IRequest` build'i kırar. 12 query → `IQuery`, Auth Login/Refresh → `ICommand` (niyet olarak command).
+  - **`TenancyFlowTests`** E2E: ata → daire `Occupied`, end → `Empty`, sakin atama tarihçesi (aktif→kapalı).
+  - **Failure-path** E2E: çift aktif atama → **409**, kapalı döneme dağıtım → 409, boş dağıtım (dolu daire yok) → 409.
+  - **Bug fix:** çift aktif atama DB unique index'e çarpıp **500** dönüyordu → handler artık `ITenancyQueries.GetActiveOccupantAsync` ile önden kontrol edip temiz **409** + lokalize mesaj (`Tenancy.Apartment.AlreadyAssigned`) döndürüyor. DB index son savunma hattı.
+  - **Self-review** geçti (6 mimari soru + Money/event/aggregate-sınırı kontrolleri tertemiz).
 - **PLAN DIŞI — bu hafta fazladan yapıldı** (backend sağlamlaştırma; detay `CLAUDE.md`):
-  item **payment recording** · **UI modernizasyon** (kart tabanlı siteler/billing, login dil switcher) · **transactional Outbox** (mail/event commit sonrası) · **soft delete + restore + hard purge** (Site) · **audit** (created/modified by+at, interceptor) · **tüm Application command-handler unit testleri**. ~283 test yeşil.
+  item **payment recording** · **UI modernizasyon** (kart tabanlı siteler/billing, login dil switcher) · **transactional Outbox** (mail/event commit sonrası) · **soft delete + restore + hard purge** (Site) · **audit** (created/modified by+at, interceptor) · **tüm Application command-handler unit testleri**.
 
-> Yarın: `git pull` → `CLAUDE.md`'yi oku (konvansiyonlar + gotchas) → Gün 7'yi bitir.
+> Sıradaki: **W4 — MongoDB PaymentService** (`ROADMAP.md`). Resident login → borç → kart → ödeme → `Paid`.
 
 ---
 

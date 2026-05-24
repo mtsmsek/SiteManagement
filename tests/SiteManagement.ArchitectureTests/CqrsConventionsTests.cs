@@ -1,6 +1,7 @@
 using FluentAssertions;
 using FluentValidation;
 using MediatR;
+using SiteManagement.Application.Abstractions.Messaging;
 
 namespace SiteManagement.ArchitectureTests;
 
@@ -112,6 +113,35 @@ public class CqrsConventionsTests
             "every Command should be paired with an AbstractValidator (missing: {0})",
             string.Join(", ", commandsMissingValidator));
     }
+
+    /// <summary>
+    /// Every MediatR request must be explicitly an <see cref="ICommand"/> /
+    /// <see cref="ICommand{T}"/> (write, transactional) or an
+    /// <see cref="IQuery{T}"/> (read). A plain <c>IRequest</c> is forbidden so
+    /// "command or query?" — and therefore "transactional or not?" — is never
+    /// left ambiguous and TransactionBehavior's targeting stays correct.
+    /// </summary>
+    [Fact]
+    public void Every_RequestType_IsCommandOrQuery()
+    {
+        // arrange
+        var offenders = RequestTypes
+            .Where(t => !ImplementsCommandOrQuery(t))
+            .Select(t => t.FullName!)
+            .ToArray();
+
+        // assert
+        offenders.Should().BeEmpty(
+            "every MediatR request must implement ICommand/ICommand<T> or IQuery<T>, not a bare IRequest (offenders: {0})",
+            string.Join(", ", offenders));
+    }
+
+    private static bool ImplementsCommandOrQuery(Type type)
+        => type.GetInterfaces().Any(i =>
+            i == typeof(ICommand)
+            || (i.IsGenericType
+                && (i.GetGenericTypeDefinition() == typeof(ICommand<>)
+                 || i.GetGenericTypeDefinition() == typeof(IQuery<>))));
 
     private static bool IsRequest(Type type)
     {

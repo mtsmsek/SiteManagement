@@ -128,4 +128,7 @@
   <data name="Billing.Distribution.Empty" xml:space="preserve">
     <value>There are no occupied apartments to distribute across.</value>
   </data>
+  <data name="Tenancy.Apartment.AlreadyAssigned" xml:space="preserve">
+    <value>This apartment already has an active assignment; end the current one first.</value>
+  </data>
 </root>

@@ -35,4 +35,7 @@ public static class ErrorMessageKeys
 
     /// <summary>Resident registration attempted with an email that is already on file (Identity unique constraint).</summary>
     public const string ResidencyDuplicateEmail = "Residency.DuplicateEmail";
+
+    /// <summary>Assignment attempted on an apartment that already has an active occupant.</summary>
+    public const string TenancyApartmentAlreadyAssigned = "Tenancy.Apartment.AlreadyAssigned";
 }

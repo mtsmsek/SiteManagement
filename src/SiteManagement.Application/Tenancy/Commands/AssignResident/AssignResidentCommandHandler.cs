@@ -1,6 +1,8 @@
 using MediatR;
 using SiteManagement.Application.Abstractions.Persistence;
 using SiteManagement.Application.Shared.Exceptions;
+using SiteManagement.Application.Shared.Resources;
+using SiteManagement.Application.Tenancy.Queries;
 using SiteManagement.Domain.Property;
 using SiteManagement.Domain.Tenancy;
 
@@ -10,20 +12,24 @@ namespace SiteManagement.Application.Tenancy.Commands.AssignResident;
 /// Creates an <see cref="ApartmentAssignment"/> and saves inside a transaction
 /// so the assignment INSERT and the apartment-occupancy flip — raised by the
 /// assignment's <c>ResidentAssignedToApartment</c> event and applied by a
-/// Property-side handler in a follow-up save — commit atomically. The
-/// apartment and resident must both exist; the DB's filtered unique index is
-/// the final guard against a second active assignment on the same apartment.
+/// Property-side handler in a follow-up save — commit atomically. The apartment
+/// and resident must both exist, and the apartment must be free. "Already
+/// assigned" is a cross-aggregate rule (it spans other assignments), so it's
+/// checked here via the read side rather than inside the aggregate; the DB's
+/// filtered unique index stays as the last line of defence against a race.
 /// </summary>
 public sealed class AssignResidentCommandHandler(
     IApartmentAssignmentRepository assignmentRepository,
     ISiteRepository siteRepository,
     IResidentRepository residentRepository,
+    ITenancyQueries tenancyQueries,
     IUnitOfWork unitOfWork)
     : IRequestHandler<AssignResidentCommand, AssignResidentResult>
 {
     private readonly IApartmentAssignmentRepository _assignmentRepository = assignmentRepository;
     private readonly ISiteRepository _siteRepository = siteRepository;
     private readonly IResidentRepository _residentRepository = residentRepository;
+    private readonly ITenancyQueries _tenancyQueries = tenancyQueries;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     /// <inheritdoc />
@@ -34,6 +40,16 @@ public sealed class AssignResidentCommandHandler(
             ?? throw new EntityNotFoundException(nameof(Apartment), request.ApartmentId);
         _ = await _residentRepository.GetByIdAsync(request.ResidentId, cancellationToken)
             ?? throw new EntityNotFoundException("Resident", request.ResidentId);
+
+        // Reject up front if the apartment is already occupied, so the caller
+        // gets a clean 409 instead of the DB index surfacing as a 500.
+        var existingOccupant = await _tenancyQueries.GetActiveOccupantAsync(request.ApartmentId, cancellationToken);
+        if (existingOccupant is not null)
+        {
+            throw new BusinessRuleViolationException(
+                ErrorMessageKeys.TenancyApartmentAlreadyAssigned,
+                ErrorMessageKeys.TenancyApartmentAlreadyAssigned);
+        }
 
         var assignment = ApartmentAssignment.Assign(
             request.ApartmentId, request.ResidentId, request.TenantType, request.StartDate);

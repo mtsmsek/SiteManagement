@@ -261,7 +261,7 @@ Postman'i ad-hoc keşif için kullan (yeni endpoint denerken). Regression yükü
 
 ---
 
-### Hafta 3 — Tenancy & Billing Domain
+### Hafta 3 — Tenancy & Billing Domain ✅
 **Hedef:** "Admin sakin atayıp aylık aidat/fatura'ları toplu dağıtabiliyor"
 
 - Tenancy aggregate (TDD) — sahip/kiracı, tarihçe

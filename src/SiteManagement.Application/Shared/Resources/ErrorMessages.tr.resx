@@ -128,4 +128,7 @@
   <data name="Billing.Distribution.Empty" xml:space="preserve">
     <value>Dağıtım yapılacak dolu daire yok.</value>
   </data>
+  <data name="Tenancy.Apartment.AlreadyAssigned" xml:space="preserve">
+    <value>Bu dairede halihazırda aktif bir atama var; önce mevcut atamayı sonlandırın.</value>
+  </data>
 </root>
