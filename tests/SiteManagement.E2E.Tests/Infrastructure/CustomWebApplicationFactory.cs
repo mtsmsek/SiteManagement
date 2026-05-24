@@ -16,7 +16,10 @@ namespace SiteManagement.E2E.Tests.Infrastructure;
 /// test session gets a deterministic environment regardless of what the
 /// developer has on their machine.
 /// </summary>
-public sealed class CustomWebApplicationFactory(PostgresFixture postgres) : WebApplicationFactory<Program>
+public sealed class CustomWebApplicationFactory(
+    PostgresFixture postgres,
+    string? paymentServiceBaseUrl = null,
+    string? paymentServiceApiKey = null) : WebApplicationFactory<Program>
 {
     /// <summary>Email of the bootstrap admin seeded into the test database on first request.</summary>
     public const string BootstrapAdminEmail = "admin@e2e.local";
@@ -27,6 +30,8 @@ public sealed class CustomWebApplicationFactory(PostgresFixture postgres) : WebA
     private const string TestJwtKey = "e2e-only-secret-not-used-in-production-please";
 
     private readonly PostgresFixture _postgres = postgres;
+    private readonly string? _paymentServiceBaseUrl = paymentServiceBaseUrl;
+    private readonly string? _paymentServiceApiKey = paymentServiceApiKey;
 
     /// <inheritdoc />
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -35,7 +40,7 @@ public sealed class CustomWebApplicationFactory(PostgresFixture postgres) : WebA
 
         builder.ConfigureAppConfiguration((_, config) =>
         {
-            config.AddInMemoryCollection(new Dictionary<string, string?>
+            var settings = new Dictionary<string, string?>
             {
                 ["ConnectionStrings:DefaultConnection"] = _postgres.ConnectionString,
                 ["Jwt:Key"] = TestJwtKey,
@@ -54,7 +59,18 @@ public sealed class CustomWebApplicationFactory(PostgresFixture postgres) : WebA
                 // Keep the background outbox poller effectively idle during tests
                 // so it never races an explicit ProcessOutboxAsync call.
                 ["Outbox:PollSeconds"] = "3600",
-            });
+            };
+
+            // Point the payment gateway at the test's stub server when one is
+            // supplied (the pay-by-card E2E); other suites never hit the gateway
+            // so they leave it unset.
+            if (_paymentServiceBaseUrl is not null)
+            {
+                settings["PaymentService:BaseUrl"] = _paymentServiceBaseUrl;
+                settings["PaymentService:ApiKey"] = _paymentServiceApiKey ?? string.Empty;
+            }
+
+            config.AddInMemoryCollection(settings);
         });
 
         builder.ConfigureServices(services =>

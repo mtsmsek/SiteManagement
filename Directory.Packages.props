@@ -65,5 +65,12 @@
     <PackageVersion Include="Testcontainers.PostgreSql" Version="4.1.0" />
     <PackageVersion Include="Testcontainers.MongoDb" Version="4.1.0" />
     <PackageVersion Include="NetArchTest.Rules" Version="1.3.2" />
+    <!-- Stubs the external Payment service over real HTTP in the main API's E2E:
+         Refit + Polly run for real against it, keeping the consumer-side contract
+         test isolated from PaymentService's code (microservice independence). -->
+    <PackageVersion Include="WireMock.Net" Version="1.6.7" />
+    <!-- Transitive pin: WireMock.Net pulls System.Linq.Dynamic.Core 1.3.12
+         (GHSA-4cv2-4hjh-77rx); force a patched version so the NuGet audit stays clean. -->
+    <PackageVersion Include="System.Linq.Dynamic.Core" Version="1.7.2" />
   </ItemGroup>
 </Project>
