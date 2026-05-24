@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+    <!-- Force the patched SharpCompress over MongoDB.Driver's vulnerable transitive 0.30.1. -->
+    <PackageReference Include="SharpCompress" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PaymentService.Application\PaymentService.Application.csproj" />
+    <ProjectReference Include="..\PaymentService.Domain\PaymentService.Domain.csproj" />
+  </ItemGroup>
+
+</Project>

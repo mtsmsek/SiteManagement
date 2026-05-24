@@ -3,9 +3,10 @@
 #
 # Services:
 #   postgres  : main relational DB (Identity, Property, Residency, Tenancy, Billing, Messaging)
-#   mongo     : payment service DB (W4)
-#   mailhog   : SMTP catcher (1025) + UI (8025)
-#   api       : SiteManagement.Api on :${API_PORT}
+#   mongo       : payment service DB (W4)
+#   mailhog     : SMTP catcher (1025) + UI (8025)
+#   api         : SiteManagement.Api on :${API_PORT}
+#   payment-api : PaymentService.Api on :${PAYMENT_API_PORT} (W4, Mongo-backed)
 
 services:
 
@@ -85,6 +86,31 @@ services:
       - "${API_PORT:-8080}:8080"
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 6
+      start_period: 15s
+
+  payment-api:
+    build:
+      context: .
+      dockerfile: payment-service/src/PaymentService.Api/Dockerfile
+    container_name: sitemgmt-payment-api
+    restart: unless-stopped
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8090"
+      # Root-auth Mongo connection (compose seeds root creds); authSource=admin.
+      Mongo__ConnectionString: >-
+        mongodb://${MONGO_ROOT_USER:-mongoroot}:${MONGO_ROOT_PASSWORD:-mongo_dev_pw}@mongo:27017/?authSource=admin
+      Mongo__Database: ${PAYMENT_DB:-payments}
+    ports:
+      - "${PAYMENT_API_PORT:-8090}:8090"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8090/health"]
       interval: 10s
       timeout: 5s
       retries: 6
