@@ -1,4 +1,7 @@
 using Microsoft.Extensions.Options;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 
 namespace PaymentService.Infrastructure.Persistence;
@@ -11,6 +14,12 @@ namespace PaymentService.Infrastructure.Persistence;
 public sealed class PaymentMongoContext
 {
     private readonly IMongoDatabase _database;
+
+    // MongoDB.Driver 3.x no longer assumes a default Guid representation and
+    // throws on Unspecified. Our ids are plain Guids, so register the standard
+    // (UUID) representation once, process-wide, before any client is built.
+    static PaymentMongoContext()
+        => BsonSerializer.TryRegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
 
     /// <summary>Connects using the configured connection string + database name.</summary>
     public PaymentMongoContext(IOptions<MongoOptions> options)

@@ -44,6 +44,10 @@ public sealed class CreditCard : AggregateRoot<Guid>
     public static CreditCard Issue(Guid bankAccountId, CardNumber number, Cvv cvv, ExpiryDate expiry)
         => new(Guid.NewGuid(), bankAccountId, number, cvv, expiry);
 
+    /// <summary>Rebuilds a card from persisted state. Persistence layer only.</summary>
+    public static CreditCard Restore(Guid id, Guid bankAccountId, CardNumber number, Cvv cvv, ExpiryDate expiry)
+        => new(id, bankAccountId, number, cvv, expiry);
+
     /// <summary>
     /// Confirms the card can be charged as of <paramref name="asOf"/>.
     /// </summary>

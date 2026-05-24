@@ -49,6 +49,18 @@ public sealed class PaymentTransaction : AggregateRoot<Guid>
     public static PaymentTransaction Start(string idempotencyKey, string reference, Money amount)
         => new(Guid.NewGuid(), idempotencyKey, reference, amount);
 
+    /// <summary>
+    /// Rebuilds a transaction from persisted state, including its settled
+    /// status and failure reason. Persistence layer only.
+    /// </summary>
+    public static PaymentTransaction Restore(
+        Guid id, string idempotencyKey, string reference, Money amount, PaymentStatus status, string? failureReason)
+        => new(id, idempotencyKey, reference, amount)
+        {
+            Status = status,
+            FailureReason = failureReason,
+        };
+
     /// <summary>Settles the transaction as succeeded.</summary>
     /// <exception cref="InvalidTransactionStateException">Thrown when already settled.</exception>
     public void Succeed()

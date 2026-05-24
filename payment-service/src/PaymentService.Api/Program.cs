@@ -1,6 +1,7 @@
 using PaymentService.Api.Configuration;
 using PaymentService.Application;
 using PaymentService.Infrastructure;
+using PaymentService.Infrastructure.Persistence;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -23,6 +24,9 @@ if (app.Environment.IsDevelopment())
 
 app.MapHealthChecks("/health");
 app.MapControllers();
+
+// Seed the demo card + funded account (idempotent) so the pay flow works out of the box.
+await PaymentSeeder.SeedAsync(app.Services);
 
 app.Run();
 

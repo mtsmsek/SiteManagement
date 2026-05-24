@@ -24,6 +24,12 @@ public sealed class BankAccount : AggregateRoot<Guid>
     public static BankAccount Open(Money openingBalance) => new(Guid.NewGuid(), openingBalance);
 
     /// <summary>
+    /// Rebuilds an account from persisted state (id + balance). For the
+    /// persistence layer only — bypasses no invariants, just reconstitutes.
+    /// </summary>
+    public static BankAccount Restore(Guid id, Money balance) => new(id, balance);
+
+    /// <summary>
     /// Charges <paramref name="amount"/> against the balance.
     /// </summary>
     /// <exception cref="InsufficientBalanceException">Thrown when funds are insufficient; the balance is left unchanged.</exception>
