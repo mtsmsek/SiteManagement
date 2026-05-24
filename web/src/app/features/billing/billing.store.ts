@@ -5,6 +5,7 @@ import type {
   DuesPeriodListItem,
   OpenDuesPeriodRequest,
   OpenUtilityBillRequest,
+  PayByCardRequest,
   PeriodItem,
   SiteDebtSummary,
   UtilityBillPeriodListItem,
@@ -135,6 +136,36 @@ export class BillingStore {
   /** Marks a utility bill item paid, then refreshes its items, the period list and the debt summary. */
   async payUtilityItem(siteId: string, utilityBillPeriodId: string, itemId: string): Promise<void> {
     await firstValueFrom(this.api.payUtilityItem(utilityBillPeriodId, itemId));
+    await Promise.all([
+      this.loadUtilityItems(utilityBillPeriodId),
+      this.refreshUtilityPeriods(siteId),
+      this.refreshDebtSummary(siteId),
+    ]);
+  }
+
+  /** Charges a dues item by card via the payment gateway, then refreshes views. */
+  async payDuesItemByCard(
+    siteId: string,
+    duesPeriodId: string,
+    itemId: string,
+    card: PayByCardRequest,
+  ): Promise<void> {
+    await firstValueFrom(this.api.payDuesItemByCard(duesPeriodId, itemId, card));
+    await Promise.all([
+      this.loadDuesItems(duesPeriodId),
+      this.refreshDuesPeriods(siteId),
+      this.refreshDebtSummary(siteId),
+    ]);
+  }
+
+  /** Charges a utility bill item by card via the payment gateway, then refreshes views. */
+  async payUtilityItemByCard(
+    siteId: string,
+    utilityBillPeriodId: string,
+    itemId: string,
+    card: PayByCardRequest,
+  ): Promise<void> {
+    await firstValueFrom(this.api.payUtilityItemByCard(utilityBillPeriodId, itemId, card));
     await Promise.all([
       this.loadUtilityItems(utilityBillPeriodId),
       this.refreshUtilityPeriods(siteId),

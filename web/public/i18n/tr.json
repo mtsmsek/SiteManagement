@@ -199,6 +199,17 @@
       "outstanding": "Bakiye"
     }
   },
+  "payment": {
+    "title": "Kartla Öde",
+    "amount": "Tutar",
+    "cardNumber": "Kart Numarası",
+    "cardNumberInvalid": "Geçerli bir kart numarası girin (13-19 hane).",
+    "cvv": "CVV",
+    "cvvInvalid": "CVV 3-4 hane olmalı.",
+    "expiryMonth": "Ay",
+    "expiryYear": "Yıl",
+    "pay": "Öde"
+  },
   "errors": {
     "generic": "Bir hata oluştu.",
     "network": "Sunucuya ulaşılamıyor.",

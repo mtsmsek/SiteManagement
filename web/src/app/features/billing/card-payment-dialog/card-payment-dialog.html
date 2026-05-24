@@ -1,0 +1,51 @@
+<h2 mat-dialog-title>{{ 'payment.title' | translate }}</h2>
+
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <p class="dialog-note">
+      <mat-icon>credit_card</mat-icon>
+      <span>{{ 'payment.amount' | translate }}: <strong>{{ amount | number: '1.2-2' }} TRY</strong></span>
+    </p>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'payment.cardNumber' | translate }}</mat-label>
+      <input matInput formControlName="cardNumber" inputmode="numeric" maxlength="19" autocomplete="cc-number" />
+      @if (form.controls.cardNumber.touched && form.controls.cardNumber.invalid) {
+        <mat-error>{{ 'payment.cardNumberInvalid' | translate }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>{{ 'payment.cvv' | translate }}</mat-label>
+      <input matInput formControlName="cvv" inputmode="numeric" maxlength="4" autocomplete="cc-csc" />
+      @if (form.controls.cvv.touched && form.controls.cvv.invalid) {
+        <mat-error>{{ 'payment.cvvInvalid' | translate }}</mat-error>
+      }
+    </mat-form-field>
+
+    <div class="period-row">
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'payment.expiryMonth' | translate }}</mat-label>
+        <mat-select formControlName="expiryMonth">
+          @for (m of months; track m) {
+            <mat-option [value]="m">{{ m }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>{{ 'payment.expiryYear' | translate }}</mat-label>
+        <mat-select formControlName="expiryYear">
+          @for (y of years; track y) {
+            <mat-option [value]="y">{{ y }}</mat-option>
+          }
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button matButton type="button" (click)="cancel()">{{ 'common.cancel' | translate }}</button>
+    <button matButton="filled" type="submit" [disabled]="submitting()">{{ 'payment.pay' | translate }}</button>
+  </mat-dialog-actions>
+</form>

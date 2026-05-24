@@ -391,7 +391,7 @@ export interface paths {
         };
         put?: never;
         post?: never;
-        /** Deletes a site (cascades to its blocks + apartments). */
+        /** Soft-deletes (archives) a site; it disappears from reads but its data is kept. */
         delete: {
             parameters: {
                 query?: never;
@@ -490,6 +490,100 @@ export interface paths {
                 };
                 /** @description Conflict */
                 409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sites/{siteId}/permanent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Permanently deletes a site (and its blocks + apartments). Irreversible. */
+        delete: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    siteId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/sites/{siteId}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restores a previously archived site, bringing it back into reads. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    siteId: string;
+                };
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Not Found */
+                404: {
                     headers: {
                         [name: string]: unknown;
                     };
@@ -1126,7 +1220,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Marks one dues item paid. */
+        /** Marks one dues item paid directly (admin override, no charge). */
         post: {
             parameters: {
                 query?: never;
@@ -1145,6 +1239,71 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/dues/{duesPeriodId}/items/{itemId}/pay-by-card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pays one dues item by credit card via the payment gateway. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    duesPeriodId: string;
+                    itemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PayByCardRequest"];
+                    "text/json": components["schemas"]["PayByCardRequest"];
+                    "application/*+json": components["schemas"]["PayByCardRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Payment Required */
+                402: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
                 /** @description Not Found */
                 404: {
@@ -2028,6 +2187,19 @@ export interface components {
             utilityType: components["schemas"]["UtilityType"];
             /** Format: double */
             totalAmount: number | string;
+        };
+        /**
+         * @description Card details for paying a billing item by card. The amount is taken from the
+         *     item server-side; the card is passed straight to the payment gateway and
+         *     never stored by this API.
+         */
+        PayByCardRequest: {
+            cardNumber: string;
+            cvv: string;
+            /** Format: int32 */
+            expiryYear: number | string;
+            /** Format: int32 */
+            expiryMonth: number | string;
         };
         PeriodItemDto: {
             /** Format: uuid */

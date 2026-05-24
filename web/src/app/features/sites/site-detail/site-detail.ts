@@ -31,7 +31,12 @@ import {
   UtilityBillFormDialog,
   UtilityBillFormDialogData,
 } from '../../billing/utility-bill-form-dialog/utility-bill-form-dialog';
+import {
+  CardPaymentDialog,
+  CardPaymentDialogData,
+} from '../../billing/card-payment-dialog/card-payment-dialog';
 import { ConfirmDialog, ConfirmDialogData } from '../../../shared/confirm-dialog/confirm-dialog';
+import type { PayByCardRequest } from '../../../core/api/api.models';
 import {
   ApartmentStatus,
   BillingItemStatus,
@@ -244,11 +249,29 @@ export class SiteDetail implements OnInit {
     void this.billing.closeUtility(this.siteId(), period.id);
   }
 
-  payDuesItem(period: DuesPeriodListItem, item: PeriodItem): void {
-    void this.billing.payDuesItem(this.siteId(), period.id, item.itemId);
+  async payDuesItem(period: DuesPeriodListItem, item: PeriodItem): Promise<void> {
+    const card = await this.collectCard(item.amount);
+    if (card) {
+      await this.billing.payDuesItemByCard(this.siteId(), period.id, item.itemId, card);
+    }
   }
 
-  payUtilityItem(period: UtilityBillPeriodListItem, item: PeriodItem): void {
-    void this.billing.payUtilityItem(this.siteId(), period.id, item.itemId);
+  async payUtilityItem(period: UtilityBillPeriodListItem, item: PeriodItem): Promise<void> {
+    const card = await this.collectCard(item.amount);
+    if (card) {
+      await this.billing.payUtilityItemByCard(this.siteId(), period.id, item.itemId, card);
+    }
+  }
+
+  /** Opens the card dialog and resolves to the entered card, or null if cancelled. */
+  private collectCard(amount: number | string): Promise<PayByCardRequest | undefined> {
+    return firstValueFrom(
+      this.dialog
+        .open<CardPaymentDialog, CardPaymentDialogData, PayByCardRequest>(CardPaymentDialog, {
+          width: '420px',
+          data: { amount },
+        })
+        .afterClosed(),
+    );
   }
 }

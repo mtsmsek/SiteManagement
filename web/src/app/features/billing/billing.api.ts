@@ -7,6 +7,7 @@ import type {
   OpenDuesPeriodResponse,
   OpenUtilityBillRequest,
   OpenUtilityBillResponse,
+  PayByCardRequest,
   PeriodItem,
   SiteDebtSummary,
   UtilityBillPeriodListItem,
@@ -71,5 +72,17 @@ export class BillingApi {
 
   payUtilityItem(utilityBillPeriodId: string, itemId: string): Observable<void> {
     return this.api.post<void>(`/utility-bills/${utilityBillPeriodId}/items/${itemId}/pay`);
+  }
+
+  payDuesItemByCard(duesPeriodId: string, itemId: string, card: PayByCardRequest): Observable<void> {
+    return this.api.post<void>(`/dues/${duesPeriodId}/items/${itemId}/pay-by-card`, card);
+  }
+
+  payUtilityItemByCard(
+    utilityBillPeriodId: string,
+    itemId: string,
+    card: PayByCardRequest,
+  ): Observable<void> {
+    return this.api.post<void>(`/utility-bills/${utilityBillPeriodId}/items/${itemId}/pay-by-card`, card);
   }
 }

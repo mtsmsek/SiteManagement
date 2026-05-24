@@ -199,6 +199,17 @@
       "outstanding": "Outstanding"
     }
   },
+  "payment": {
+    "title": "Pay by Card",
+    "amount": "Amount",
+    "cardNumber": "Card Number",
+    "cardNumberInvalid": "Enter a valid card number (13-19 digits).",
+    "cvv": "CVV",
+    "cvvInvalid": "CVV must be 3-4 digits.",
+    "expiryMonth": "Month",
+    "expiryYear": "Year",
+    "pay": "Pay"
+  },
   "errors": {
     "generic": "An error occurred.",
     "network": "Cannot reach the server.",

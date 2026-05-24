@@ -6,6 +6,7 @@ using SiteManagement.Application.Billing.Commands.CloseUtilityBillPeriod;
 using SiteManagement.Application.Billing.Commands.DistributeUtilityBill;
 using SiteManagement.Application.Billing.Commands.MarkUtilityBillItemPaid;
 using SiteManagement.Application.Billing.Commands.OpenUtilityBillPeriod;
+using SiteManagement.Application.Billing.Commands.PayUtilityItem;
 using SiteManagement.Application.Billing.Queries;
 using SiteManagement.Application.Billing.Queries.ListUtilityBillPeriodItems;
 using SiteManagement.Application.Billing.Queries.ListUtilityBillPeriods;
@@ -27,6 +28,7 @@ public class UtilityBillsController(ISender sender) : ControllerBase
     private const string CloseRoute = "{utilityBillPeriodId:guid}/close";
     private const string ItemsRoute = "{utilityBillPeriodId:guid}/items";
     private const string PayItemRoute = "{utilityBillPeriodId:guid}/items/{itemId:guid}/pay";
+    private const string PayItemByCardRoute = "{utilityBillPeriodId:guid}/items/{itemId:guid}/pay-by-card";
     private const string BySiteRoute = "sites/{siteId:guid}";
 
     private readonly ISender _sender = sender;
@@ -76,6 +78,24 @@ public class UtilityBillsController(ISender sender) : ControllerBase
     public async Task<IActionResult> PayItem(Guid utilityBillPeriodId, Guid itemId, CancellationToken ct)
     {
         await _sender.Send(new MarkUtilityBillItemPaidCommand(utilityBillPeriodId, itemId), ct);
+        return NoContent();
+    }
+
+    /// <summary>Pays one utility bill item by credit card via the payment gateway.</summary>
+    [HttpPost(PayItemByCardRoute)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status402PaymentRequired)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> PayItemByCard(
+        Guid utilityBillPeriodId,
+        Guid itemId,
+        [FromBody] PayByCardRequest body,
+        CancellationToken ct)
+    {
+        await _sender.Send(
+            new PayUtilityItemCommand(
+                utilityBillPeriodId, itemId, body.CardNumber, body.Cvv, body.ExpiryYear, body.ExpiryMonth),
+            ct);
         return NoContent();
     }
 
