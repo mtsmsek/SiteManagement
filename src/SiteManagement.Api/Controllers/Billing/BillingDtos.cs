@@ -16,3 +16,14 @@ public sealed record OpenUtilityBillRequest(
     int Month,
     UtilityType UtilityType,
     decimal TotalAmount);
+
+/// <summary>
+/// Card details for paying a billing item by card. The amount is taken from the
+/// item server-side; the card is passed straight to the payment gateway and
+/// never stored by this API.
+/// </summary>
+public sealed record PayByCardRequest(
+    string CardNumber,
+    string Cvv,
+    int ExpiryYear,
+    int ExpiryMonth);

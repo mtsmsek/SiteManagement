@@ -14,6 +14,9 @@ builder.Services
     .AddPaymentHealthChecks()
     .AddOpenApi();
 
+builder.Services.AddOptions<PaymentService.Api.Configuration.ApiKeyOptions>()
+    .Bind(builder.Configuration.GetSection(PaymentService.Api.Configuration.ApiKeyOptions.SectionName));
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -21,6 +24,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
+
+// Service-to-service API key guard (skips /health + docs; no-op when unset).
+app.UseMiddleware<ApiKeyMiddleware>();
 
 app.MapHealthChecks("/health");
 app.MapControllers();

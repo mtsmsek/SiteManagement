@@ -8,6 +8,7 @@ using SiteManagement.Infrastructure.Auth;
 using SiteManagement.Infrastructure.Email;
 using SiteManagement.Infrastructure.Events;
 using SiteManagement.Infrastructure.Identity;
+using SiteManagement.Infrastructure.Payments;
 using SiteManagement.Infrastructure.Persistence;
 
 namespace SiteManagement.Infrastructure;
@@ -64,6 +65,9 @@ public static class DependencyInjection
         // Outbox: after-commit delivery of integration events.
         services.AddScoped<IOutboxProcessor, OutboxProcessor>();
         services.AddHostedService<OutboxBackgroundService>();
+
+        // Outbound Payment-service integration (Refit + resilience + adapter).
+        services.AddPaymentGateway(configuration);
 
         return services;
     }

@@ -92,6 +92,9 @@ public class GlobalExceptionMiddleware(
             case AuthenticationException authentication:
                 problem.Extensions[ApiConstants.ProblemDetailsMessageKey] = authentication.MessageKey;
                 break;
+            case PaymentRejectedException payment:
+                problem.Extensions[ApiConstants.ProblemDetailsMessageKey] = payment.MessageKey;
+                break;
         }
 
         await WriteAsync(context, problem);
@@ -113,6 +116,7 @@ public class GlobalExceptionMiddleware(
         ValidationException => _errorLocalizer[ErrorMessageKeys.ValidationFailed].Value,
         BusinessRuleViolationException business => business.Message,
         AuthenticationException auth => Localize(_errorLocalizer, auth.MessageKey),
+        PaymentRejectedException payment => Localize(_errorLocalizer, payment.MessageKey),
         _ => ex.Message,
     };
 

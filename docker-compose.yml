@@ -64,6 +64,8 @@ services:
         condition: service_healthy
       mailhog:
         condition: service_started
+      payment-api:
+        condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ASPNETCORE_HTTP_PORTS: "8080"
@@ -71,6 +73,9 @@ services:
         Host=postgres;Port=5432;Database=${POSTGRES_DB:-sitemanagement};Username=${POSTGRES_USER:-sitemanagement};Password=${POSTGRES_PASSWORD:-sitemanagement_dev_pw}
       Smtp__Host: mailhog
       Smtp__Port: "1025"
+      # Outbound payment-service integration (Refit + Polly use these).
+      PaymentService__BaseUrl: http://payment-api:8090
+      PaymentService__ApiKey: ${PAYMENT_API_KEY:-dev-payment-api-key}
       Jwt__Key: ${JWT_KEY:-dev-only-secret-please-change-me-at-least-32-chars}
       Jwt__Issuer: ${JWT_ISSUER:-SiteManagement}
       Jwt__Audience: ${JWT_AUDIENCE:-SiteManagement.Clients}
@@ -107,6 +112,8 @@ services:
       Mongo__ConnectionString: >-
         mongodb://${MONGO_ROOT_USER:-mongoroot}:${MONGO_ROOT_PASSWORD:-mongo_dev_pw}@mongo:27017/?authSource=admin
       Mongo__Database: ${PAYMENT_DB:-payments}
+      # Service-to-service API key the main API must present (same value both sides).
+      ApiKey__Value: ${PAYMENT_API_KEY:-dev-payment-api-key}
     ports:
       - "${PAYMENT_API_PORT:-8090}:8090"
     healthcheck:

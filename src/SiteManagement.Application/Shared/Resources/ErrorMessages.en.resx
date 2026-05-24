@@ -131,4 +131,7 @@
   <data name="Tenancy.Apartment.AlreadyAssigned" xml:space="preserve">
     <value>This apartment already has an active assignment; end the current one first.</value>
   </data>
+  <data name="Payment.Rejected" xml:space="preserve">
+    <value>Payment was declined. Please check your card details and balance, then try again.</value>
+  </data>
 </root>

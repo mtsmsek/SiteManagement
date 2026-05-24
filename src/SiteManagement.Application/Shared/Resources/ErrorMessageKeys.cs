@@ -38,4 +38,7 @@ public static class ErrorMessageKeys
 
     /// <summary>Assignment attempted on an apartment that already has an active occupant.</summary>
     public const string TenancyApartmentAlreadyAssigned = "Tenancy.Apartment.AlreadyAssigned";
+
+    /// <summary>A card charge was declined by the payment gateway.</summary>
+    public const string PaymentRejected = "Payment.Rejected";
 }

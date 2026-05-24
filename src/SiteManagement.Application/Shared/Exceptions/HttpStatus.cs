@@ -16,6 +16,9 @@ public static class HttpStatus
     /// <summary>403 — authenticated but not allowed.</summary>
     public const int Forbidden = 403;
 
+    /// <summary>402 — a card charge was declined by the payment gateway.</summary>
+    public const int PaymentRequired = 402;
+
     /// <summary>404 — referenced aggregate does not exist.</summary>
     public const int NotFound = 404;
 

@@ -131,4 +131,7 @@
   <data name="Tenancy.Apartment.AlreadyAssigned" xml:space="preserve">
     <value>Bu dairede halihazırda aktif bir atama var; önce mevcut atamayı sonlandırın.</value>
   </data>
+  <data name="Payment.Rejected" xml:space="preserve">
+    <value>Ödeme reddedildi. Lütfen kart bilgilerinizi ve bakiyenizi kontrol edip tekrar deneyin.</value>
+  </data>
 </root>

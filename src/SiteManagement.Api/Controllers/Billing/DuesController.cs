@@ -6,6 +6,7 @@ using SiteManagement.Application.Billing.Commands.CloseDuesPeriod;
 using SiteManagement.Application.Billing.Commands.DistributeDues;
 using SiteManagement.Application.Billing.Commands.MarkDuesItemPaid;
 using SiteManagement.Application.Billing.Commands.OpenDuesPeriod;
+using SiteManagement.Application.Billing.Commands.PayDuesItem;
 using SiteManagement.Application.Billing.Queries;
 using SiteManagement.Application.Billing.Queries.GetSiteDebtSummary;
 using SiteManagement.Application.Billing.Queries.ListDuesPeriodItems;
@@ -28,6 +29,7 @@ public class DuesController(ISender sender) : ControllerBase
     private const string CloseRoute = "{duesPeriodId:guid}/close";
     private const string ItemsRoute = "{duesPeriodId:guid}/items";
     private const string PayItemRoute = "{duesPeriodId:guid}/items/{itemId:guid}/pay";
+    private const string PayItemByCardRoute = "{duesPeriodId:guid}/items/{itemId:guid}/pay-by-card";
     private const string BySiteRoute = "sites/{siteId:guid}";
     private const string DebtSummaryRoute = "sites/{siteId:guid}/debt-summary";
 
@@ -77,13 +79,31 @@ public class DuesController(ISender sender) : ControllerBase
     public async Task<ActionResult<IReadOnlyList<DuesPeriodListItemDto>>> ListForSite(Guid siteId, CancellationToken ct)
         => Ok(await _sender.Send(new ListDuesPeriodsQuery(siteId), ct));
 
-    /// <summary>Marks one dues item paid.</summary>
+    /// <summary>Marks one dues item paid directly (admin override, no charge).</summary>
     [HttpPost(PayItemRoute)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> PayItem(Guid duesPeriodId, Guid itemId, CancellationToken ct)
     {
         await _sender.Send(new MarkDuesItemPaidCommand(duesPeriodId, itemId), ct);
+        return NoContent();
+    }
+
+    /// <summary>Pays one dues item by credit card via the payment gateway.</summary>
+    [HttpPost(PayItemByCardRoute)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status402PaymentRequired)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> PayItemByCard(
+        Guid duesPeriodId,
+        Guid itemId,
+        [FromBody] PayByCardRequest body,
+        CancellationToken ct)
+    {
+        await _sender.Send(
+            new PayDuesItemCommand(
+                duesPeriodId, itemId, body.CardNumber, body.Cvv, body.ExpiryYear, body.ExpiryMonth),
+            ct);
         return NoContent();
     }
 
