@@ -42,4 +42,7 @@ public sealed class DuesItem : Entity<Guid>
 
     /// <summary>Marks this item paid. Idempotent.</summary>
     internal void MarkPaid() => Status = BillingItemStatus.Paid;
+
+    /// <summary>Sets a new amount on this item (used when correcting a period's rate).</summary>
+    internal void ChangeAmount(Money amount) => Amount = amount;
 }

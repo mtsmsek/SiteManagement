@@ -122,6 +122,15 @@
             <span class="debt-value">{{ debt.totalOutstanding | number: '1.2-2' }} ₺</span>
           </div>
         </div>
+        @if (hasCredit(debt.totalCredit)) {
+          <div class="debt-tile credit">
+            <mat-icon>savings</mat-icon>
+            <div class="debt-text">
+              <span class="debt-label">{{ 'billing.debt.credit' | translate }}</span>
+              <span class="debt-value">{{ debt.totalCredit | number: '1.2-2' }} ₺</span>
+            </div>
+          </div>
+        }
       </div>
     }
 
@@ -165,6 +174,12 @@
                 }
 
                 <div class="period-actions">
+                  @if (!period.isClosed) {
+                    <button matButton (click)="editDuesAmount(period)">
+                      <mat-icon>edit</mat-icon>
+                      {{ 'billing.actions.editAmount' | translate }}
+                    </button>
+                  }
                   @if (!period.isClosed && !hasItems(period)) {
                     <button matButton="filled" (click)="distributeDues(period)">
                       <mat-icon>call_split</mat-icon>
@@ -262,6 +277,12 @@
                 }
 
                 <div class="period-actions">
+                  @if (!period.isClosed) {
+                    <button matButton (click)="editUtilityAmount(period)">
+                      <mat-icon>edit</mat-icon>
+                      {{ 'billing.actions.editAmount' | translate }}
+                    </button>
+                  }
                   @if (!period.isClosed && !hasItems(period)) {
                     <button matButton="filled" (click)="distributeUtility(period)">
                       <mat-icon>call_split</mat-icon>

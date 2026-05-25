@@ -17,6 +17,12 @@ public sealed record OpenUtilityBillRequest(
     UtilityType UtilityType,
     decimal TotalAmount);
 
+/// <summary>Request body for <c>PUT /api/dues/{id}</c> — corrects the per-apartment amount.</summary>
+public sealed record ChangeDuesAmountRequest(decimal PerApartmentAmount);
+
+/// <summary>Request body for <c>PUT /api/utility-bills/{id}</c> — corrects the invoice total.</summary>
+public sealed record ChangeUtilityBillAmountRequest(decimal TotalAmount);
+
 /// <summary>
 /// Card details for paying a billing item by card. The amount is taken from the
 /// item server-side; the card is passed straight to the payment gateway and

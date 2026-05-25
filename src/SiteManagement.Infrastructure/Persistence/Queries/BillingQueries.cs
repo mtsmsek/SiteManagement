@@ -98,20 +98,30 @@ public sealed class BillingQueries(AppDbContext dbContext) : IBillingQueries
         var duesItems = await _dbContext.DuesPeriods
             .AsNoTracking()
             .Where(p => p.SiteId == siteId)
-            .SelectMany(p => p.Items.Select(i => new { i.Amount.Amount, i.Status }))
+            .SelectMany(p => p.Items.Select(i => new { i.Amount.Amount, i.Status, i.ResidentId }))
             .ToListAsync(ct);
 
         var utilityItems = await _dbContext.UtilityBillPeriods
             .AsNoTracking()
             .Where(p => p.SiteId == siteId)
-            .SelectMany(p => p.Items.Select(i => new { i.Amount.Amount, i.Status }))
+            .SelectMany(p => p.Items.Select(i => new { i.Amount.Amount, i.Status, i.ResidentId }))
             .ToListAsync(ct);
 
         var all = duesItems.Concat(utilityItems).ToList();
         var accrued = all.Sum(i => i.Amount);
         var collected = all.Where(i => i.Status == BillingItemStatus.Paid).Sum(i => i.Amount);
 
-        return new SiteDebtSummaryDto(siteId, accrued, collected, accrued - collected);
+        // Credit the site owes back: the balances of residents who appear in this
+        // site's billing — the only way to scope per-resident accounts to a site.
+        var residentIds = all.Select(i => i.ResidentId).Distinct().ToList();
+        var balances = await _dbContext.ResidentCreditAccounts
+            .AsNoTracking()
+            .Where(a => residentIds.Contains(a.ResidentId))
+            .Select(a => a.Balance)
+            .ToListAsync(ct);
+        var credit = balances.Sum(b => b.Amount);
+
+        return new SiteDebtSummaryDto(siteId, accrued, collected, accrued - collected, credit);
     }
 
     /// <summary>

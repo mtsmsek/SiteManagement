@@ -34,6 +34,7 @@ describe('BillingStore', () => {
     totalAccrued: 800,
     totalCollected: 0,
     totalOutstanding: 800,
+    totalCredit: 0,
   };
   const item: PeriodItem = {
     itemId: 'item-1',

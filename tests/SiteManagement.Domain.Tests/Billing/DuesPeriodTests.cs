@@ -143,4 +143,72 @@ public class DuesPeriodTests
         // assert
         act.Should().Throw<BillingItemNotFoundException>();
     }
+
+    [Fact]
+    public void ChangePerApartmentAmount_ResetsUnpaidItemsToNewAmount()
+    {
+        // arrange — two unpaid items at 750
+        var period = OpenPeriod();
+        period.AddItemFor(Guid.NewGuid(), Guid.NewGuid());
+        period.AddItemFor(Guid.NewGuid(), Guid.NewGuid());
+
+        // act — correct the per-apartment amount down to 100
+        period.ChangePerApartmentAmount(Money.Of(100m));
+
+        // assert — the period rate and every unpaid item follow
+        period.PerApartmentAmount.Should().Be(Money.Of(100m));
+        period.Items.Should().OnlyContain(i => i.Amount == Money.Of(100m));
+    }
+
+    [Fact]
+    public void ChangePerApartmentAmount_CreditsTheDifferenceOnPaidItems()
+    {
+        // arrange — one paid item at 750, one still unpaid
+        var period = OpenPeriod();
+        var paidResident = Guid.NewGuid();
+        period.AddItemFor(Guid.NewGuid(), paidResident);
+        period.AddItemFor(Guid.NewGuid(), Guid.NewGuid());
+        var paidItemId = period.Items.First().Id;
+        period.MarkItemPaid(paidItemId);
+
+        // act — drop the amount to 100; the paid resident over-paid by 650
+        var credits = period.ChangePerApartmentAmount(Money.Of(100m));
+
+        // assert — a single credit for the paid resident, item stays Paid at the new amount
+        credits.Should().ContainSingle()
+            .Which.Should().Match<OverpaymentCredit>(c =>
+                c.ResidentId == paidResident && c.Amount == Money.Of(650m));
+        var paidItem = period.Items.Single(i => i.Id == paidItemId);
+        paidItem.Status.Should().Be(BillingItemStatus.Paid);
+        paidItem.Amount.Should().Be(Money.Of(100m));
+    }
+
+    [Fact]
+    public void ChangePerApartmentAmount_RaisingAmount_CreditsNothing()
+    {
+        // arrange — a paid item at 750
+        var period = OpenPeriod();
+        period.AddItemFor(Guid.NewGuid(), Guid.NewGuid());
+        period.MarkItemPaid(period.Items.Single().Id);
+
+        // act — raise the amount; an under-charge is not credited back
+        var credits = period.ChangePerApartmentAmount(Money.Of(900m));
+
+        // assert
+        credits.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void ChangePerApartmentAmount_AfterClose_Throws()
+    {
+        // arrange
+        var period = OpenPeriod();
+        period.Close();
+
+        // act
+        var act = () => period.ChangePerApartmentAmount(Money.Of(100m));
+
+        // assert
+        act.Should().Throw<PeriodAlreadyClosedException>();
+    }
 }

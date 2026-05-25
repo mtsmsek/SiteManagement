@@ -2,6 +2,7 @@ using FluentAssertions;
 using NSubstitute;
 using SiteManagement.Application.Abstractions.Persistence;
 using SiteManagement.Application.Billing.Commands.DistributeUtilityBill;
+using SiteManagement.Application.Billing.Services;
 using SiteManagement.Application.Shared.Exceptions;
 using SiteManagement.Application.Tenancy.Queries;
 using SiteManagement.Domain.Billing;
@@ -13,12 +14,13 @@ namespace SiteManagement.Application.Tests.Billing;
 /// <summary>
 /// Unit tests for <see cref="DistributeUtilityBillCommandHandler"/>: resolve the
 /// site's occupants, split the total across them, register the brand-new items
-/// with the tracker, and save.
+/// with the tracker, settle any covered by credit, and save.
 /// </summary>
 public class DistributeUtilityBillCommandHandlerTests
 {
     private readonly IUtilityBillPeriodRepository _utilityBillPeriodRepository = Substitute.For<IUtilityBillPeriodRepository>();
     private readonly ITenancyQueries _tenancyQueries = Substitute.For<ITenancyQueries>();
+    private readonly IResidentCreditService _creditService = Substitute.For<IResidentCreditService>();
     private readonly IUnitOfWork _unitOfWork = Substitute.For<IUnitOfWork>();
 
     [Fact]
@@ -61,5 +63,5 @@ public class DistributeUtilityBillCommandHandlerTests
     }
 
     private DistributeUtilityBillCommandHandler CreateHandler()
-        => new(_utilityBillPeriodRepository, _tenancyQueries, _unitOfWork);
+        => new(_utilityBillPeriodRepository, _tenancyQueries, _creditService, _unitOfWork);
 }

@@ -105,6 +105,44 @@ public sealed class UtilityBillPeriod : AggregateRoot<Guid>
         item.MarkPaid();
     }
 
+    /// <summary>
+    /// Corrects the invoice total on an open period and re-splits it equally
+    /// across the already-distributed items (the rounding remainder still folds
+    /// into the last share, so they sum back to the new total). A paid item
+    /// follows the new share too, but if its share dropped, the resident
+    /// over-paid: the difference comes back as an <see cref="OverpaymentCredit"/>
+    /// (no cash refund). If the period was never distributed, only the total is
+    /// updated.
+    /// </summary>
+    /// <returns>The over-payments to credit back, one per re-rated paid item.</returns>
+    /// <exception cref="PeriodAlreadyClosedException">Thrown when the period is closed.</exception>
+    public IReadOnlyList<OverpaymentCredit> ChangeTotalAmount(Money newTotal)
+    {
+        EnsureOpen();
+
+        TotalAmount = newTotal;
+        if (_items.Count == 0)
+        {
+            return [];
+        }
+
+        var shares = newTotal.DistributeEqually(_items.Count);
+        var credits = new List<OverpaymentCredit>();
+        for (var i = 0; i < _items.Count; i++)
+        {
+            var item = _items[i];
+            var newShare = shares[i];
+            if (item.Status == BillingItemStatus.Paid && item.Amount.Amount > newShare.Amount)
+            {
+                credits.Add(new OverpaymentCredit(item.ResidentId, item.Amount.Subtract(newShare)));
+            }
+
+            item.ChangeAmount(newShare);
+        }
+
+        return credits;
+    }
+
     private void EnsureOpen()
     {
         if (IsClosed)

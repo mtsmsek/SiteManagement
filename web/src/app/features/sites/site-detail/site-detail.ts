@@ -35,6 +35,10 @@ import {
   CardPaymentDialog,
   CardPaymentDialogData,
 } from '../../billing/card-payment-dialog/card-payment-dialog';
+import {
+  AmountEditDialog,
+  AmountEditDialogData,
+} from '../../billing/amount-edit-dialog/amount-edit-dialog';
 import { ConfirmDialog, ConfirmDialogData } from '../../../shared/confirm-dialog/confirm-dialog';
 import type { PayByCardRequest } from '../../../core/api/api.models';
 import {
@@ -187,6 +191,11 @@ export class SiteDetail implements OnInit {
     return Number(period.itemCount) > 0;
   }
 
+  /** True when the site owes residents any credit (the value may arrive as a string). */
+  hasCredit(credit: number | string): boolean {
+    return Number(credit) > 0;
+  }
+
   /** Paid-to-total ratio of a period as a 0-100 percentage for the progress bar. */
   paidRatio(paid: number | string, total: number | string): number {
     const totalCount = Number(total);
@@ -239,6 +248,19 @@ export class SiteDetail implements OnInit {
     void this.billing.closeDues(this.siteId(), period.id);
   }
 
+  /** Opens the amount dialog for a dues period and applies the correction. */
+  async editDuesAmount(period: DuesPeriodListItem): Promise<void> {
+    const amount = await this.collectAmount({
+      titleKey: 'billing.amountEdit.duesTitle',
+      labelKey: 'billing.dues.perApartment',
+      hintKey: 'billing.amountEdit.hint',
+      currentAmount: period.perApartmentAmount,
+    });
+    if (amount != null) {
+      await this.billing.changeDuesAmount(this.siteId(), period.id, amount);
+    }
+  }
+
   /** Distributes a utility period and reveals the resulting items right away. */
   async distributeUtility(period: UtilityBillPeriodListItem): Promise<void> {
     await this.billing.distributeUtility(this.siteId(), period.id);
@@ -247,6 +269,28 @@ export class SiteDetail implements OnInit {
 
   closeUtility(period: UtilityBillPeriodListItem): void {
     void this.billing.closeUtility(this.siteId(), period.id);
+  }
+
+  /** Opens the amount dialog for a utility period and applies the correction. */
+  async editUtilityAmount(period: UtilityBillPeriodListItem): Promise<void> {
+    const amount = await this.collectAmount({
+      titleKey: 'billing.amountEdit.utilityTitle',
+      labelKey: 'billing.utility.total',
+      hintKey: 'billing.amountEdit.hint',
+      currentAmount: period.totalAmount,
+    });
+    if (amount != null) {
+      await this.billing.changeUtilityAmount(this.siteId(), period.id, amount);
+    }
+  }
+
+  /** Opens the amount-edit dialog and resolves to the entered amount, or undefined if cancelled. */
+  private collectAmount(data: AmountEditDialogData): Promise<number | undefined> {
+    return firstValueFrom(
+      this.dialog
+        .open<AmountEditDialog, AmountEditDialogData, number>(AmountEditDialog, { width: '420px', data })
+        .afterClosed(),
+    );
   }
 
   async payDuesItem(period: DuesPeriodListItem, item: PeriodItem): Promise<void> {

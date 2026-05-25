@@ -2,6 +2,8 @@ import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../../core/api/api-client';
 import type {
+  ChangeDuesAmountRequest,
+  ChangeUtilityBillAmountRequest,
   DuesPeriodListItem,
   OpenDuesPeriodRequest,
   OpenDuesPeriodResponse,
@@ -46,6 +48,10 @@ export class BillingApi {
     return this.api.post<OpenDuesPeriodResponse>('/dues', body);
   }
 
+  changeDuesAmount(duesPeriodId: string, body: ChangeDuesAmountRequest): Observable<void> {
+    return this.api.put<void>(`/dues/${duesPeriodId}`, body);
+  }
+
   distributeDues(duesPeriodId: string): Observable<void> {
     return this.api.post<void>(`/dues/${duesPeriodId}/distribute`);
   }
@@ -56,6 +62,13 @@ export class BillingApi {
 
   openUtility(body: OpenUtilityBillRequest): Observable<OpenUtilityBillResponse> {
     return this.api.post<OpenUtilityBillResponse>('/utility-bills', body);
+  }
+
+  changeUtilityAmount(
+    utilityBillPeriodId: string,
+    body: ChangeUtilityBillAmountRequest,
+  ): Observable<void> {
+    return this.api.put<void>(`/utility-bills/${utilityBillPeriodId}`, body);
   }
 
   distributeUtility(utilityBillPeriodId: string): Observable<void> {

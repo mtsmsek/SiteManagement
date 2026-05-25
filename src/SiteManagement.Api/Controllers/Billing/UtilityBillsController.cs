@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SiteManagement.Api.Configuration;
+using SiteManagement.Application.Billing.Commands.ChangeUtilityBillAmount;
 using SiteManagement.Application.Billing.Commands.CloseUtilityBillPeriod;
 using SiteManagement.Application.Billing.Commands.DistributeUtilityBill;
 using SiteManagement.Application.Billing.Commands.MarkUtilityBillItemPaid;
@@ -24,6 +25,7 @@ namespace SiteManagement.Api.Controllers.Billing;
 [Route($"{ApiConstants.RoutePrefix}/utility-bills")]
 public class UtilityBillsController(ISender sender) : ControllerBase
 {
+    private const string ChangeAmountRoute = "{utilityBillPeriodId:guid}";
     private const string DistributeRoute = "{utilityBillPeriodId:guid}/distribute";
     private const string CloseRoute = "{utilityBillPeriodId:guid}/close";
     private const string ItemsRoute = "{utilityBillPeriodId:guid}/items";
@@ -47,6 +49,21 @@ public class UtilityBillsController(ISender sender) : ControllerBase
             new OpenUtilityBillPeriodCommand(body.SiteId, body.Year, body.Month, body.UtilityType, body.TotalAmount), ct);
 
         return StatusCode(StatusCodes.Status201Created, result);
+    }
+
+    /// <summary>Corrects an open utility bill period's total, re-splitting it across the items.</summary>
+    [HttpPut(ChangeAmountRoute)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> ChangeAmount(
+        Guid utilityBillPeriodId,
+        [FromBody] ChangeUtilityBillAmountRequest body,
+        CancellationToken ct)
+    {
+        await _sender.Send(new ChangeUtilityBillAmountCommand(utilityBillPeriodId, body.TotalAmount), ct);
+        return NoContent();
     }
 
     /// <summary>Distributes the total across every occupied apartment in the period's site.</summary>

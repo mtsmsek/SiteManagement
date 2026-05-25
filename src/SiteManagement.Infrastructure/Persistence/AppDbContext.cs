@@ -36,6 +36,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
     /// <summary>Billing — utility bill period root set.</summary>
     public DbSet<UtilityBillPeriod> UtilityBillPeriods => Set<UtilityBillPeriod>();
 
+    /// <summary>Billing — per-resident credit balances (over-payment held for a future bill).</summary>
+    public DbSet<ResidentCreditAccount> ResidentCreditAccounts => Set<ResidentCreditAccount>();
+
     /// <summary>Outbox — integration events awaiting after-commit delivery.</summary>
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();
 

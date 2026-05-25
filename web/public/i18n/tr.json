@@ -168,6 +168,7 @@
       "tab": "Fatura",
       "openTitle": "Fatura Dönemi Aç",
       "open": "Dönem Aç",
+      "total": "toplam tutar",
       "empty": "Henüz fatura dönemi yok."
     },
     "utilityType": {
@@ -178,9 +179,16 @@
     "actions": {
       "distribute": "Dağıt",
       "close": "Kapat",
+      "editAmount": "Tutarı Düzenle",
       "showItems": "Kalemler",
       "hideItems": "Gizle",
       "markPaid": "Ödendi"
+    },
+    "amountEdit": {
+      "duesTitle": "Aidat Tutarını Düzelt",
+      "utilityTitle": "Fatura Tutarını Düzelt",
+      "hint": "Yeni tutar ödenmemiş kalemlere uygulanır. Fazla ödenen kalemler için fark, sakine alacak olarak yazılır ve bir sonraki dağıtımda otomatik düşülür.",
+      "invalid": "Tutar 0'dan büyük olmalı."
     },
     "status": {
       "open": "Açık",
@@ -197,7 +205,8 @@
     "debt": {
       "accrued": "Tahakkuk",
       "collected": "Tahsil",
-      "outstanding": "Bakiye"
+      "outstanding": "Bakiye",
+      "credit": "Alacak"
     }
   },
   "payment": {

@@ -46,6 +46,11 @@ public static class DependencyInjection
 
         services.AddValidatorsFromAssembly(assembly, includeInternalTypes: false);
 
+        // Billing orchestration that spans more than one aggregate but isn't a
+        // request handler itself (shared by the dues + utility amount-change and
+        // distribute handlers).
+        services.AddScoped<Billing.Services.IResidentCreditService, Billing.Services.ResidentCreditService>();
+
         return services;
     }
 }

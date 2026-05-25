@@ -2,6 +2,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SiteManagement.Api.Configuration;
+using SiteManagement.Application.Billing.Commands.ChangeDuesAmount;
 using SiteManagement.Application.Billing.Commands.CloseDuesPeriod;
 using SiteManagement.Application.Billing.Commands.DistributeDues;
 using SiteManagement.Application.Billing.Commands.MarkDuesItemPaid;
@@ -25,6 +26,7 @@ namespace SiteManagement.Api.Controllers.Billing;
 [Route($"{ApiConstants.RoutePrefix}/dues")]
 public class DuesController(ISender sender) : ControllerBase
 {
+    private const string ChangeAmountRoute = "{duesPeriodId:guid}";
     private const string DistributeRoute = "{duesPeriodId:guid}/distribute";
     private const string CloseRoute = "{duesPeriodId:guid}/close";
     private const string ItemsRoute = "{duesPeriodId:guid}/items";
@@ -49,6 +51,21 @@ public class DuesController(ISender sender) : ControllerBase
             new OpenDuesPeriodCommand(body.SiteId, body.Year, body.Month, body.PerApartmentAmount), ct);
 
         return StatusCode(StatusCodes.Status201Created, result);
+    }
+
+    /// <summary>Corrects an open dues period's per-apartment amount, re-rating its items.</summary>
+    [HttpPut(ChangeAmountRoute)]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict)]
+    public async Task<IActionResult> ChangeAmount(
+        Guid duesPeriodId,
+        [FromBody] ChangeDuesAmountRequest body,
+        CancellationToken ct)
+    {
+        await _sender.Send(new ChangeDuesAmountCommand(duesPeriodId, body.PerApartmentAmount), ct);
+        return NoContent();
     }
 
     /// <summary>Distributes dues items to every occupied apartment in the period's site.</summary>

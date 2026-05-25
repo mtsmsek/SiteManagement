@@ -94,6 +94,20 @@
       color: var(--mat-sys-on-error-container);
     }
   }
+
+  // Credit owed back to residents — a positive balance in their favour.
+  &.credit {
+    background: var(--mat-sys-tertiary-container);
+
+    > mat-icon {
+      background: var(--mat-sys-tertiary);
+      color: var(--mat-sys-on-tertiary);
+    }
+
+    .debt-value {
+      color: var(--mat-sys-on-tertiary-container);
+    }
+  }
 }
 
 .tab-actions {

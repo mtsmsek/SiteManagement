@@ -41,4 +41,7 @@ public sealed class UtilityBillItem : Entity<Guid>
 
     /// <summary>Marks this item paid.</summary>
     internal void MarkPaid() => Status = BillingItemStatus.Paid;
+
+    /// <summary>Sets a new share on this item (used when re-splitting a corrected total).</summary>
+    internal void ChangeAmount(Money amount) => Amount = amount;
 }

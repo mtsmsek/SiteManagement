@@ -46,6 +46,8 @@ export type OpenDuesPeriodResponse = Schemas['OpenDuesPeriodResult'];
 export type OpenUtilityBillRequest = Schemas['OpenUtilityBillRequest'];
 export type OpenUtilityBillResponse = Schemas['OpenUtilityBillPeriodResult'];
 export type PayByCardRequest = Schemas['PayByCardRequest'];
+export type ChangeDuesAmountRequest = Schemas['ChangeDuesAmountRequest'];
+export type ChangeUtilityBillAmountRequest = Schemas['ChangeUtilityBillAmountRequest'];
 
 // Shared
 export type ProblemDetails = Schemas['ProblemDetails'];

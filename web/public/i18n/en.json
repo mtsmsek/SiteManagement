@@ -168,6 +168,7 @@
       "tab": "Utility",
       "openTitle": "Open Utility Bill Period",
       "open": "Open Period",
+      "total": "total amount",
       "empty": "No utility bill periods yet."
     },
     "utilityType": {
@@ -178,9 +179,16 @@
     "actions": {
       "distribute": "Distribute",
       "close": "Close",
+      "editAmount": "Edit Amount",
       "showItems": "Items",
       "hideItems": "Hide",
       "markPaid": "Mark Paid"
+    },
+    "amountEdit": {
+      "duesTitle": "Correct Dues Amount",
+      "utilityTitle": "Correct Bill Total",
+      "hint": "The new amount is applied to unpaid items. For over-paid items the difference is credited to the resident and applied automatically to their next bill.",
+      "invalid": "Amount must be greater than 0."
     },
     "status": {
       "open": "Open",
@@ -197,7 +205,8 @@
     "debt": {
       "accrued": "Accrued",
       "collected": "Collected",
-      "outstanding": "Outstanding"
+      "outstanding": "Outstanding",
+      "credit": "Credit"
     }
   },
   "payment": {

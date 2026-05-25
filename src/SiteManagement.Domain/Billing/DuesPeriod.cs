@@ -93,6 +93,35 @@ public sealed class DuesPeriod : AggregateRoot<Guid>
         item.MarkPaid();
     }
 
+    /// <summary>
+    /// Corrects the per-apartment amount on an open period and re-rates every
+    /// item to it. Unpaid items simply follow the new rate. A paid item also
+    /// follows the new rate, but if the amount dropped, the resident over-paid:
+    /// the difference is returned as an <see cref="OverpaymentCredit"/> so the
+    /// application can credit it back (no cash refund). Raising the amount
+    /// credits nothing — there is no mechanism to re-charge a settled item here.
+    /// </summary>
+    /// <returns>The over-payments to credit back, one per re-rated paid item.</returns>
+    /// <exception cref="PeriodAlreadyClosedException">Thrown when the period is closed.</exception>
+    public IReadOnlyList<OverpaymentCredit> ChangePerApartmentAmount(Money newAmount)
+    {
+        EnsureOpen();
+
+        var credits = new List<OverpaymentCredit>();
+        foreach (var item in _items)
+        {
+            if (item.Status == BillingItemStatus.Paid && item.Amount.Amount > newAmount.Amount)
+            {
+                credits.Add(new OverpaymentCredit(item.ResidentId, item.Amount.Subtract(newAmount)));
+            }
+
+            item.ChangeAmount(newAmount);
+        }
+
+        PerApartmentAmount = newAmount;
+        return credits;
+    }
+
     private void EnsureOpen()
     {
         if (IsClosed)

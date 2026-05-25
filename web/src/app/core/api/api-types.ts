@@ -1055,6 +1055,81 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/dues/{duesPeriodId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Corrects an open dues period's per-apartment amount, re-rating its items. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    duesPeriodId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ChangeDuesAmountRequest"];
+                    "text/json": components["schemas"]["ChangeDuesAmountRequest"];
+                    "application/*+json": components["schemas"]["ChangeDuesAmountRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/dues/{duesPeriodId}/distribute": {
         parameters: {
             query?: never;
@@ -1481,6 +1556,81 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/utility-bills/{utilityBillPeriodId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Corrects an open utility bill period's total, re-splitting it across the items. */
+        put: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    utilityBillPeriodId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["ChangeUtilityBillAmountRequest"];
+                    "text/json": components["schemas"]["ChangeUtilityBillAmountRequest"];
+                    "application/*+json": components["schemas"]["ChangeUtilityBillAmountRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Bad Request */
+                400: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+                /** @description Conflict */
+                409: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/utility-bills/{utilityBillPeriodId}/distribute": {
         parameters: {
             query?: never;
@@ -1625,6 +1775,71 @@ export interface paths {
                         [name: string]: unknown;
                     };
                     content?: never;
+                };
+                /** @description Not Found */
+                404: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
+                };
+            };
+        };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/utility-bills/{utilityBillPeriodId}/items/{itemId}/pay-by-card": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pays one utility bill item by credit card via the payment gateway. */
+        post: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path: {
+                    utilityBillPeriodId: string;
+                    itemId: string;
+                };
+                cookie?: never;
+            };
+            requestBody: {
+                content: {
+                    "application/json": components["schemas"]["PayByCardRequest"];
+                    "text/json": components["schemas"]["PayByCardRequest"];
+                    "application/*+json": components["schemas"]["PayByCardRequest"];
+                };
+            };
+            responses: {
+                /** @description No Content */
+                204: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content?: never;
+                };
+                /** @description Payment Required */
+                402: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ProblemDetails"];
+                        "application/json": components["schemas"]["ProblemDetails"];
+                        "text/json": components["schemas"]["ProblemDetails"];
+                    };
                 };
                 /** @description Not Found */
                 404: {
@@ -2125,6 +2340,16 @@ export interface components {
             name: string;
             apartments: components["schemas"]["ApartmentSummaryDto"][];
         };
+        /** @description Request body for `PUT /api/dues/{id}` — corrects the per-apartment amount. */
+        ChangeDuesAmountRequest: {
+            /** Format: double */
+            perApartmentAmount: number | string;
+        };
+        /** @description Request body for `PUT /api/utility-bills/{id}` — corrects the invoice total. */
+        ChangeUtilityBillAmountRequest: {
+            /** Format: double */
+            totalAmount: number | string;
+        };
         /** @description Request body for `POST /api/sites`. */
         CreateSiteRequest: {
             name: string;
@@ -2293,6 +2518,8 @@ export interface components {
             totalCollected: number | string;
             /** Format: double */
             totalOutstanding: number | string;
+            /** Format: double */
+            totalCredit: number | string;
         };
         SiteDetailsDto: {
             /** Format: uuid */

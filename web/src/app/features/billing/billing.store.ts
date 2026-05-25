@@ -83,6 +83,16 @@ export class BillingStore {
     ]);
   }
 
+  /** Corrects a dues period's per-apartment amount, then refreshes its items and totals. */
+  async changeDuesAmount(siteId: string, duesPeriodId: string, perApartmentAmount: number): Promise<void> {
+    await firstValueFrom(this.api.changeDuesAmount(duesPeriodId, { perApartmentAmount }));
+    await Promise.all([
+      this.loadDuesItems(duesPeriodId),
+      this.refreshDuesPeriods(siteId),
+      this.refreshDebtSummary(siteId),
+    ]);
+  }
+
   /** Closes a dues period, then refreshes the site billing. */
   async closeDues(siteId: string, duesPeriodId: string): Promise<void> {
     await firstValueFrom(this.api.closeDues(duesPeriodId));
@@ -104,6 +114,16 @@ export class BillingStore {
   /** Distributes a utility bill period, then refreshes its items, the period list and the debt summary. */
   async distributeUtility(siteId: string, utilityBillPeriodId: string): Promise<void> {
     await firstValueFrom(this.api.distributeUtility(utilityBillPeriodId));
+    await Promise.all([
+      this.loadUtilityItems(utilityBillPeriodId),
+      this.refreshUtilityPeriods(siteId),
+      this.refreshDebtSummary(siteId),
+    ]);
+  }
+
+  /** Corrects a utility bill period's total, then refreshes its items and totals. */
+  async changeUtilityAmount(siteId: string, utilityBillPeriodId: string, totalAmount: number): Promise<void> {
+    await firstValueFrom(this.api.changeUtilityAmount(utilityBillPeriodId, { totalAmount }));
     await Promise.all([
       this.loadUtilityItems(utilityBillPeriodId),
       this.refreshUtilityPeriods(siteId),

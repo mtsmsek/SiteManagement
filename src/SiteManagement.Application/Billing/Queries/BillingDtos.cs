@@ -44,8 +44,13 @@ public sealed record ResidentBillDto(
     string Status);
 
 /// <summary>Per-site accrued-vs-collected summary across all periods.</summary>
+/// <param name="TotalCredit">
+/// Sum of credit the site owes its residents back from corrected over-charges,
+/// waiting to be applied to a future bill (held, not refunded).
+/// </param>
 public sealed record SiteDebtSummaryDto(
     Guid SiteId,
     decimal TotalAccrued,
     decimal TotalCollected,
-    decimal TotalOutstanding);
+    decimal TotalOutstanding,
+    decimal TotalCredit);

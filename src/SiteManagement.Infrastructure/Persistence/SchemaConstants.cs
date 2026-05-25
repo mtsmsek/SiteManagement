@@ -25,6 +25,7 @@ public static class SchemaConstants
         public const string DuesItems = "DuesItems";
         public const string UtilityBillPeriods = "UtilityBillPeriods";
         public const string UtilityBillItems = "UtilityBillItems";
+        public const string ResidentCreditAccounts = "ResidentCreditAccounts";
 
         // Messaging — after-commit integration event delivery.
         public const string OutboxMessages = "OutboxMessages";
