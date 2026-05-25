@@ -25,8 +25,13 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const isUnauthorized = error.status === 401;
 
       if (!isValidation && !isUnauthorized) {
-        snackBar.open(resolveMessage(error, translate), undefined, {
+        // A failed action needs to stand out: show it at the top in the error
+        // colour (see `.error-snackbar` in styles.scss) with a dismiss action.
+        snackBar.open(resolveMessage(error, translate), translate.instant('common.close'), {
           duration: SNACKBAR_DURATION_MS,
+          panelClass: 'error-snackbar',
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
         });
       }
 

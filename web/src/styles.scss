@@ -156,3 +156,21 @@ body {
     height: 18px;
   }
 }
+
+// Error snackbar: the default surface tone is too quiet for a failed action
+// (e.g. a declined payment), so paint it in the theme's error colour, bump the
+// weight, and lift it with a shadow so it clearly reads as a problem. Applied
+// via `panelClass: 'error-snackbar'` from the HTTP error interceptor.
+.error-snackbar {
+  --mdc-snackbar-container-color: var(--mat-sys-error);
+  --mdc-snackbar-supporting-text-color: var(--mat-sys-on-error);
+  --mat-snack-bar-button-color: var(--mat-sys-on-error);
+
+  .mdc-snackbar__surface {
+    box-shadow: 0 6px 20px rgb(0 0 0 / 35%);
+  }
+
+  .mdc-snackbar__label {
+    font-weight: 500;
+  }
+}
