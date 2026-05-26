@@ -102,10 +102,10 @@ guardrail'leri baştan kapatmak (yeni E2E yığmadan önce).
       lambda'sında **lazy** (`sp.GetRequiredService<IConfiguration>()`) oku. Guardrail:
       `ConnectionStringIsolationTests` — resolved `AppDbContext` fixture container'ını
       kullanıyor. Doğrulandı: E2E sonrası compose admin + demo veri yerinde.
-- [ ] **Hijyen 2 — PaymentService architecture test.** PaymentService solution'ına
-      adanmış katman testi yok; Domain saflığı şu an csproj'da örtük. `PaymentService.ArchitectureTests`
-      (NetArchTest): Domain BCL-only (Mongo/EF/ASP yok), Application → Infra/Api'ye
-      bağlı değil, Infra → Api yok. (Author'ın "konvansiyon ⇒ guardrail" kuralı.)
+- [x] **Hijyen 2 — PaymentService architecture test.** ✅ `PaymentService.ArchitectureTests`
+      (NetArchTest, 4 test): Domain BCL-only (Mongo/EF/ASP yok), Application → Infra/Api'ye
+      bağlı değil, Application → Mongo/ASP yok, Infra → Api yok. slnx'e eklendi; yeşil.
+      Domain saflığı artık örtük değil, açık guardrail. (Author'ın "konvansiyon ⇒ guardrail" kuralı.)
 
 **Commit:** `test(payment): layer-dependency guardrails` + `test(e2e): isolate from compose db` (+ karar notları)
 

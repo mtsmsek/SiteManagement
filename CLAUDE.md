@@ -125,7 +125,8 @@ fine: migrations + bootstrap-admin seed run automatically on `docker compose up`
   `.slnx` and use `-m:1` (e.g. `dotnet test SiteManagement.slnx --nologo -m:1`).
 - Main suites: `SiteManagement.Domain.Tests`, `.Application.Tests` (handler units),
   `.ArchitectureTests` (conventions/guardrails), `.E2E.Tests` (full HTTP flows).
-  PaymentService suites: `PaymentService.Domain.Tests`, `.E2E.Tests`.
+  PaymentService suites: `PaymentService.Domain.Tests`, `.ArchitectureTests`
+  (NetArchTest layer guardrails — Domain BCL-only/no-Mongo etc.), `.E2E.Tests`.
 - **E2E uses Testcontainers → Docker MUST be running** or E2E tests fail with
   "Docker is either not running or misconfigured" (NOT a code bug).
 - **Two-service E2E:** PaymentService.E2E runs the real gateway over Mongo
@@ -160,15 +161,12 @@ no longer drives the surface; custom `ErrorSnackbar` via `openFromComponent`).
 **W4 self-review verdict:** code architecturally sound, no real defects; see
 `WEEK-4-DETAIL.md` Day 7 for the boundary/402/idempotency findings + the three
 deferred items below. **Tests green:** Domain 213, Application 62, Architecture 17,
-E2E 28 (main); PaymentService Domain 46, E2E 4; web (Vitest) 15.
+E2E 29 (main; +1 connection-string isolation guardrail, W5 D1); PaymentService
+Domain 46, Architecture 4 (W5 D1), E2E 4; web (Vitest) 15.
 
 **Pending / next:**
 - **Resident-facing portal (W5, NEXT):** resident login + "my bills" + paying
   **own** item, with **IDOR** protection. All pay endpoints are admin-only until then.
-- **PaymentService architecture test (small follow-up):** the PaymentService
-  solution has no dedicated NetArchTest; Domain purity is currently only implicit
-  (its `.csproj` has zero package refs — no Mongo/EF/ASP). A layer-dependency
-  guardrail there would match the author's "convention ⇒ guardrail test" rule.
 - **Credit partial settlement (deferred to project end):** when credit < the new
   item (e.g. 300 credit vs 400 bill) it is currently **left untouched** (item stays
   Unpaid). Author expects partial consume (apply 300, owe 100) — needs a partial/
