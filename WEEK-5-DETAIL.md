@@ -146,50 +146,43 @@ erişemez.
 
 ---
 
-## Gün 3 — Messaging Domain (TDD)
+## Gün 3 — Messaging Domain (TDD) ✅
 
-**Hedef:** Rich `Conversation` aggregate; admin ↔ sakin mesajlaşma invariant'ları.
+- [x] `Domain/Messaging/Conversation : AggregateRoot` — `{ ResidentId, Subject,
+      Messages[] }`; `Start(...)` (ilk mesajla açılır), `PostMessage(...)` (yeni mesajı
+      döner — MarkAsAdded), `MarkRead(reader, atUtc)` (yalnız **karşı** tarafın
+      mesajlarını okur).
+- [x] `Message` iç entity — `{ SenderUserId, SenderRole, Body, SentAtUtc, ReadAtUtc? }`;
+      `Create` validasyonlu (yalnız Conversation çağırır); `MarkRead` idempotent.
+- [x] `MessagingLimits` (Subject/Body/SenderRole) + exception'lar
+      (`InvalidConversationSubjectException`, `InvalidMessageBodyException`, MessageKey + tr/en resx).
+- [x] **TDD:** `ConversationTests` (9) — start, blank/too-long subject+body, post, read (yalnız karşı taraf), idempotent read.
 
-- [ ] `Domain/Messaging/Conversation : AggregateRoot` — `{ ResidentId, Subject,
-      Messages (iç entity koleksiyonu), CreatedAt }`; `Start(...)`,
-      `PostMessage(senderUserId, senderRole, body)`, `MarkRead(byRole, atUtc)`.
-- [ ] `Message` iç entity / value: `{ Id, SenderUserId, SenderRole, Body, SentAtUtc,
-      ReadAtUtc? }`; body uzunluk limiti `MessagingLimits`.
-- [ ] Invariant'lar: boş body yok; conversation bir resident'a aittir; mesaj
-      sırası zaman damgalı.
-- [ ] Exceptions: `EmptyMessageException` / `MessageTooLongException` (+ MessageKey,
-      tr/en resx).
-- [ ] **TDD:** `ConversationTests` (start, post, read, invariant'lar), limit'ler.
-
-**Commit:** `feat(messaging): conversation aggregate (TDD)`
+**Commit:** `539a145` — Domain 222 (+9) yeşil.
 
 ---
 
-## Gün 4 — Messaging Application + Infrastructure + API
+## Gün 4 — Messaging Application + Infrastructure + API ✅
 
-**Hedef:** Mesajlaşma uçtan uca; hem admin hem resident tarafı.
+> **Tasarım:** Gün 2'deki authz deseni Messaging'e taşındı. Resident conversation
+> erişimi yeni `ConversationOwnershipBehavior` + `IOwnedConversationRequest` ile
+> (bill-item ownership'in birebir aynısı) — handler'larda authz yok. Komutlar
+> admin/resident ayrı (rol marker'ı net). Reply'da yeni mesaj `MarkAsAdded` ile.
 
-**Application (CQRS-lite):**
-- [ ] Commands: `StartConversationCommand` (admin veya resident başlatabilir —
-      karara göre), `PostMessageCommand`, `MarkConversationReadCommand`
-      (+ her biri için FluentValidation validator).
-- [ ] Queries (`IMessagingQueries`): admin → tüm conversation'lar; resident →
-      **yalnız kendi** conversation'ları; mesaj listesi; **unread count**.
-- [ ] DTO'lar (projection, domain entity dönmez).
+- [x] **Application:** komutlar — admin: `StartConversation`/`ReplyToConversation`/`MarkConversationRead`;
+      resident: `StartMyConversation`/`ReplyToMyConversation`/`MarkMyConversationRead` (+ validator'lar).
+      Query'ler: admin inbox + thread; resident kendi inbox + thread; **per-side unread**
+      (`IMessagingQueries`). DTO projeksiyon.
+- [x] **Infrastructure:** EF config (owned `Messages` tablosu, ResidentId +
+      (ConversationId,SentAtUtc) index) + migration (`AddMessagingConversations`) +
+      `ConversationRepository` + `MessagingQueries`.
+- [x] **API:** admin `/api/conversations*` (`[Authorize(Roles=Admin)]`) + resident
+      `/api/me/conversations*` (token-scoped, ownership behavior'la IDOR-safe).
+- [x] **E2E:** `MessagingFlowTests` — admin açar → sakin unread görür → okur + cevaplar
+      → admin görür; sakin başkasının conversation'ına erişemez (403).
 
-**Infrastructure:**
-- [ ] EF Core config + migration (conversation + message tabloları); index'ler
-      (ResidentId, CreatedAt).
-- [ ] Repository + query implementasyonu (cross-context'e dikkat — W3'teki
-      translatable-LINQ dersi).
-
-**API:**
-- [ ] Admin: `GET/POST /api/conversations*` (`[Authorize(Roles=Admin)]`).
-- [ ] Resident: `GET/POST /api/me/conversations*` (token-scoped, IDOR-safe).
-- [ ] **E2E:** admin sakine yazar → sakin görür + cevaplar → admin görür; sakin
-      başkasının conversation'ına erişemez (IDOR).
-
-**Commit:** `feat(messaging): app + infra + api (admin & resident, IDOR-safe)`
+**Commits:** `82357ae` (persistence + migration) · `9f861e0` (app + api + e2e).
+**Tests:** Domain 222, Application 81, Architecture 18, E2E 34 — yeşil.
 
 ---
 
