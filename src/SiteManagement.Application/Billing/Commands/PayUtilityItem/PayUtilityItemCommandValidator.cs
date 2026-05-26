@@ -14,7 +14,7 @@ public sealed class PayUtilityItemCommandValidator : AbstractValidator<PayUtilit
     {
         RuleFor(x => x.UtilityBillPeriodId).ValidId();
         RuleFor(x => x.ItemId).ValidId();
-        RuleFor(x => x.CardNumber).NotEmpty().WithMessage(ValidationMessages.Required);
-        RuleFor(x => x.Cvv).NotEmpty().WithMessage(ValidationMessages.Required);
+        RuleFor(x => x.CardNumber).ValidCardNumber();
+        RuleFor(x => x.Cvv).ValidCvv();
     }
 }

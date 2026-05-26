@@ -12,8 +12,8 @@ namespace SiteManagement.Infrastructure.Persistence.Queries;
 /// </summary>
 public sealed class BillingQueries(AppDbContext dbContext) : IBillingQueries
 {
-    private const string DuesKind = "Dues";
-    private const string UtilityKind = "Utility";
+    private const string DuesKind = BillingItemKinds.Dues;
+    private const string UtilityKind = BillingItemKinds.Utility;
 
     private readonly AppDbContext _dbContext = dbContext;
 

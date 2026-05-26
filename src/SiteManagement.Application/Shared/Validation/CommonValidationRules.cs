@@ -98,6 +98,22 @@ public static class CommonValidationRules
         => ruleBuilder.GreaterThan(decimal.Zero).WithMessage(ValidationMessages.AmountNotPositive);
 
     /// <summary>
+    /// Required card number — surface-level presence only. Deep validity (Luhn,
+    /// length, network) is the payment gateway's job, so the API fails fast on an
+    /// empty field and lets the gateway reject a malformed PAN. Shared by every
+    /// pay path (admin dues/utility + resident self-service).
+    /// </summary>
+    public static IRuleBuilderOptions<T, string> ValidCardNumber<T>(this IRuleBuilder<T, string> ruleBuilder)
+        => ruleBuilder.NotEmpty().WithMessage(ValidationMessages.Required);
+
+    /// <summary>
+    /// Required card CVV — surface-level presence only; the gateway validates the
+    /// real shape. Shared by every pay path.
+    /// </summary>
+    public static IRuleBuilderOptions<T, string> ValidCvv<T>(this IRuleBuilder<T, string> ruleBuilder)
+        => ruleBuilder.NotEmpty().WithMessage(ValidationMessages.Required);
+
+    /// <summary>
     /// Required Turkish citizenship number — surface-level check only
     /// (non-empty, exactly <see cref="ResidencyLimits.TcNoLength"/> digits).
     /// The checksum validation lives on the <c>TcNo</c> value object.

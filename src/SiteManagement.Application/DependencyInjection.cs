@@ -33,15 +33,17 @@ public static class DependencyInjection
         {
             cfg.RegisterServicesFromAssembly(assembly);
 
-            // Order matters (outermost first): logging wraps the whole call,
-            // authorization rejects a disallowed caller before any work (so an
-            // unauthorized request is never validated or executed), validation
-            // runs before the handler, exception translation catches anything
-            // the handler (or domain) throws, then the transaction sits closest
+            // Order matters (outermost first): logging wraps the whole call;
+            // authorization rejects a disallowed caller before any work (role
+            // gate, then resource-ownership for resident item requests), so an
+            // unauthorized request is never validated or executed; validation
+            // runs before the handler; exception translation catches anything
+            // the handler (or domain) throws; then the transaction sits closest
             // to the handler so a thrown-and-translated error still leaves the
             // scope uncommitted (rolled back on dispose).
             cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
             cfg.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
+            cfg.AddOpenBehavior(typeof(ResidentBillOwnershipBehavior<,>));
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
             cfg.AddOpenBehavior(typeof(ExceptionTranslationBehavior<,>));
             cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));
@@ -53,6 +55,10 @@ public static class DependencyInjection
         // request handler itself (shared by the dues + utility amount-change and
         // distribute handlers).
         services.AddScoped<Billing.Services.IResidentCreditService, Billing.Services.ResidentCreditService>();
+
+        // Shared by every pay path (admin + resident) so the gateway charge +
+        // decline handling lives in one place.
+        services.AddScoped<Billing.Services.IBillItemPaymentService, Billing.Services.BillItemPaymentService>();
 
         return services;
     }

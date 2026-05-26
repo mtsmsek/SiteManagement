@@ -14,7 +14,7 @@ public sealed class PayDuesItemCommandValidator : AbstractValidator<PayDuesItemC
     {
         RuleFor(x => x.DuesPeriodId).ValidId();
         RuleFor(x => x.ItemId).ValidId();
-        RuleFor(x => x.CardNumber).NotEmpty().WithMessage(ValidationMessages.Required);
-        RuleFor(x => x.Cvv).NotEmpty().WithMessage(ValidationMessages.Required);
+        RuleFor(x => x.CardNumber).ValidCardNumber();
+        RuleFor(x => x.Cvv).ValidCvv();
     }
 }

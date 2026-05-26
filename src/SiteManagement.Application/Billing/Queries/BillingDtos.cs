@@ -1,5 +1,19 @@
 namespace SiteManagement.Application.Billing.Queries;
 
+/// <summary>
+/// Stable values for <see cref="ResidentBillDto.Kind"/> — the discriminator
+/// that tells which aggregate a resident's bill belongs to. Single source of
+/// truth shared by the read projection and the resident pay handler.
+/// </summary>
+public static class BillingItemKinds
+{
+    /// <summary>A monthly dues line.</summary>
+    public const string Dues = "Dues";
+
+    /// <summary>A utility bill line.</summary>
+    public const string Utility = "Utility";
+}
+
 /// <summary>One dues period row on the site's billing list.</summary>
 public sealed record DuesPeriodListItemDto(
     Guid Id,

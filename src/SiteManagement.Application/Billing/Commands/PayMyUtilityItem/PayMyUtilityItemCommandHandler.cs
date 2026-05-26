@@ -4,30 +4,28 @@ using SiteManagement.Application.Billing.Services;
 using SiteManagement.Application.Shared.Exceptions;
 using SiteManagement.Domain.Billing;
 
-namespace SiteManagement.Application.Billing.Commands.PayUtilityItem;
+namespace SiteManagement.Application.Billing.Commands.PayMyUtilityItem;
 
 /// <summary>
-/// Charges a utility bill item through the payment gateway, then marks it paid
-/// only on success. Charge first, persist second: if the charge is declined the
-/// item stays unpaid (a <see cref="PaymentRejectedException"/> → 402); if the
-/// charge succeeds but the local save somehow fails, the deterministic
-/// idempotency key makes a retry safe — the gateway returns the prior success
-/// instead of charging again. Charging is delegated to
-/// <see cref="IBillItemPaymentService"/> so the resident self-service path
-/// shares the exact same logic.
+/// Pays one of the current resident's own utility bill items. Role and ownership
+/// are already enforced by the pipeline (the command is an
+/// <c>IOwnedBillItemRequest</c>), so this handler is pure billing work and
+/// matches the admin path: charge through the shared
+/// <see cref="IBillItemPaymentService"/> first, mark paid only on success
+/// (decline → 402, item stays unpaid; retry is idempotent).
 /// </summary>
-public sealed class PayUtilityItemCommandHandler(
+public sealed class PayMyUtilityItemCommandHandler(
     IUtilityBillPeriodRepository utilityBillPeriodRepository,
     IBillItemPaymentService payment,
     IUnitOfWork unitOfWork)
-    : IRequestHandler<PayUtilityItemCommand>
+    : IRequestHandler<PayMyUtilityItemCommand>
 {
     private readonly IUtilityBillPeriodRepository _utilityBillPeriodRepository = utilityBillPeriodRepository;
     private readonly IBillItemPaymentService _payment = payment;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     /// <inheritdoc />
-    public async Task Handle(PayUtilityItemCommand request, CancellationToken cancellationToken)
+    public async Task Handle(PayMyUtilityItemCommand request, CancellationToken cancellationToken)
     {
         var period = await _utilityBillPeriodRepository.GetByIdAsync(request.UtilityBillPeriodId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(UtilityBillPeriod), request.UtilityBillPeriodId);

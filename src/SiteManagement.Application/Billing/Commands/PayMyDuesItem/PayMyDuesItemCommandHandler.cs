@@ -4,29 +4,28 @@ using SiteManagement.Application.Billing.Services;
 using SiteManagement.Application.Shared.Exceptions;
 using SiteManagement.Domain.Billing;
 
-namespace SiteManagement.Application.Billing.Commands.PayDuesItem;
+namespace SiteManagement.Application.Billing.Commands.PayMyDuesItem;
 
 /// <summary>
-/// Charges a dues item through the payment gateway, then marks it paid only on
-/// success. Charge first, persist second: if the charge is declined the item
-/// stays unpaid (a <see cref="PaymentRejectedException"/> → 402); if the charge
-/// succeeds but the local save somehow fails, the deterministic idempotency key
-/// makes a retry safe — the gateway returns the prior success instead of
-/// charging again. Charging is delegated to <see cref="IBillItemPaymentService"/>
-/// so the resident self-service path shares the exact same logic.
+/// Pays one of the current resident's own dues items. Role and ownership are
+/// already enforced by the pipeline (the command is an
+/// <c>IOwnedBillItemRequest</c>), so this handler is pure billing work and
+/// matches the admin path: charge through the shared
+/// <see cref="IBillItemPaymentService"/> first, mark paid only on success
+/// (decline → 402, item stays unpaid; retry is idempotent).
 /// </summary>
-public sealed class PayDuesItemCommandHandler(
+public sealed class PayMyDuesItemCommandHandler(
     IDuesPeriodRepository duesPeriodRepository,
     IBillItemPaymentService payment,
     IUnitOfWork unitOfWork)
-    : IRequestHandler<PayDuesItemCommand>
+    : IRequestHandler<PayMyDuesItemCommand>
 {
     private readonly IDuesPeriodRepository _duesPeriodRepository = duesPeriodRepository;
     private readonly IBillItemPaymentService _payment = payment;
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     /// <inheritdoc />
-    public async Task Handle(PayDuesItemCommand request, CancellationToken cancellationToken)
+    public async Task Handle(PayMyDuesItemCommand request, CancellationToken cancellationToken)
     {
         var period = await _duesPeriodRepository.GetByIdAsync(request.DuesPeriodId, cancellationToken)
             ?? throw new EntityNotFoundException(nameof(DuesPeriod), request.DuesPeriodId);
