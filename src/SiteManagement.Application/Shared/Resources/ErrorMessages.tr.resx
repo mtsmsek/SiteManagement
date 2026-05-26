@@ -140,4 +140,10 @@
   <data name="Auth.Forbidden" xml:space="preserve">
     <value>Bu işlemi yapmaya yetkiniz yok.</value>
   </data>
+  <data name="Messaging.Conversation.SubjectInvalid" xml:space="preserve">
+    <value>Konu zorunludur ve en fazla {0} karakter olabilir.</value>
+  </data>
+  <data name="Messaging.Message.BodyInvalid" xml:space="preserve">
+    <value>Mesaj zorunludur ve en fazla {0} karakter olabilir.</value>
+  </data>
 </root>

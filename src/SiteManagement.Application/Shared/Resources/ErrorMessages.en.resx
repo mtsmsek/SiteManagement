@@ -140,4 +140,10 @@
   <data name="Auth.Forbidden" xml:space="preserve">
     <value>You are not allowed to perform this action.</value>
   </data>
+  <data name="Messaging.Conversation.SubjectInvalid" xml:space="preserve">
+    <value>Subject is required and must be at most {0} characters.</value>
+  </data>
+  <data name="Messaging.Message.BodyInvalid" xml:space="preserve">
+    <value>Message is required and must be at most {0} characters.</value>
+  </data>
 </root>
