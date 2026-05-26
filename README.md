@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com/)
 
-🚧 **Work in progress** — **Hafta 1-4 tamam.** Foundation & Deploy → Property/Residency → Tenancy & Billing → **Payment microservice (MongoDB)**. Sırada: resident portal (W5). [ROADMAP.md](ROADMAP.md) 6 haftalık planı; gün gün ilerleme [WEEK-1-2-DETAIL.md](WEEK-1-2-DETAIL.md) · [WEEK-3-DETAIL.md](WEEK-3-DETAIL.md) · [WEEK-4-DETAIL.md](WEEK-4-DETAIL.md).
+🚧 **Work in progress** — **Hafta 1-4 tamam.** Foundation & Deploy → Property/Residency → Tenancy & Billing → **Payment microservice (MongoDB)**. Sırada: resident portal + messaging + reports (W5, planı çıkarıldı). [ROADMAP.md](ROADMAP.md) 6 haftalık planı; gün gün ilerleme [WEEK-1-2-DETAIL.md](WEEK-1-2-DETAIL.md) · [WEEK-3-DETAIL.md](WEEK-3-DETAIL.md) · [WEEK-4-DETAIL.md](WEEK-4-DETAIL.md) · [WEEK-5-DETAIL.md](WEEK-5-DETAIL.md).
 
 ---
 
