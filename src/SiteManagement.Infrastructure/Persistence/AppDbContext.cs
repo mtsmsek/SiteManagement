@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SiteManagement.Domain.Billing;
+using SiteManagement.Domain.Messaging;
 using SiteManagement.Domain.Property;
 using SiteManagement.Domain.Residency;
 using SiteManagement.Domain.Tenancy;
@@ -38,6 +39,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options)
 
     /// <summary>Billing — per-resident credit balances (over-payment held for a future bill).</summary>
     public DbSet<ResidentCreditAccount> ResidentCreditAccounts => Set<ResidentCreditAccount>();
+
+    /// <summary>Messaging — admin ↔ resident conversation threads.</summary>
+    public DbSet<Conversation> Conversations => Set<Conversation>();
 
     /// <summary>Outbox — integration events awaiting after-commit delivery.</summary>
     public DbSet<OutboxMessage> OutboxMessages => Set<OutboxMessage>();

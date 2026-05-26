@@ -63,6 +63,7 @@ public static class PersistenceExtensions
         services.AddScoped<IDuesPeriodRepository, DuesPeriodRepository>();
         services.AddScoped<IUtilityBillPeriodRepository, UtilityBillPeriodRepository>();
         services.AddScoped<IResidentCreditAccountRepository, ResidentCreditAccountRepository>();
+        services.AddScoped<IConversationRepository, ConversationRepository>();
 
         // Read-side: per-context query services, scoped to the same DbContext.
         services.AddScoped<ISiteQueries, SiteQueries>();

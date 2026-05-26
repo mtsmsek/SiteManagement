@@ -17,6 +17,10 @@ public static class SchemaConstants
         public const string Residents = "Residents";
         public const string ResidentVehicles = "ResidentVehicles";
 
+        // Messaging — admin ↔ resident conversation threads.
+        public const string Conversations = "Conversations";
+        public const string Messages = "Messages";
+
         // Tenancy
         public const string ApartmentAssignments = "ApartmentAssignments";
 
@@ -48,6 +52,7 @@ public static class SchemaConstants
         public const string ResidentId = "ResidentId";
         public const string DuesPeriodId = "DuesPeriodId";
         public const string UtilityBillPeriodId = "UtilityBillPeriodId";
+        public const string ConversationId = "ConversationId";
     }
 
     /// <summary>Owned/child entity column names mapped by the Billing configurations.</summary>
@@ -69,6 +74,7 @@ public static class SchemaConstants
         public const string ResidentVehicles = "_vehicles";
         public const string DuesPeriodItems = "_items";
         public const string UtilityBillPeriodItems = "_items";
+        public const string ConversationMessages = "_messages";
     }
 
     /// <summary>Shadow property name used as the synthetic PK on owned-collection rows.</summary>
