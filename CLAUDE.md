@@ -141,33 +141,39 @@ fine: migrations + bootstrap-admin seed run automatically on `docker compose up`
   if `:4200` or `:8080` is down, restart them; it's environmental.
 
 ## Current status (updated 2026-05-26)
-**Done:** **W1–W3 complete** (Property, Residency, Tenancy, Billing dues+utility;
-Angular admin pages; outbox; soft delete/restore/purge on Site; audit metadata;
-`IQuery<T>` marker + guardrails). **W4 Days 1–6 complete:** the MongoDB
-**PaymentService** (separate solution, fake bank, idempotency), **Refit + Polly**
-integration behind `IPaymentGateway`, **pay-by-card** for dues + utility items
-(402 on decline, item stays Unpaid), Angular **card payment dialog**, and the
-**two-layer E2E** (PaymentService over real Mongo+HTTP; main API pay-by-card via
-a WireMock stub). Plus, after W4: a **prominent error snackbar** and the
-**credit-balance / overpayment** feature (correct a period's amount → resident
-credit → auto-applied to the next bill; `PUT` endpoints + `TotalCredit` in the
-debt summary). **Tests green:** Domain 213, Application 62, Architecture 17,
-E2E 28 (main); PaymentService Domain 46, E2E 4.
+**Done:** **W1–W4 complete.** W1–W3 (Property, Residency, Tenancy, Billing
+dues+utility; Angular admin pages; outbox; soft delete/restore/purge on Site;
+audit metadata; `IQuery<T>` marker + guardrails). **W4 closed out (Day 7 done):**
+the MongoDB **PaymentService** (separate solution, fake bank, idempotency),
+**Refit + Polly** integration behind `IPaymentGateway`, **pay-by-card** for dues +
+utility items (402 on decline, item stays Unpaid), Angular **card payment dialog**,
+and the **two-layer E2E** (PaymentService over real Mongo+HTTP; main API pay-by-card
+via a WireMock stub). Plus, after W4: the **credit-balance / overpayment** feature
+(correct a period's amount → resident credit → auto-applied to the next bill when it
+fully covers; `PUT` endpoints + `TotalCredit` in the debt summary), and a
+**prominent animated error snackbar** (icon + error colour painted on the MDC
+surface directly + scale-in/glow, 8s — the `--mdc-snackbar-container-color` token
+no longer drives the surface; custom `ErrorSnackbar` via `openFromComponent`).
+**W4 self-review verdict:** code architecturally sound, no real defects; see
+`WEEK-4-DETAIL.md` Day 7 for the boundary/402/idempotency findings + the three
+deferred items below. **Tests green:** Domain 213, Application 62, Architecture 17,
+E2E 28 (main); PaymentService Domain 46, E2E 4; web (Vitest) 15.
 
 **Pending / next:**
-- **W4 Day 7 — close-out:** self-review pass, update `WEEK-4-DETAIL.md` + README
-  (payment + credit notes), final all-green. **(NEXT — author wants to finish W4.)**
-- **Error snackbar:** made top-positioned + `.error-snackbar` class (red/shadow/
-  Close action), but the author reports it still reads as just "moved to top" and
-  dismisses too fast — **verify the red styling actually applies in the running app
-  and lengthen the duration.** (`error.interceptor.ts` + `styles.scss`.)
+- **Resident-facing portal (W5, NEXT):** resident login + "my bills" + paying
+  **own** item, with **IDOR** protection. All pay endpoints are admin-only until then.
+- **PaymentService architecture test (small follow-up):** the PaymentService
+  solution has no dedicated NetArchTest; Domain purity is currently only implicit
+  (its `.csproj` has zero package refs — no Mongo/EF/ASP). A layer-dependency
+  guardrail there would match the author's "convention ⇒ guardrail test" rule.
 - **Credit partial settlement (deferred to project end):** when credit < the new
   item (e.g. 300 credit vs 400 bill) it is currently **left untouched** (item stays
   Unpaid). Author expects partial consume (apply 300, owe 100) — needs a partial/
   `creditApplied` state on the item (domain + migration + UI). Decided to defer.
-- **Resident-facing portal** (W4 DoD's missing half / ROADMAP this week): resident
-  login + "my bills" + paying **own** item, with **IDOR** protection (a resident
-  must not read/pay another's bills). All endpoints are admin-only until then.
+- **Isolate E2E from the compose DB:** E2E (Testcontainers) clobbered the local
+  compose DB during the W4 close-out (admin + domain data truncated). Remedy used:
+  `docker compose restart api` re-seeds the admin, then re-seed demo data. The
+  fixture should point only at its own container — see Testing & gotchas.
 - Optional UI polish (flow hints on the billing "Distribute/Close" actions).
 
 ## Collaboration style (author preferences)

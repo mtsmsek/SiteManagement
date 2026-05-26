@@ -276,18 +276,21 @@ Postman'i ad-hoc keşif için kullan (yeni endpoint denerken). Regression yükü
 
 ---
 
-### Hafta 4 — Payment Microservice
+### Hafta 4 — Payment Microservice ✅
 **Hedef:** "Resident borcunu görüp kartla ödeyebiliyor"
 
-- PaymentService solution iskelet + Mongo
-- PaymentService Domain (TDD) — rich aggregate'lar (BankAccount, CreditCard, PaymentTransaction)
-- PaymentService API endpoint'leri
-- Ana API → PaymentService Refit/Polly entegrasyonu
-- PayInvoiceCommand (exception translation ile)
-- Angular ödeme akışı
-- E2E test: full pay flow (iki container birden)
+- ✅ PaymentService solution iskelet + Mongo (ayrı `PaymentService.slnx`, `payment-api:8090`)
+- ✅ PaymentService Domain (TDD) — rich aggregate'lar (BankAccount, CreditCard, PaymentTransaction); fake banka (Luhn/expiry/balance), idempotency unique index
+- ✅ PaymentService API endpoint'i (`POST /api/payments`, API-key korumalı)
+- ✅ Ana API → PaymentService Refit + Polly (`AddStandardResilienceHandler`) entegrasyonu; `IPaymentGateway` port + `PaymentGatewayAdapter` ACL
+- ✅ Pay-by-card (dues + utility item) — charge first, başarılıysa `Paid`; decline → **402**, item `Unpaid`
+- ✅ Angular kart ödeme dialog'u + belirgin hata snackbar'ı
+- ✅ İki-katmanlı E2E: PaymentService gerçek Mongo+HTTP üzerinde; ana API pay-by-card WireMock stub ile (consumer contract)
+- ✅ **Ekstra (W4 sonrası):** overpayment → resident **credit balance** (`ResidentCreditAccount`), dönem tutarı düzeltince otomatik kredi + sonraki faturada otomatik mahsup
 
-**Definition of Done:** Resident login → borç → kart bilgisi → ödeme → status Paid; transaction MongoDB'de; E2E geçiyor; failure path test'leri de yeşil.
+**Definition of Done:** ✅ Kartla ödeme → status `Paid`; transaction MongoDB'de; E2E + failure-path (yetersiz bakiye / red kart / idempotent / gateway-down) yeşil; her iki solution'ın testleri yeşil.
+
+> **W5 köprüsü:** PDF'in "resident login → kendi borcunu öder" yarısı (resident portal + IDOR koruması) **Hafta 5'e** taşındı; W4'te akış **admin** tarafından tetikleniyor (tüm pay endpoint'leri şimdilik admin-only).
 
 ---
 

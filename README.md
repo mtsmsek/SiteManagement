@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com/)
 
-🚧 **Work in progress** — şu an **Hafta 1 tamam** (Foundation & Deploy). [ROADMAP.md](ROADMAP.md) toplam 6 haftalık planı, [WEEK-1-2-DETAIL.md](WEEK-1-2-DETAIL.md) gün gün ilerlemeyi içerir.
+🚧 **Work in progress** — **Hafta 1-4 tamam.** Foundation & Deploy → Property/Residency → Tenancy & Billing → **Payment microservice (MongoDB)**. Sırada: resident portal (W5). [ROADMAP.md](ROADMAP.md) 6 haftalık planı; gün gün ilerleme [WEEK-1-2-DETAIL.md](WEEK-1-2-DETAIL.md) · [WEEK-3-DETAIL.md](WEEK-3-DETAIL.md) · [WEEK-4-DETAIL.md](WEEK-4-DETAIL.md).
 
 ---
 
@@ -27,7 +27,25 @@
 - ✅ GitHub Actions CI (build + test, Postgres service container)
 - ✅ Railway deploy hazır (PORT + DATABASE_URL platform env'lerini otomatik handle eder)
 
-🔜 **Hafta 2:** Property + Residency bounded context'leri (rich domain, TDD), Angular admin UI.
+**Domain & işlevler (W2-W3):**
+- ✅ **Property / Residency / Tenancy / Billing** bounded context'leri — rich aggregate'lar (TDD), private setter'lar, value object'ler (TcNo checksum, Money, BillingMonth…)
+- ✅ Site → Blok → Daire, sakin kaydı, daireye sahip/kiracı ataması (tarihçeli)
+- ✅ **Aidat + fatura dönemleri:** aç → toplu dağıt → öde → kapat; site borç özeti (tahakkuk/tahsil/bakiye)
+- ✅ **Transactional Outbox** — integration event'ler commit sonrası teslim (mail vb.); domain event'ler in-transaction
+- ✅ **Soft delete** (aggregate-root, Site) — archive / restore / permanent purge, global query filter + guardrail test
+- ✅ **Audit** — `Created/Modified By+At`, SaveChanges interceptor + `ICurrentUser`
+- ✅ Angular 21 admin UI (standalone + signals): siteler, sakinler, faturalandırma sayfaları
+
+**Payment microservice (W4):**
+- ✅ **Ayrı solution** (`payment-service/`, `payment-api:8090`) — MongoDB 7, kendi Domain/App/Infra/Api katmanları (polyglot persistence)
+- ✅ **Fake banka:** `BankAccount` + `CreditCard` rich aggregate'lar; Luhn / son-kullanma / bakiye kontrolü; idempotency için Mongo unique index
+- ✅ Ana API → PaymentService **Refit + Polly** (`AddStandardResilienceHandler`) — `IPaymentGateway` port + `PaymentGatewayAdapter` (anti-corruption layer); servis-servis API-key
+- ✅ **Kartla ödeme** (aidat + fatura kalemi): charge first → başarılıysa `Paid`; **red → 402**, kalem `Unpaid` (atomik); deterministik idempotency key ile retry güvenli
+- ✅ **Credit balance (overpayment):** dönem tutarı aşağı düzeltilince fazla ödeyen sakine kredi (`ResidentCreditAccount`); sonraki dağıtımda kalemi **tam karşılıyorsa** otomatik mahsup
+- ✅ Angular kart ödeme dialog'u + belirgin animasyonlu hata snackbar'ı
+- ✅ İki-katmanlı E2E: PaymentService gerçek Mongo+HTTP; ana API pay-by-card WireMock stub (consumer contract)
+
+🔜 **Hafta 5:** resident portal (sakin login → "borçlarım" → kendi kalemini öde, **IDOR** koruması) + messaging & reports.
 
 ---
 
@@ -47,8 +65,8 @@
 | API docs | Scalar UI (Swashbuckle yerine — .NET 10 / OpenApi 2.0 uyumlu) |
 | HTTP client | Refit + Polly _(W4)_ |
 | Localization | `IStringLocalizer` + .resx (tr-TR, en-US) |
-| Frontend | Angular (standalone components) _(W2)_ |
-| UI lib | Material veya PrimeNG _(W6)_ |
+| Frontend | Angular 21 (standalone, signals) _(W2)_ |
+| UI lib | Angular Material 3 _(W2)_ |
 | i18n (frontend) | ngx-translate _(W2)_ |
 | Test | xUnit, FluentAssertions, NSubstitute, Testcontainers |
 | Container | Docker + Compose v2 |
@@ -141,19 +159,18 @@ npm start            # ng serve -> http://localhost:4200
 - Login: bootstrap admin credential'larıyla gir → `/admin/sites`
 - API base URL: `web/src/environments/environment.ts` (`http://localhost:8080`)
 - Backend CORS dev policy `http://localhost:4200`'e açık
-# -> {"errors":{"Email":["Email is required."], ...}}
-```
 
 ### Çalışan servisler
 
 | Servis | URL / Port | Not |
 |---|---|---|
 | API | http://localhost:8080 | `/health` (Postgres probe dahil) |
+| Payment API | http://localhost:8090 | Ayrı microservice (Mongo); `/health` (Mongo ping) |
 | Scalar API docs | http://localhost:8080/scalar/v1 | OpenAPI tabanlı interaktif UI (dev only) |
 | OpenAPI JSON | http://localhost:8080/openapi/v1.json | Postman/Insomnia/Bruno import için |
 | MailHog UI | http://localhost:8025 | Dev SMTP catcher |
-| PostgreSQL | `localhost:5432` | DBeaver/pgAdmin ile bağlan |
-| MongoDB | `localhost:27017` | _(W4'te aktif olacak)_ |
+| PostgreSQL | `localhost:5432` | Ana DB — DBeaver/pgAdmin ile bağlan |
+| MongoDB | `localhost:27017` | PaymentService DB _(W4'ten beri aktif)_ |
 
 ### Sadece DB'leri çalıştır, API'yi local'den koş
 
@@ -165,9 +182,16 @@ dotnet run --project src/SiteManagement.Api
 
 ### Test
 
+İki ayrı solution olduğu için `dotnet test`'i **argümansız çağırma** (iki `.slnx` bulur, hata verir) — solution'ı belirt:
+
 ```powershell
-dotnet test
+dotnet test SiteManagement.slnx -m:1                       # ana API (Domain/App/Arch/E2E)
+dotnet test payment-service/PaymentService.slnx -m:1       # payment microservice (Domain/E2E)
+
+cd web; npm test                                           # Angular (Vitest)
 ```
+
+> **E2E Docker ister** (Testcontainers). **Uyarı:** lokal `docker compose` stack ayaktayken E2E koşmak compose veritabanını sıfırlayabilir (bootstrap admin + domain verisi); sonrasında `docker compose restart api` admin'i yeniden seed eder.
 
 ### Stack'i kapat
 
@@ -205,10 +229,13 @@ Test projeleri:
 
 | Proje | Amaç |
 |---|---|
-| `SiteManagement.Domain.Tests` | Domain unit testleri (TDD ile yazılacak — W2'den itibaren aggregate invariant'ları) |
+| `SiteManagement.Domain.Tests` | Domain unit testleri — aggregate invariant'ları, value object'ler (TDD) |
 | `SiteManagement.Application.Tests` | Handler / pipeline behavior unit testleri (repo mock'lı, NSubstitute) |
-| `SiteManagement.E2E.Tests` | TestContainers + WebApplicationFactory (W2 sonu altyapı, şimdilik pure helper testler) |
-| **`SiteManagement.ArchitectureTests`** | NetArchTest ile katman bağımlılık koruması + CQRS naming + resource key bütünlüğü |
+| `SiteManagement.E2E.Tests` | Testcontainers + WebApplicationFactory — full HTTP akışları; pay-by-card WireMock stub ile |
+| **`SiteManagement.ArchitectureTests`** | NetArchTest ile katman bağımlılık koruması + CQRS naming + soft-delete/integration-event guardrail'ları + resource key bütünlüğü |
+| `PaymentService.Domain.Tests` | PaymentService domain unit testleri (banka/kart/transaction, Money rounding) |
+| `PaymentService.E2E.Tests` | PaymentService'i gerçek Mongo (Testcontainer) + HTTP üzerinde uçtan uca |
+| `web` (Vitest) | Angular store / interceptor / component unit testleri |
 
 Architecture testleri proje sağlığının uzun vadeli garantörü:
 - **Layer dependency:** Domain BCL-only, Application no-EF / no-ASP.NET, Infrastructure → Api referans yok
