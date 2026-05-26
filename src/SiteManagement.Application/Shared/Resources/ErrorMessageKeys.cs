@@ -41,4 +41,10 @@ public static class ErrorMessageKeys
 
     /// <summary>A card charge was declined by the payment gateway.</summary>
     public const string PaymentRejected = "Payment.Rejected";
+
+    /// <summary>A resident attempted to pay a billing item that is not their own.</summary>
+    public const string PaymentNotYourBill = "Payment.NotYourBill";
+
+    /// <summary>The caller is authenticated but lacks the role/scope for the action (generic 403).</summary>
+    public const string Forbidden = "Auth.Forbidden";
 }

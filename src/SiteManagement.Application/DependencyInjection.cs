@@ -34,11 +34,14 @@ public static class DependencyInjection
             cfg.RegisterServicesFromAssembly(assembly);
 
             // Order matters (outermost first): logging wraps the whole call,
-            // validation runs before the handler, exception translation catches
-            // anything the handler (or domain) throws, then the transaction sits
-            // closest to the handler so a thrown-and-translated error still
-            // leaves the scope uncommitted (rolled back on dispose).
+            // authorization rejects a disallowed caller before any work (so an
+            // unauthorized request is never validated or executed), validation
+            // runs before the handler, exception translation catches anything
+            // the handler (or domain) throws, then the transaction sits closest
+            // to the handler so a thrown-and-translated error still leaves the
+            // scope uncommitted (rolled back on dispose).
             cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
+            cfg.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
             cfg.AddOpenBehavior(typeof(ExceptionTranslationBehavior<,>));
             cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));

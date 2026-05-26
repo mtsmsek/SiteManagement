@@ -7,4 +7,4 @@ namespace SiteManagement.Application.Tenancy.Commands.EndAssignment;
 /// assignment raises <c>ResidentMovedOut</c>, which a Property-side handler
 /// reacts to by marking the apartment empty again. Admin-only command.
 /// </summary>
-public sealed record EndAssignmentCommand(Guid AssignmentId, DateOnly EndDate) : ICommand;
+public sealed record EndAssignmentCommand(Guid AssignmentId, DateOnly EndDate) : ICommand, IAdminRequest;

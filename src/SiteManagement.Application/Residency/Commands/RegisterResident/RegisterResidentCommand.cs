@@ -13,7 +13,7 @@ public sealed record RegisterResidentCommand(
     string FirstName,
     string LastName,
     string Email,
-    string Phone) : ICommand<RegisterResidentResult>;
+    string Phone) : ICommand<RegisterResidentResult>, IAdminRequest;
 
 /// <summary>Result carrying the new resident's identifier.</summary>
 public sealed record RegisterResidentResult(Guid ResidentId);

@@ -7,4 +7,4 @@ namespace SiteManagement.Application.Billing.Commands.ChangeDuesAmount;
 /// Unpaid items follow the new rate; a paid item that was over-charged credits
 /// the difference back to the resident (held as credit, not refunded). Admin-only.
 /// </summary>
-public sealed record ChangeDuesAmountCommand(Guid DuesPeriodId, decimal PerApartmentAmount) : ICommand;
+public sealed record ChangeDuesAmountCommand(Guid DuesPeriodId, decimal PerApartmentAmount) : ICommand, IAdminRequest;

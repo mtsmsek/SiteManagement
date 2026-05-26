@@ -6,4 +6,4 @@ namespace SiteManagement.Application.Billing.Commands.MarkUtilityBillItemPaid;
 /// Marks a single utility bill item paid within its period. Idempotent — paying
 /// an already-paid item is a no-op. Admin-only.
 /// </summary>
-public sealed record MarkUtilityBillItemPaidCommand(Guid UtilityBillPeriodId, Guid ItemId) : ICommand;
+public sealed record MarkUtilityBillItemPaidCommand(Guid UtilityBillPeriodId, Guid ItemId) : ICommand, IAdminRequest;

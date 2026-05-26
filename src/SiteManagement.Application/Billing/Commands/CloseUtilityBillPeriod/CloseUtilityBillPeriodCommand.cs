@@ -7,4 +7,4 @@ namespace SiteManagement.Application.Billing.Commands.CloseUtilityBillPeriod;
 /// <c>UtilityBillPeriodClosed</c>, which a notification handler turns into a
 /// utility bill e-mail to each billed resident. Admin-only.
 /// </summary>
-public sealed record CloseUtilityBillPeriodCommand(Guid UtilityBillPeriodId) : ICommand;
+public sealed record CloseUtilityBillPeriodCommand(Guid UtilityBillPeriodId) : ICommand, IAdminRequest;

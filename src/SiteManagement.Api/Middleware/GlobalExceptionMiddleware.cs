@@ -95,6 +95,9 @@ public class GlobalExceptionMiddleware(
             case PaymentRejectedException payment:
                 problem.Extensions[ApiConstants.ProblemDetailsMessageKey] = payment.MessageKey;
                 break;
+            case UnauthorizedActionException unauthorized:
+                problem.Extensions[ApiConstants.ProblemDetailsMessageKey] = unauthorized.MessageKey;
+                break;
         }
 
         await WriteAsync(context, problem);
@@ -117,6 +120,7 @@ public class GlobalExceptionMiddleware(
         BusinessRuleViolationException business => business.Message,
         AuthenticationException auth => Localize(_errorLocalizer, auth.MessageKey),
         PaymentRejectedException payment => Localize(_errorLocalizer, payment.MessageKey),
+        UnauthorizedActionException unauthorized => Localize(_errorLocalizer, unauthorized.MessageKey),
         _ => ex.Message,
     };
 

@@ -7,4 +7,4 @@ namespace SiteManagement.Application.Billing.Commands.CloseDuesPeriod;
 /// <c>DuesPeriodClosed</c>, which a notification handler turns into a dues
 /// e-mail to each billed resident. Admin-only.
 /// </summary>
-public sealed record CloseDuesPeriodCommand(Guid DuesPeriodId) : ICommand;
+public sealed record CloseDuesPeriodCommand(Guid DuesPeriodId) : ICommand, IAdminRequest;

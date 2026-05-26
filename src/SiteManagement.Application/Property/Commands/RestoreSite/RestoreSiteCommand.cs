@@ -6,4 +6,4 @@ namespace SiteManagement.Application.Property.Commands.RestoreSite;
 /// Restores a soft-deleted (archived) site, bringing it and its data back into
 /// reads. Admin-only. The undo to <c>DeleteSiteCommand</c>.
 /// </summary>
-public sealed record RestoreSiteCommand(Guid SiteId) : ICommand;
+public sealed record RestoreSiteCommand(Guid SiteId) : ICommand, IAdminRequest;

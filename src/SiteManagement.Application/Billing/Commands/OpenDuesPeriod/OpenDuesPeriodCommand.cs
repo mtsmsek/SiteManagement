@@ -10,7 +10,7 @@ public sealed record OpenDuesPeriodCommand(
     Guid SiteId,
     int Year,
     int Month,
-    decimal PerApartmentAmount) : ICommand<OpenDuesPeriodResult>;
+    decimal PerApartmentAmount) : ICommand<OpenDuesPeriodResult>, IAdminRequest;
 
 /// <summary>Result carrying the new dues period's identifier.</summary>
 public sealed record OpenDuesPeriodResult(Guid DuesPeriodId);

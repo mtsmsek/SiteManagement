@@ -134,4 +134,10 @@
   <data name="Payment.Rejected" xml:space="preserve">
     <value>Ödeme reddedildi. Lütfen kart bilgilerinizi ve bakiyenizi kontrol edip tekrar deneyin.</value>
   </data>
+  <data name="Payment.NotYourBill" xml:space="preserve">
+    <value>Yalnızca kendi borçlarınızı ödeyebilirsiniz.</value>
+  </data>
+  <data name="Auth.Forbidden" xml:space="preserve">
+    <value>Bu işlemi yapmaya yetkiniz yok.</value>
+  </data>
 </root>

@@ -8,4 +8,4 @@ namespace SiteManagement.Application.Billing.Commands.ChangeUtilityBillAmount;
 /// was over-charged credits the difference back to the resident (held as credit,
 /// not refunded). Admin-only.
 /// </summary>
-public sealed record ChangeUtilityBillAmountCommand(Guid UtilityBillPeriodId, decimal TotalAmount) : ICommand;
+public sealed record ChangeUtilityBillAmountCommand(Guid UtilityBillPeriodId, decimal TotalAmount) : ICommand, IAdminRequest;

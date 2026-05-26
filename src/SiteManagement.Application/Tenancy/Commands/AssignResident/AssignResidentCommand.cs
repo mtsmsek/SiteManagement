@@ -14,7 +14,7 @@ public sealed record AssignResidentCommand(
     Guid ApartmentId,
     Guid ResidentId,
     TenantType TenantType,
-    DateOnly StartDate) : ICommand<AssignResidentResult>;
+    DateOnly StartDate) : ICommand<AssignResidentResult>, IAdminRequest;
 
 /// <summary>Result carrying the new assignment's identifier.</summary>
 public sealed record AssignResidentResult(Guid AssignmentId);

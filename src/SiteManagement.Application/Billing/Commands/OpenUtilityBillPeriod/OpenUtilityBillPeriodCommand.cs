@@ -13,7 +13,7 @@ public sealed record OpenUtilityBillPeriodCommand(
     int Year,
     int Month,
     UtilityType UtilityType,
-    decimal TotalAmount) : ICommand<OpenUtilityBillPeriodResult>;
+    decimal TotalAmount) : ICommand<OpenUtilityBillPeriodResult>, IAdminRequest;
 
 /// <summary>Result carrying the new utility bill period's identifier.</summary>
 public sealed record OpenUtilityBillPeriodResult(Guid UtilityBillPeriodId);

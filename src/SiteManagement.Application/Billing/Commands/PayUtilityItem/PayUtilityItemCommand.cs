@@ -14,4 +14,4 @@ public sealed record PayUtilityItemCommand(
     string CardNumber,
     string Cvv,
     int ExpiryYear,
-    int ExpiryMonth) : ICommand;
+    int ExpiryMonth) : ICommand, IAdminRequest;

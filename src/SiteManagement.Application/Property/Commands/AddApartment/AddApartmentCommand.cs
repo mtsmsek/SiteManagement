@@ -11,7 +11,7 @@ public sealed record AddApartmentCommand(
     Guid BlockId,
     int Number,
     int Floor,
-    string Type) : ICommand<AddApartmentResult>;
+    string Type) : ICommand<AddApartmentResult>, IAdminRequest;
 
 /// <summary>Result carrying the new apartment's identifier.</summary>
 public sealed record AddApartmentResult(Guid ApartmentId);

@@ -134,4 +134,10 @@
   <data name="Payment.Rejected" xml:space="preserve">
     <value>Payment was declined. Please check your card details and balance, then try again.</value>
   </data>
+  <data name="Payment.NotYourBill" xml:space="preserve">
+    <value>You can only pay your own bills.</value>
+  </data>
+  <data name="Auth.Forbidden" xml:space="preserve">
+    <value>You are not allowed to perform this action.</value>
+  </data>
 </root>

@@ -7,4 +7,4 @@ namespace SiteManagement.Application.Property.Commands.PurgeSite;
 /// Works on an already-archived site too. Admin-only — the explicit,
 /// irreversible counterpart to the soft-delete <c>DeleteSiteCommand</c>.
 /// </summary>
-public sealed record PurgeSiteCommand(Guid SiteId) : ICommand;
+public sealed record PurgeSiteCommand(Guid SiteId) : ICommand, IAdminRequest;
