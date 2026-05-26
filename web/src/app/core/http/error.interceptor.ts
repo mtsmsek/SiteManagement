@@ -4,8 +4,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslateService } from '@ngx-translate/core';
 import { catchError, throwError } from 'rxjs';
 import { isProblemDetails } from './problem-details';
+import { ErrorSnackbar, ErrorSnackbarData } from './error-snackbar';
 
-const SNACKBAR_DURATION_MS = 5000;
+// A failed action lingers a touch longer than the usual toast so the user has
+// time to read what went wrong before it auto-hides.
+const SNACKBAR_DURATION_MS = 8000;
 
 /**
  * Surfaces API failures as snackbars. The API already localizes the
@@ -25,9 +28,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const isUnauthorized = error.status === 401;
 
       if (!isValidation && !isUnauthorized) {
-        // A failed action needs to stand out: show it at the top in the error
-        // colour (see `.error-snackbar` in styles.scss) with a dismiss action.
-        snackBar.open(resolveMessage(error, translate), translate.instant('common.close'), {
+        // A failed action needs to stand out: a dedicated component (icon +
+        // error colour + entry animation, see `.error-snackbar` in styles.scss)
+        // shown at the top so a decline or server error is impossible to miss.
+        snackBar.openFromComponent<ErrorSnackbar, ErrorSnackbarData>(ErrorSnackbar, {
+          data: { message: resolveMessage(error, translate) },
           duration: SNACKBAR_DURATION_MS,
           panelClass: 'error-snackbar',
           horizontalPosition: 'center',

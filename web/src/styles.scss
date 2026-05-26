@@ -158,19 +158,42 @@ body {
 }
 
 // Error snackbar: the default surface tone is too quiet for a failed action
-// (e.g. a declined payment), so paint it in the theme's error colour, bump the
-// weight, and lift it with a shadow so it clearly reads as a problem. Applied
-// via `panelClass: 'error-snackbar'` from the HTTP error interceptor.
-.error-snackbar {
-  --mdc-snackbar-container-color: var(--mat-sys-error);
-  --mdc-snackbar-supporting-text-color: var(--mat-sys-on-error);
-  --mat-snack-bar-button-color: var(--mat-sys-on-error);
+// (e.g. a declined payment). We paint the MDC surface in the theme's error
+// colour *directly* — the `--mdc-snackbar-container-color` token proved
+// unreliable across Material versions — then make it announce itself: a quick
+// scale-in pop followed by two red glow pulses, lifted on a strong shadow.
+// Applied via `panelClass: 'error-snackbar'` (see the HTTP error interceptor),
+// which carries the custom `app-error-snackbar` component.
+.error-snackbar .mdc-snackbar__surface {
+  background-color: var(--mat-sys-error);
+  box-shadow: 0 8px 28px rgb(0 0 0 / 45%);
+  animation:
+    error-snackbar-pop 0.4s ease-out,
+    error-snackbar-glow 1.1s ease-in-out 0.4s 2;
+}
 
-  .mdc-snackbar__surface {
-    box-shadow: 0 6px 20px rgb(0 0 0 / 35%);
+@keyframes error-snackbar-pop {
+  0% {
+    transform: scale(0.85);
+    opacity: 0;
   }
+  60% {
+    transform: scale(1.04);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
 
-  .mdc-snackbar__label {
-    font-weight: 500;
+@keyframes error-snackbar-glow {
+  0%,
+  100% {
+    box-shadow: 0 8px 28px rgb(0 0 0 / 45%);
+  }
+  50% {
+    box-shadow:
+      0 0 0 4px color-mix(in srgb, var(--mat-sys-error) 55%, transparent),
+      0 8px 28px rgb(0 0 0 / 45%);
   }
 }
