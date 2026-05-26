@@ -44,6 +44,7 @@ public static class DependencyInjection
             cfg.AddOpenBehavior(typeof(LoggingBehavior<,>));
             cfg.AddOpenBehavior(typeof(AuthorizationBehavior<,>));
             cfg.AddOpenBehavior(typeof(ResidentBillOwnershipBehavior<,>));
+            cfg.AddOpenBehavior(typeof(ConversationOwnershipBehavior<,>));
             cfg.AddOpenBehavior(typeof(ValidationBehavior<,>));
             cfg.AddOpenBehavior(typeof(ExceptionTranslationBehavior<,>));
             cfg.AddOpenBehavior(typeof(TransactionBehavior<,>));

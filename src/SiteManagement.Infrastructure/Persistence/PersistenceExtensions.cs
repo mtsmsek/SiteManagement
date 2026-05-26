@@ -70,6 +70,7 @@ public static class PersistenceExtensions
         services.AddScoped<IResidentQueries, ResidentQueries>();
         services.AddScoped<ITenancyQueries, TenancyQueries>();
         services.AddScoped<IBillingQueries, BillingQueries>();
+        services.AddScoped<Application.Messaging.Queries.IMessagingQueries, Queries.MessagingQueries>();
 
         return services;
     }
