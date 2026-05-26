@@ -94,11 +94,14 @@ guardrail'leri baştan kapatmak (yeni E2E yığmadan önce).
 
 - [ ] Yukarıdaki **6 açık soruyu** prose ile karara bağla; kararları bu dosyaya
       "Mimari Kararlar (W5)" tablosu olarak işle.
-- [ ] **Hijyen 1 — E2E ↔ compose DB izolasyonu (CLAUDE.md açık maddesi).** E2E
-      Testcontainers izole olmalı; W4 kapanışında compose DB'sini ezdi (admin +
-      demo veri truncate). Bağlantı/factory'nin yalnız kendi container'ına
-      baktığını doğrula/düzelt; "compose stack ayaktayken E2E güvenli" hale getir.
-      Guardrail: E2E sonrası compose admin login hâlâ 200.
+- [x] **Hijyen 1 — E2E ↔ compose DB izolasyonu (CLAUDE.md açık maddesi).** ✅
+      Kök sebep: connection string `AddPersistence`'te **eager** okunuyordu (Program
+      Build'den önce çağırır) → factory'nin InMemory Testcontainer override'ı çok
+      geç geliyor, E2E `localhost:5432` (compose) DB'sine bağlanıp truncate +
+      `admin@sitemanagement.local` siliyordu. Fix: connection string'i `AddDbContext`
+      lambda'sında **lazy** (`sp.GetRequiredService<IConfiguration>()`) oku. Guardrail:
+      `ConnectionStringIsolationTests` — resolved `AppDbContext` fixture container'ını
+      kullanıyor. Doğrulandı: E2E sonrası compose admin + demo veri yerinde.
 - [ ] **Hijyen 2 — PaymentService architecture test.** PaymentService solution'ına
       adanmış katman testi yok; Domain saflığı şu an csproj'da örtük. `PaymentService.ArchitectureTests`
       (NetArchTest): Domain BCL-only (Mongo/EF/ASP yok), Application → Infra/Api'ye

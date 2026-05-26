@@ -26,7 +26,7 @@ public static class DependencyInjection
     /// <summary>Registers every Infrastructure service in the right scope.</summary>
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddPersistence(configuration);
+        services.AddPersistence();
 
         services
             .AddIdentity<AppUser, AppRole>(opts =>

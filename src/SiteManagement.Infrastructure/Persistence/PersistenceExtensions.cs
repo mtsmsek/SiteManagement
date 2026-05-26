@@ -29,20 +29,27 @@ public static class PersistenceExtensions
     /// Registers EF Core + Postgres, repositories, unit of work, and read
     /// query services on the supplied collection.
     /// </summary>
-    public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+    public static IServiceCollection AddPersistence(this IServiceCollection services)
     {
-        var connectionString = configuration.GetConnectionString(ConnectionStringName)
-            ?? throw new InvalidOperationException(
-                $"Connection string '{ConnectionStringName}' is missing from configuration.");
-
         // Stamps created/modified audit metadata on every aggregate root at save.
         services.AddScoped<AuditSaveChangesInterceptor>();
 
-        services.AddDbContext<AppDbContext>((sp, opts) => opts
-            .UseNpgsql(
-                connectionString,
-                npg => npg.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName))
-            .AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>()));
+        // Resolve the connection string lazily from the service provider's
+        // IConfiguration — NOT eagerly at registration. AddInfrastructure runs
+        // before the host is built, so an eager read would capture ambient
+        // config (appsettings/env) and miss any source added later, e.g. the
+        // E2E factory's in-memory override → tests would hit the wrong DB.
+        services.AddDbContext<AppDbContext>((sp, opts) =>
+        {
+            var connectionString = sp.GetRequiredService<IConfiguration>().GetConnectionString(ConnectionStringName)
+                ?? throw new InvalidOperationException(
+                    $"Connection string '{ConnectionStringName}' is missing from configuration.");
+
+            opts.UseNpgsql(
+                    connectionString,
+                    npg => npg.MigrationsAssembly(typeof(AppDbContext).Assembly.FullName))
+                .AddInterceptors(sp.GetRequiredService<AuditSaveChangesInterceptor>());
+        });
 
         // Domain events: aggregates raise them, the unit of work flushes them
         // through this dispatcher after each save.

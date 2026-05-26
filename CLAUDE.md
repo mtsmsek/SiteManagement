@@ -133,10 +133,13 @@ fine: migrations + bootstrap-admin seed run automatically on `docker compose up`
   **WireMock.Net** over real HTTP (consumer-side contract test, no compile-time
   dep on PaymentService) — `CustomWebApplicationFactory` takes an optional payment
   base URL + API key; only that suite wires the gateway.
-- **Running E2E while the local `docker compose` stack is up can clobber the
-  compose bootstrap admin** (a TRUNCATE-style reset deletes `admin@sitemanagement.local`,
-  leaving only test users). If login 401s after running E2E locally:
-  `docker compose restart api` re-seeds it. (Open: isolate E2E from the compose DB.)
+- **E2E is isolated from the compose DB** (fixed W5 Day 1). The connection string
+  is resolved lazily inside the `AddDbContext` options lambda
+  (`PersistenceExtensions`), so the E2E factory's in-memory Testcontainer override
+  wins. Guardrail: `ConnectionStringIsolationTests` asserts the resolved
+  `AppDbContext` uses the fixture container, not ambient config. (Before: the
+  string was read eagerly at registration → E2E ran against the local compose
+  Postgres and truncated its data + bootstrap admin.)
 - Docker Desktop / the `npm start` dev server occasionally stop on this setup —
   if `:4200` or `:8080` is down, restart them; it's environmental.
 
@@ -170,10 +173,6 @@ E2E 28 (main); PaymentService Domain 46, E2E 4; web (Vitest) 15.
   item (e.g. 300 credit vs 400 bill) it is currently **left untouched** (item stays
   Unpaid). Author expects partial consume (apply 300, owe 100) — needs a partial/
   `creditApplied` state on the item (domain + migration + UI). Decided to defer.
-- **Isolate E2E from the compose DB:** E2E (Testcontainers) clobbered the local
-  compose DB during the W4 close-out (admin + domain data truncated). Remedy used:
-  `docker compose restart api` re-seeds the admin, then re-seed demo data. The
-  fixture should point only at its own container — see Testing & gotchas.
 - Optional UI polish (flow hints on the billing "Distribute/Close" actions).
 
 ## Collaboration style (author preferences)
