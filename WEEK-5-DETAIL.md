@@ -111,25 +111,38 @@ guardrail'leri baştan kapatmak (yeni E2E yığmadan önce).
 
 ---
 
-## Gün 2 — Resident Portal Backend (IDOR-safe "me" endpoint'leri)
+## Gün 2 — Resident Portal Backend (IDOR-safe "me" endpoint'leri) ✅
 
 **Hedef:** Sakin kendi borcunu görür ve **kendi** kalemini öder; başkasınınkine
 erişemez.
 
-- [ ] `GET /api/me/bills` — `[Authorize(Roles=Resident)]`; `ICurrentUser.ResidentId`
-      → `ListResidentBillsAsync`. Route'ta id **yok**.
-- [ ] `GET /api/me/summary` (opsiyonel) — kendi toplam borcu + kredisi.
-- [ ] `POST /api/me/bills/{itemId}/pay-by-card` — ownership guard'lı ödeme: item
-      gerçekten çağıranın mı? değilse **403/404** (bilgi sızdırma yok). Başarılıysa
-      mevcut pay zinciri (charge first → `Paid`), decline → 402.
-- [ ] Ownership kontrolü için: item → residentId eşleşmesi (billing item zaten
-      `ResidentId` taşıyor) `ICurrentUser.ResidentId` ile karşılaştırılır.
-- [ ] **TDD:** handler unit'leri (kendi item'ı / başkasının item'ı / decline);
-      `me` controller authz.
-- [ ] **IDOR guardrail E2E:** Resident A login → B'nin item'ını oku/öde → 403/404;
-      kendi item'ını öde → 204/Paid.
+> **Tasarım kararı (Gün 2'de oturdu):** authz'u handler'larda `if/else` yerine
+> **pipeline + request marker**'a aldık (author yönlendirmesi). İki yeni behavior:
+> `AuthorizationBehavior` (rol: `IAdminRequest`/`IResidentRequest`/`IPublicRequest`,
+> her request **tam bir** marker — `AuthorizationConventionsTests` guardrail'i) ve
+> `ResidentBillOwnershipBehavior` (resource-based: `IOwnedBillItemRequest` için
+> kalem çağıranın **kendi** faturalarında mı?). Sonuç: handler'larda **sıfır authz
+> kodu** — rol pipeline'da, sahiplik pipeline'da, iş handler'da. Pay komutları
+> admin/resident olarak **bölündü** (`PayDuesItem` vs `PayMyDuesItem`); ortak charge
+> mantığı `IBillItemPaymentService`'e çekildi (duplikasyon yok).
 
-**Commit:** `feat(api): resident self-service bills + pay own item (IDOR-guarded)`
+- [x] `GET /api/me/bills` — `GetMyBillsQuery` (`IResidentRequest`), `ICurrentUser.ResidentId`
+      → `ListResidentBillsAsync`. Route'ta id **yok** (token-scoped).
+- [ ] `GET /api/me/summary` — **Gün 6 dashboard'a ertelendi** (kendi borç+kredi özeti orada).
+- [x] `POST /api/me/dues/{periodId}/items/{itemId}/pay-by-card` +
+      `.../utility-bills/...` — `PayMyDuesItemCommand`/`PayMyUtilityItemCommand`
+      (`IOwnedBillItemRequest`). Charge first → `Paid`; decline → 402; başkasının
+      kalemi → **403** (ownership behavior, bilgi sızmaz).
+- [x] Ownership: `ResidentBillOwnershipBehavior` — kalem çağıranın fatura listesinde
+      yoksa 403. Handler'da karşılaştırma **yok**.
+- [x] **TDD:** `AuthorizationBehaviorTests` (7), `ResidentBillOwnershipBehaviorTests` (4),
+      `PayMyDuesItem`/`PayMyUtilityItem` handler (6), `GetMyBillsQueryHandler` (2).
+- [x] **IDOR guardrail E2E:** `ResidentPortalFlowTests` — A kendi faturasını görür
+      (B'ninkini görmez), kendi kalemini öder (204/Paid), B'nin kalemini → 403, Unpaid kalır.
+- [x] Kart alan validasyonu `CommonValidationRules`'a çekildi (`ValidCardNumber`/`ValidCvv`).
+
+**Tests:** Application 81, Architecture 18, E2E 32 — yeşil.
+**Commits:** `c93d291` (authz pipeline + markers) · `47cbff8` (resident portal + IDOR)
 
 ---
 
