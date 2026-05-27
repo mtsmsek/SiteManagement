@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 import { MyMessagesStore } from './my-messages.store';
 import { ResidentApi } from './resident.api';
-import type { ConversationListItem, ConversationMessage } from '../../core/api/messaging.models';
+import type { ConversationListItem, ConversationMessage } from '../../core/api/api.models';
 
 describe('MyMessagesStore', () => {
   const conversation: ConversationListItem = {

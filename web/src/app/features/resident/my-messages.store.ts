@@ -1,7 +1,7 @@
 import { inject, Injectable, signal } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { ResidentApi } from './resident.api';
-import type { ConversationListItem, ConversationMessage } from '../../core/api/messaging.models';
+import type { ConversationListItem, ConversationMessage } from '../../core/api/api.models';
 
 /**
  * Signal-based store for the resident's own conversations. Holds the inbox list

@@ -52,6 +52,11 @@ export type ChangeUtilityBillAmountRequest = Schemas['ChangeUtilityBillAmountReq
 // Resident self-service (own bills)
 export type ResidentBill = Schemas['ResidentBillDto'];
 
+// Messaging (admin <-> resident conversations)
+export type ConversationListItem = Schemas['ConversationListItemDto'];
+export type ConversationMessage = Schemas['MessageDto'];
+export type ConversationCreated = Schemas['ConversationCreatedResult'];
+
 // Shared
 export type ProblemDetails = Schemas['ProblemDetails'];
 
@@ -59,6 +64,12 @@ export type ProblemDetails = Schemas['ProblemDetails'];
 export const BillKind = {
   dues: 'Dues',
   utility: 'Utility',
+} as const;
+
+/** Message sender role values, as the API serialises them. */
+export const MessageSenderRole = {
+  admin: 'Admin',
+  resident: 'Resident',
 } as const;
 
 /**

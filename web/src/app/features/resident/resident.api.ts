@@ -1,12 +1,13 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiClient } from '../../core/api/api-client';
-import type { PayByCardRequest, ResidentBill } from '../../core/api/api.models';
 import type {
   ConversationCreated,
   ConversationListItem,
   ConversationMessage,
-} from '../../core/api/messaging.models';
+  PayByCardRequest,
+  ResidentBill,
+} from '../../core/api/api.models';
 
 /**
  * Resident self-service API surface. Every path is token-scoped on the server

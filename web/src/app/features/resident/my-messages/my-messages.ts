@@ -10,7 +10,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MyMessagesStore } from '../my-messages.store';
-import { MessageSenderRole } from '../../../core/api/messaging.models';
+import { MessageSenderRole } from '../../../core/api/api.models';
 
 /**
  * Resident messaging page. A two-pane view: the resident's conversation list
