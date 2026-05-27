@@ -207,24 +207,29 @@ erişemez.
 
 ---
 
-## Gün 6 — Raporlar + Dashboard'lar
+## Gün 6 — Raporlar + Dashboard'lar ✅
 
 **Hedef:** Admin borç-alacak görünürlüğü + iki taraflı dashboard.
 
 **Backend (read-side):**
-- [ ] `IReportQueries` (gerekirse) — admin: site(ler) borç/alacak özeti, tahsil
-      oranı, açık dönemler; mevcut `GetSiteDebtSummaryAsync` üstüne.
-- [ ] Resident dashboard verisi = `ListResidentBills` + toplam açık borç + kredi +
-      unread mesaj sayısı kompozisyonu.
+- [x] **Resident dashboard** (`GET /api/me/dashboard`, `IResidentRequest`):
+      `GetMyDashboardQuery` mevcut Billing + Messaging read'lerini **kompoze eder**
+      — açık borç + ödenmemiş sayı, kredi (`GetResidentCreditAsync`), okunmamış
+      mesaj. Token-scoped, yeni infra yok.
+- [x] **Admin dashboard** (`GET /api/reports/dashboard`, `IAdminRequest`): yeni
+      `IReportQueries` sistem geneli toplar — site/sakin sayısı, tahakkuk/tahsil,
+      açık bakiye, kredi, tahsilat oranı. Saf projeksiyon (`AsNoTracking`, DTO).
+- [x] Unit test: `GetMyDashboardQueryHandler` (kompozisyon + not-a-resident).
 
 **Frontend:**
-- [ ] **Admin dashboard:** site özetleri (tahakkuk/tahsil/bakiye/kredi), tahsil
-      oranı, kısa "son hareketler".
-- [ ] **Resident dashboard:** açık borç toplamı + kalemler kısa görünüm + okunmamış
-      mesaj rozeti.
-- [ ] (Opsiyonel) basit grafik/progress görselleştirme; aşırıya kaçma.
+- [x] **Resident dashboard** = `/resident` landing: açık borç (+ödenmemiş sayı),
+      kredi, okunmamış mesaj tile'ları + bills/messages derin link'leri.
+- [x] **Admin dashboard** = `/admin` landing: site/sakin sayısı, tahakkuk/tahsil,
+      açık bakiye, kredi, **tahsilat oranı** (PercentPipe). Nav link'leri + landing redirect'leri.
+- [x] i18n `resident.dashboard.*` + `admin.dashboard.*` (tr+en).
 
-**Commit:** `feat(reports): admin debt/credit report + admin & resident dashboards`
+**Commits:** `a8ed635` (backend read models) · `f5df440` (frontend dashboards).
+**Tests:** Application 83 (+2), Architecture 18, E2E 34, web 25 — yeşil; `ng build` temiz.
 
 ---
 
