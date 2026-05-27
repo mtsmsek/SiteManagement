@@ -186,22 +186,24 @@ erişemez.
 
 ---
 
-## Gün 5 — Angular Resident Portal
+## Gün 5 — Angular Resident Portal ✅
 
 **Hedef:** Sakin kendi alanında borcunu görür/öder ve mesajlaşır.
 
-- [ ] `npm run gen:api` (yeni `me/*` + messaging endpoint'leri).
-- [ ] Routing: `/resident/*` + **`residentGuard`** (`auth.isResident()` computed —
-      `auth.service.ts`'e ekle); login sonrası rol'e göre yönlendirme
-      (admin → `/admin`, resident → `/resident`).
-- [ ] Resident layout + sayfalar: **Borçlarım** (liste + kartla öde dialog'unu
-      yeniden kullan), **Mesajlar** (thread + cevap), **Dashboard** (Gün 6).
-- [ ] Ödeme akışı: mevcut `CardPaymentDialog` + animasyonlu hata snackbar'ı tekrar
-      kullan; `me/bills/{id}/pay-by-card`.
-- [ ] i18n `resident.*` + `messaging.*` (tr+en, **iki dosyaya da**).
-- [ ] Vitest: `residentGuard`, resident store(lar), payment akışı.
+- [x] **Routing:** `/resident/*` + **`residentGuard`** (`auth.isResident()` computed);
+      `AuthService.homeUrl()` ile login + admin/resident guard'ları rol bazlı
+      yönlendiriyor (admin→`/admin`, resident→`/resident`; rol uyuşmazlığı login loop'u değil kendi home'una).
+- [x] **Resident layout** (admin shell'i aynalar) + sayfalar: **Borçlarım**
+      (`MyBillsStore` — liste + açık borç toplamı + `CardPaymentDialog` reuse, dues/utility
+      kind'a göre endpoint), **Mesajlar** (`MyMessagesStore` — iki panel inbox/thread,
+      unread badge, yanıt + yeni konu; thread açınca unread temizlenir).
+- [x] `ResidentApi` token-scoped `/api/me/*` çağırır.
+- [x] i18n `resident.*` (tr+en).
+- [x] **Vitest:** `residentGuard` (3) + `MyBillsStore` (3) + `MyMessagesStore` (4) → web 25 (+10). `ng build` temiz.
+- [x] **`gen:api`** çalıştırıldı; messaging tipleri `api.models`'e alias'landı, geçici köprü silindi.
 
-**Commit:** `feat(web): resident portal — my bills, pay, messaging`
+**Commits:** `6692d9a` (portal) · `91f54cb` (gen:api + alias temizliği).
+**Not:** Tarayıcı doğrulaması Docker geri gelince yapılacak (kod derleniyor + Vitest yeşil).
 
 ---
 
