@@ -24,4 +24,7 @@ public interface IBillingQueries
 
     /// <summary>Returns the accrued / collected / outstanding totals for a site.</summary>
     Task<SiteDebtSummaryDto> GetSiteDebtSummaryAsync(Guid siteId, CancellationToken ct = default);
+
+    /// <summary>The resident's current over-payment credit balance (0 when they have none).</summary>
+    Task<decimal> GetResidentCreditAsync(Guid residentId, CancellationToken ct = default);
 }

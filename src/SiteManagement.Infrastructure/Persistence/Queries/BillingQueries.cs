@@ -124,6 +124,14 @@ public sealed class BillingQueries(AppDbContext dbContext) : IBillingQueries
         return new SiteDebtSummaryDto(siteId, accrued, collected, accrued - collected, credit);
     }
 
+    /// <inheritdoc />
+    public async Task<decimal> GetResidentCreditAsync(Guid residentId, CancellationToken ct = default)
+        => await _dbContext.ResidentCreditAccounts
+            .AsNoTracking()
+            .Where(a => a.ResidentId == residentId)
+            .Select(a => a.Balance.Amount)
+            .FirstOrDefaultAsync(ct);
+
     /// <summary>
     /// Enriches a period's raw items with the apartment label ("A-1") and the
     /// occupant's name. Owned-collection items don't join cleanly to the other

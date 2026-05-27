@@ -15,6 +15,8 @@ using SiteManagement.Application.Messaging.Commands.StartMyConversation;
 using SiteManagement.Application.Messaging.Queries;
 using SiteManagement.Application.Messaging.Queries.GetMyConversationMessages;
 using SiteManagement.Application.Messaging.Queries.ListMyConversations;
+using SiteManagement.Application.Reports.Queries;
+using SiteManagement.Application.Reports.Queries.GetMyDashboard;
 using SiteManagement.Domain.Identity;
 
 namespace SiteManagement.Api.Controllers.Me;
@@ -31,6 +33,7 @@ namespace SiteManagement.Api.Controllers.Me;
 [Route($"{ApiConstants.RoutePrefix}/me")]
 public class MeController(ISender sender) : ControllerBase
 {
+    private const string DashboardRoute = "dashboard";
     private const string BillsRoute = "bills";
     private const string PayDuesRoute = "dues/{duesPeriodId:guid}/items/{itemId:guid}/pay-by-card";
     private const string PayUtilityRoute = "utility-bills/{utilityBillPeriodId:guid}/items/{itemId:guid}/pay-by-card";
@@ -39,6 +42,12 @@ public class MeController(ISender sender) : ControllerBase
     private const string ConversationReadRoute = "conversations/{conversationId:guid}/read";
 
     private readonly ISender _sender = sender;
+
+    /// <summary>The current resident's portal summary (outstanding, credit, unread messages).</summary>
+    [HttpGet(DashboardRoute)]
+    [ProducesResponseType<ResidentDashboardDto>(StatusCodes.Status200OK)]
+    public async Task<ActionResult<ResidentDashboardDto>> Dashboard(CancellationToken ct)
+        => Ok(await _sender.Send(new GetMyDashboardQuery(), ct));
 
     /// <summary>Lists the current resident's own outstanding + paid bills.</summary>
     [HttpGet(BillsRoute)]
