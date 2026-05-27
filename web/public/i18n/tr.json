@@ -228,7 +228,8 @@
   "resident": {
     "nav": {
       "bills": "Borçlarım",
-      "messages": "Mesajlar"
+      "messages": "Mesajlar",
+      "dashboard": "Panel"
     },
     "bills": {
       "title": "Borçlarım",
@@ -252,6 +253,27 @@
       "empty": "Henüz mesajınız yok.",
       "reply": "Yanıt",
       "selectPrompt": "Görüntülemek için bir konu seçin."
+    },
+    "dashboard": {
+      "title": "Panelim",
+      "outstanding": "Açık borç",
+      "unpaidCount": "{{count}} ödenmemiş kalem",
+      "credit": "Kredi bakiyem",
+      "unread": "Okunmamış mesaj",
+      "goBills": "Borçlarıma git",
+      "goMessages": "Mesajlara git"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Yönetim Paneli",
+      "sites": "Site",
+      "residents": "Sakin",
+      "accrued": "Tahakkuk",
+      "collected": "Tahsil",
+      "outstanding": "Açık bakiye",
+      "credit": "Sakin kredisi",
+      "collectionRate": "Tahsilat oranı"
     }
   }
 }

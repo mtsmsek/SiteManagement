@@ -1,0 +1,28 @@
+<h1 class="page-title">{{ 'resident.dashboard.title' | translate }}</h1>
+
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate" />
+} @else if (data(); as d) {
+  <div class="tiles">
+    <mat-card class="tile" [class.alert]="+d.totalOutstanding > 0">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <div class="value">{{ d.totalOutstanding | number: '1.2-2' }} ₺</div>
+      <div class="label">{{ 'resident.dashboard.outstanding' | translate }}</div>
+      <div class="sub">{{ 'resident.dashboard.unpaidCount' | translate: { count: d.unpaidCount } }}</div>
+      <a matButton routerLink="/resident/bills">{{ 'resident.dashboard.goBills' | translate }}</a>
+    </mat-card>
+
+    <mat-card class="tile credit">
+      <mat-icon>savings</mat-icon>
+      <div class="value">{{ d.totalCredit | number: '1.2-2' }} ₺</div>
+      <div class="label">{{ 'resident.dashboard.credit' | translate }}</div>
+    </mat-card>
+
+    <mat-card class="tile">
+      <mat-icon>forum</mat-icon>
+      <div class="value">{{ d.unreadMessages }}</div>
+      <div class="label">{{ 'resident.dashboard.unread' | translate }}</div>
+      <a matButton routerLink="/resident/messages">{{ 'resident.dashboard.goMessages' | translate }}</a>
+    </mat-card>
+  </div>
+}

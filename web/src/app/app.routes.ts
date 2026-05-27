@@ -11,7 +11,12 @@ export const routes: Routes = [
     canActivate: [adminGuard],
     loadComponent: () => import('./layouts/admin-layout/admin-layout').then((m) => m.AdminLayout),
     children: [
-      { path: '', redirectTo: 'sites', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/reports/admin-dashboard/admin-dashboard').then((m) => m.AdminDashboard),
+      },
       {
         path: 'sites',
         loadComponent: () => import('./features/sites/site-list/site-list').then((m) => m.SiteList),
@@ -39,7 +44,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./layouts/resident-layout/resident-layout').then((m) => m.ResidentLayout),
     children: [
-      { path: '', redirectTo: 'bills', pathMatch: 'full' },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+      {
+        path: 'dashboard',
+        loadComponent: () =>
+          import('./features/resident/dashboard/resident-dashboard').then((m) => m.ResidentDashboard),
+      },
       {
         path: 'bills',
         loadComponent: () => import('./features/resident/my-bills/my-bills').then((m) => m.MyBills),

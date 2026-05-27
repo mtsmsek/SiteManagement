@@ -7,6 +7,7 @@ import type {
   ConversationMessage,
   PayByCardRequest,
   ResidentBill,
+  ResidentDashboard,
 } from '../../core/api/api.models';
 
 /**
@@ -17,6 +18,11 @@ import type {
 @Injectable({ providedIn: 'root' })
 export class ResidentApi {
   private readonly api = inject(ApiClient);
+
+  /** The current resident's portal summary (outstanding, credit, unread messages). */
+  myDashboard(): Observable<ResidentDashboard> {
+    return this.api.get<ResidentDashboard>('/me/dashboard');
+  }
 
   /** The current resident's own bills (dues + utility). */
   myBills(): Observable<ResidentBill[]> {

@@ -3,6 +3,10 @@
     <div class="brand">{{ 'common.appName' | translate }}</div>
 
     <mat-nav-list>
+      <a mat-list-item routerLink="/admin/dashboard" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>{{ 'nav.dashboard' | translate }}</span>
+      </a>
       <a mat-list-item routerLink="/admin/sites" routerLinkActive="active-link">
         <mat-icon matListItemIcon>apartment</mat-icon>
         <span matListItemTitle>{{ 'nav.sites' | translate }}</span>

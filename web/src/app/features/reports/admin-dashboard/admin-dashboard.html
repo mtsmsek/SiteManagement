@@ -1,0 +1,49 @@
+<h1 class="page-title">{{ 'admin.dashboard.title' | translate }}</h1>
+
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate" />
+} @else if (data(); as d) {
+  <div class="tiles">
+    <mat-card class="tile">
+      <mat-icon>apartment</mat-icon>
+      <div class="value">{{ d.siteCount }}</div>
+      <div class="label">{{ 'admin.dashboard.sites' | translate }}</div>
+    </mat-card>
+
+    <mat-card class="tile">
+      <mat-icon>people</mat-icon>
+      <div class="value">{{ d.residentCount }}</div>
+      <div class="label">{{ 'admin.dashboard.residents' | translate }}</div>
+    </mat-card>
+
+    <mat-card class="tile">
+      <mat-icon>request_quote</mat-icon>
+      <div class="value">{{ d.totalAccrued | number: '1.2-2' }} ₺</div>
+      <div class="label">{{ 'admin.dashboard.accrued' | translate }}</div>
+    </mat-card>
+
+    <mat-card class="tile">
+      <mat-icon>payments</mat-icon>
+      <div class="value">{{ d.totalCollected | number: '1.2-2' }} ₺</div>
+      <div class="label">{{ 'admin.dashboard.collected' | translate }}</div>
+    </mat-card>
+
+    <mat-card class="tile alert">
+      <mat-icon>account_balance_wallet</mat-icon>
+      <div class="value">{{ d.totalOutstanding | number: '1.2-2' }} ₺</div>
+      <div class="label">{{ 'admin.dashboard.outstanding' | translate }}</div>
+    </mat-card>
+
+    <mat-card class="tile credit">
+      <mat-icon>savings</mat-icon>
+      <div class="value">{{ d.totalCredit | number: '1.2-2' }} ₺</div>
+      <div class="label">{{ 'admin.dashboard.credit' | translate }}</div>
+    </mat-card>
+
+    <mat-card class="tile">
+      <mat-icon>trending_up</mat-icon>
+      <div class="value">{{ d.collectionRate | percent: '1.0-0' }}</div>
+      <div class="label">{{ 'admin.dashboard.collectionRate' | translate }}</div>
+    </mat-card>
+  </div>
+}

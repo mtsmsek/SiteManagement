@@ -228,7 +228,8 @@
   "resident": {
     "nav": {
       "bills": "My Bills",
-      "messages": "Messages"
+      "messages": "Messages",
+      "dashboard": "Dashboard"
     },
     "bills": {
       "title": "My Bills",
@@ -252,6 +253,27 @@
       "empty": "You have no messages yet.",
       "reply": "Reply",
       "selectPrompt": "Select a thread to view it."
+    },
+    "dashboard": {
+      "title": "My Dashboard",
+      "outstanding": "Outstanding",
+      "unpaidCount": "{{count}} unpaid item(s)",
+      "credit": "My credit",
+      "unread": "Unread messages",
+      "goBills": "Go to my bills",
+      "goMessages": "Go to messages"
+    }
+  },
+  "admin": {
+    "dashboard": {
+      "title": "Admin Dashboard",
+      "sites": "Sites",
+      "residents": "Residents",
+      "accrued": "Accrued",
+      "collected": "Collected",
+      "outstanding": "Outstanding",
+      "credit": "Resident credit",
+      "collectionRate": "Collection rate"
     }
   }
 }

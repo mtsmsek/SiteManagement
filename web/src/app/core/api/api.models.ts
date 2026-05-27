@@ -57,6 +57,10 @@ export type ConversationListItem = Schemas['ConversationListItemDto'];
 export type ConversationMessage = Schemas['MessageDto'];
 export type ConversationCreated = Schemas['ConversationCreatedResult'];
 
+// Reports (dashboards)
+export type ResidentDashboard = Schemas['ResidentDashboardDto'];
+export type AdminDashboard = Schemas['AdminDashboardDto'];
+
 // Shared
 export type ProblemDetails = Schemas['ProblemDetails'];
 

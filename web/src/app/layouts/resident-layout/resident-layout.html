@@ -3,6 +3,10 @@
     <div class="brand">{{ 'common.appName' | translate }}</div>
 
     <mat-nav-list>
+      <a mat-list-item routerLink="/resident/dashboard" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>dashboard</mat-icon>
+        <span matListItemTitle>{{ 'resident.nav.dashboard' | translate }}</span>
+      </a>
       <a mat-list-item routerLink="/resident/bills" routerLinkActive="active-link">
         <mat-icon matListItemIcon>receipt_long</mat-icon>
         <span matListItemTitle>{{ 'resident.nav.bills' | translate }}</span>

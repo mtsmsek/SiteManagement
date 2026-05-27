@@ -978,6 +978,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/reports/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** System-wide dashboard totals (counts, accrued/collected, outstanding, credit, collection rate). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["AdminDashboardDto"];
+                        "application/json": components["schemas"]["AdminDashboardDto"];
+                        "text/json": components["schemas"]["AdminDashboardDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/conversations": {
         parameters: {
             query?: never;
@@ -1173,6 +1211,44 @@ export interface paths {
                 };
             };
         };
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/dashboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The current resident's portal summary (outstanding, credit, unread messages). */
+        get: {
+            parameters: {
+                query?: never;
+                header?: never;
+                path?: never;
+                cookie?: never;
+            };
+            requestBody?: never;
+            responses: {
+                /** @description OK */
+                200: {
+                    headers: {
+                        [name: string]: unknown;
+                    };
+                    content: {
+                        "text/plain": components["schemas"]["ResidentDashboardDto"];
+                        "application/json": components["schemas"]["ResidentDashboardDto"];
+                        "text/json": components["schemas"]["ResidentDashboardDto"];
+                    };
+                };
+            };
+        };
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2912,6 +2988,22 @@ export interface components {
             plate: string;
             note: null | string;
         };
+        AdminDashboardDto: {
+            /** Format: int32 */
+            siteCount: number | string;
+            /** Format: int32 */
+            residentCount: number | string;
+            /** Format: double */
+            totalAccrued: number | string;
+            /** Format: double */
+            totalCollected: number | string;
+            /** Format: double */
+            totalOutstanding: number | string;
+            /** Format: double */
+            totalCredit: number | string;
+            /** Format: double */
+            collectionRate: number | string;
+        };
         ApartmentOccupantDto: {
             /** Format: uuid */
             assignmentId: string;
@@ -3134,6 +3226,16 @@ export interface components {
             /** Format: double */
             amount: number | string;
             status: string;
+        };
+        ResidentDashboardDto: {
+            /** Format: double */
+            totalOutstanding: number | string;
+            /** Format: double */
+            totalCredit: number | string;
+            /** Format: int32 */
+            unpaidCount: number | string;
+            /** Format: int32 */
+            unreadMessages: number | string;
         };
         ResidentDetailsDto: {
             /** Format: uuid */
