@@ -294,15 +294,19 @@ Postman'i ad-hoc keşif için kullan (yeni endpoint denerken). Regression yükü
 
 ---
 
-### Hafta 5 — Messaging & Reports
+### Hafta 5 — Resident Portal + Messaging & Reports ✅
 **Hedef:** "Tüm functional requirement'lar tamam"
 
-- Messaging Domain (TDD)
-- Messaging API + Angular UI
-- Borç-alacak raporu + admin dashboard
-- Resident dashboard
+- ✅ **Resident portal** — sakin login → "borçlarım" → **kendi** kalemini kartla öder; **IDOR korumalı** (token-scoped `/api/me/*` + iki resource-ownership pipeline behavior, her iki yön E2E)
+- ✅ **Authorization pipeline** — rol marker'ları (`IAdminRequest`/`IResidentRequest`/`IPublicRequest`) + `AuthorizationBehavior`; "her request authz deklare etmeli" arch guardrail'i; handler'larda authz kodu yok
+- ✅ Messaging Domain (TDD) — `Conversation` aggregate
+- ✅ Messaging API (admin `/api/conversations` + resident `/api/me/conversations`) + per-side unread; **Angular resident messaging UI** (admin UI ertelendi)
+- ✅ Admin dashboard (site/sakin sayısı, tahakkuk/tahsil, açık bakiye, kredi, tahsilat oranı) + resident dashboard (açık borç + kredi + okunmamış mesaj)
+- ✅ **Hijyen:** E2E↔compose DB izolasyonu + PaymentService architecture testleri
 
-**Definition of Done:** PDF'deki tüm madde işaretlenebilir. Admin ve resident kendi dashboard'larına sahip.
+**Definition of Done:** ✅ Sakin kendi dashboard'ı + borç ödeme + mesajlaşma; admin dashboard + mesajlaşma (backend). Tüm testler yeşil (Domain 222, App 83, Arch 18, E2E 34; PaymentService 54; web 25).
+
+> **W6'ya devreden:** admin messaging Angular sayfası (backend hazır), credit partial settlement, SignalR/real-time, deploy + polish.
 
 ---
 

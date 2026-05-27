@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com/)
 
-🚧 **Work in progress** — **Hafta 1-4 tamam.** Foundation & Deploy → Property/Residency → Tenancy & Billing → **Payment microservice (MongoDB)**. Sırada: resident portal + messaging + reports (W5, planı çıkarıldı). [ROADMAP.md](ROADMAP.md) 6 haftalık planı; gün gün ilerleme [WEEK-1-2-DETAIL.md](WEEK-1-2-DETAIL.md) · [WEEK-3-DETAIL.md](WEEK-3-DETAIL.md) · [WEEK-4-DETAIL.md](WEEK-4-DETAIL.md) · [WEEK-5-DETAIL.md](WEEK-5-DETAIL.md).
+🚧 **Work in progress** — **Hafta 1-5 tamam.** Foundation & Deploy → Property/Residency → Tenancy & Billing → **Payment microservice (MongoDB)** → **Resident portal + Messaging + Dashboards (IDOR-safe authz pipeline)**. Sırada: W6 (polish & ship). [ROADMAP.md](ROADMAP.md) 6 haftalık planı; gün gün ilerleme [WEEK-1-2-DETAIL.md](WEEK-1-2-DETAIL.md) · [WEEK-3-DETAIL.md](WEEK-3-DETAIL.md) · [WEEK-4-DETAIL.md](WEEK-4-DETAIL.md) · [WEEK-5-DETAIL.md](WEEK-5-DETAIL.md).
 
 ---
 
@@ -45,7 +45,14 @@
 - ✅ Angular kart ödeme dialog'u + belirgin animasyonlu hata snackbar'ı
 - ✅ İki-katmanlı E2E: PaymentService gerçek Mongo+HTTP; ana API pay-by-card WireMock stub (consumer contract)
 
-🔜 **Hafta 5:** resident portal (sakin login → "borçlarım" → kendi kalemini öde, **IDOR** koruması) + messaging & reports.
+**Resident portal + Messaging + Dashboards (W5):**
+- ✅ **Authorization pipeline** — her request tam bir rol marker'ı (`IAdminRequest`/`IResidentRequest`/`IPublicRequest`) deklare eder; `AuthorizationBehavior` merkezi dayatır, **arch test** "authz'u unutmak = build hatası" yapar. Handler'larda authz kodu yok.
+- ✅ **Resident portal** — sakin login → kendi dashboard'ı, "borçlarım", kendi kalemini kartla öder. Token-scoped `/api/me/*` + **resource-ownership pipeline behavior'ları**; **IDOR** her iki yön E2E ile kanıtlı (403/402, kalem `Unpaid` kalır)
+- ✅ **Messaging** — admin ↔ sakin thread'leri (`Conversation` aggregate, TDD), per-side okunmamış sayacı; admin `/api/conversations` + resident `/api/me/conversations`; Angular resident mesajlaşma UI'si
+- ✅ **Dashboard'lar** — admin (site/sakin sayısı, tahakkuk/tahsil, açık bakiye, kredi, tahsilat oranı) + resident (açık borç + kredi + okunmamış mesaj); saf read-side projeksiyon
+- ✅ Angular `/resident/*` alanı (`residentGuard`, rol bazlı login yönlendirme)
+
+🔜 **Hafta 6:** polish & ship — admin messaging UI, test coverage, deploy, demo.
 
 ---
 

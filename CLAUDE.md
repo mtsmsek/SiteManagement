@@ -54,6 +54,16 @@ Clean layered: `Domain` → `Application` → `Infrastructure` / `Api`.
    in validators; deep validity (TcNo checksum, etc.) lives on value objects.
 
 ## Implemented patterns — DON'T break these
+- **Authorization is a pipeline concern, never in handlers (W5).** Every MediatR
+  request implements **exactly one** role marker — `IAdminRequest` /
+  `IResidentRequest` / `IPublicRequest` — and `AuthorizationBehavior` enforces it
+  centrally. **Guardrail:** `AuthorizationConventionsTests` fails the build if a
+  request declares zero or many. Resource **ownership** (IDOR) is also a behavior,
+  not a handler `if`: a request implements `IOwnedBillItemRequest` /
+  `IOwnedConversationRequest` (exposes the resource id) and the matching ownership
+  behavior verifies it belongs to `ICurrentUser.ResidentId`. Resident endpoints are
+  token-scoped (`/api/me/*`, id never in the route). When adding an endpoint: pick a
+  marker (the arch test forces it); never re-check roles/ownership inside a handler.
 - **Domain events vs Integration events (Outbox).** `IDomainEvent` → dispatched
   **in-transaction** (atomic cross-aggregate state, e.g. assignment → apartment
   occupied). `IIntegrationEvent` → persisted to the **OutboxMessage** table in the
@@ -144,8 +154,37 @@ fine: migrations + bootstrap-admin seed run automatically on `docker compose up`
 - Docker Desktop / the `npm start` dev server occasionally stop on this setup —
   if `:4200` or `:8080` is down, restart them; it's environmental.
 
-## Current status (updated 2026-05-26)
-**Done:** **W1–W4 complete.** W1–W3 (Property, Residency, Tenancy, Billing
+## Current status (updated 2026-05-28)
+**Done:** **W1–W5 complete.**
+
+**W5 — Resident portal + Messaging + Dashboards (closed out, Day 7 done):**
+- **Authorization pipeline (new backbone).** Every MediatR request declares
+  **exactly one** role marker — `IAdminRequest` / `IResidentRequest` /
+  `IPublicRequest` (in `Application.Abstractions.Messaging`) — enforced centrally
+  by `AuthorizationBehavior` and by an architecture test
+  (`AuthorizationConventionsTests`): forgetting authz is a build error. **Handlers
+  carry zero authz code.** Resource **ownership** (IDOR) is two more pipeline
+  behaviors — `ResidentBillOwnershipBehavior` (`IOwnedBillItemRequest`) and
+  `ConversationOwnershipBehavior` (`IOwnedConversationRequest`) — that check the
+  item/conversation belongs to the caller. Role in the pipeline, ownership in the
+  pipeline, work in the handler. Controllers keep `[Authorize(Roles=…)]` as
+  defense-in-depth. `UnauthorizedActionException` carries a localized `MessageKey`.
+- **Resident portal.** Token-scoped `/api/me/*` (id never in the route): `me/bills`,
+  pay own dues/utility item by card (`PayMyDuesItem`/`PayMyUtilityItem`, split from
+  the admin commands), `me/conversations*`, `me/dashboard`. IDOR proven both ways
+  by E2E (`ResidentPortalFlowTests`, `MessagingFlowTests`). Shared charge logic in
+  `IBillItemPaymentService`; card rules in `CommonValidationRules`.
+- **Messaging** (new bounded context, in the main API). `Conversation` aggregate
+  (TDD) with inner `Message`s, per-side unread, `MarkRead` touches only the other
+  side. Admin `/api/conversations` + resident `/api/me/conversations`. EF owned
+  collection + `AddMessagingConversations` migration. **Polling, no SignalR.**
+- **Dashboards (read-side).** Resident (`GetMyDashboardQuery` composes Billing +
+  Messaging reads) + admin (`IReportQueries` system-wide totals + collection rate).
+  Angular `/resident/*` (residentGuard, role-based login redirect), resident +
+  admin dashboards as landing pages, my-bills (reuses card dialog), messaging UI.
+- **Hygiene:** E2E↔compose DB isolation fixed; PaymentService architecture tests.
+
+**W1–W3** (Property, Residency, Tenancy, Billing
 dues+utility; Angular admin pages; outbox; soft delete/restore/purge on Site;
 audit metadata; `IQuery<T>` marker + guardrails). **W4 closed out (Day 7 done):**
 the MongoDB **PaymentService** (separate solution, fake bank, idempotency),
@@ -159,18 +198,22 @@ fully covers; `PUT` endpoints + `TotalCredit` in the debt summary), and a
 surface directly + scale-in/glow, 8s — the `--mdc-snackbar-container-color` token
 no longer drives the surface; custom `ErrorSnackbar` via `openFromComponent`).
 **W4 self-review verdict:** code architecturally sound, no real defects; see
-`WEEK-4-DETAIL.md` Day 7 for the boundary/402/idempotency findings + the three
-deferred items below. **Tests green:** Domain 213, Application 62, Architecture 17,
-E2E 29 (main; +1 connection-string isolation guardrail, W5 D1); PaymentService
-Domain 46, Architecture 4 (W5 D1), E2E 4; web (Vitest) 15.
+`WEEK-4-DETAIL.md` Day 7 for the boundary/402/idempotency findings.
+**Tests green (all suites, 2026-05-28):** main Domain 222, Application 83,
+Architecture 18, E2E 34; PaymentService Domain 46, Architecture 4, E2E 4;
+web (Vitest) 25.
 
-**Pending / next:**
-- **Resident-facing portal (W5, NEXT):** resident login + "my bills" + paying
-  **own** item, with **IDOR** protection. All pay endpoints are admin-only until then.
+**Pending / next (W6 — Polish & Ship):**
+- **Admin messaging UI (Angular):** backend (`/api/conversations`) + resident UI +
+  E2E are done; the admin-side messaging *page* was deferred (W5 focus was the
+  resident portal). Quick add — mirror the resident `my-messages` page against
+  `/api/conversations` (route carries `residentId`, show resident name per thread).
 - **Credit partial settlement (deferred to project end):** when credit < the new
   item (e.g. 300 credit vs 400 bill) it is currently **left untouched** (item stays
   Unpaid). Author expects partial consume (apply 300, owe 100) — needs a partial/
   `creditApplied` state on the item (domain + migration + UI). Decided to defer.
+- **SignalR / real-time messaging** (roadmap; W5 uses polling).
+- W6: test-coverage fill, README v2 + ADRs, UI polish, final deploy + smoke, demo.
 - Optional UI polish (flow hints on the billing "Distribute/Close" actions).
 
 ## Collaboration style (author preferences)

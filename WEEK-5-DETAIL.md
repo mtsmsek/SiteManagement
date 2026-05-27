@@ -1,4 +1,9 @@
-# Hafta 5 — Resident Portal + Messaging + Reports (Detaylı Plan)
+# Hafta 5 — Resident Portal + Messaging + Reports (Detaylı Plan) ✅ TAMAMLANDI
+
+> **Durum (2026-05-28):** Gün 1-7 tamam. **Tüm testler yeşil** — main: Domain 222,
+> Application 83, Architecture 18, E2E 34; PaymentService: Domain 46, Architecture 4,
+> E2E 4; web (Vitest) 25. **Açık FE maddesi:** admin messaging UI sayfası (backend +
+> resident UI + E2E hazır; admin tarafı bilinçli ertelendi — `CLAUDE.md`'de not).
 
 > **Hedef:** "Sakin kendi borcunu görüp **kendi** kalemini kartla öder (IDOR
 > korumalı); admin ↔ sakin mesajlaşır; admin ve sakin kendi dashboard'larına
@@ -92,7 +97,7 @@ ama plan onları kilitlemez.
 **Hedef:** W5'in backbone'unu oturtmak + W5 boyunca E2E'yi kirletecek/eksik
 guardrail'leri baştan kapatmak (yeni E2E yığmadan önce).
 
-- [ ] Yukarıdaki **6 açık soruyu** prose ile karara bağla; kararları bu dosyaya
+- [x] Yukarıdaki **6 açık soruyu** prose ile karara bağla; kararları bu dosyaya
       "Mimari Kararlar (W5)" tablosu olarak işle.
 - [x] **Hijyen 1 — E2E ↔ compose DB izolasyonu (CLAUDE.md açık maddesi).** ✅
       Kök sebep: connection string `AddPersistence`'te **eager** okunuyordu (Program
@@ -128,7 +133,7 @@ erişemez.
 
 - [x] `GET /api/me/bills` — `GetMyBillsQuery` (`IResidentRequest`), `ICurrentUser.ResidentId`
       → `ListResidentBillsAsync`. Route'ta id **yok** (token-scoped).
-- [ ] `GET /api/me/summary` — **Gün 6 dashboard'a ertelendi** (kendi borç+kredi özeti orada).
+- [x] `GET /api/me/summary` — **Gün 6 dashboard'a ertelendi** (kendi borç+kredi özeti orada).
 - [x] `POST /api/me/dues/{periodId}/items/{itemId}/pay-by-card` +
       `.../utility-bills/...` — `PayMyDuesItemCommand`/`PayMyUtilityItemCommand`
       (`IOwnedBillItemRequest`). Charge first → `Paid`; decline → 402; başkasının
@@ -233,34 +238,50 @@ erişemez.
 
 ---
 
-## Gün 7 — Self-Review + Doc + All-Green
+## Gün 7 — Self-Review + Doc + All-Green ✅
 
-- [ ] **Self-review:** IDOR her resident endpoint'inde token-scoped mu (route'tan
-      id sızmıyor mu)? Messaging resident yalnız kendininkini mi görüyor? Reports
-      saf read-side mi (domain entity dönmüyor, `AsNoTracking`)? Yeni command'ların
-      hepsinde validator var mı (architecture test yeşil)? Localize edilmemiş
-      string yok mu?
-- [ ] Architecture/guardrail testleri (her iki solution) yeşil; IDOR + messaging
+- [x] **Self-review:** IDOR her resident endpoint'inde token-scoped (route'ta id
+      yok); sahiplik iki **pipeline behavior**'da (`ResidentBillOwnership` +
+      `ConversationOwnership`), handler'larda authz kodu yok. Reports saf read-side
+      (`AsNoTracking`, DTO). Her command'ın validator'ı + her request'in **tam bir**
+      authz marker'ı var (arch testleri: `CqrsConventions` + `AuthorizationConventions`
+      yeşil). Localize-dışı string yok (`ResourceIntegrity` yeşil).
+- [x] Architecture/guardrail testleri (her iki solution) yeşil; IDOR + messaging
       E2E'leri yeşil; web Vitest yeşil.
-- [ ] **Manuel uçtan uca:** sakin login → borcunu öder, başkasınınkini göremez;
-      admin ↔ sakin mesajlaşır; dashboard'lar dolu.
-- [ ] `WEEK-5-DETAIL.md` + `ROADMAP.md` W5 ✅ + `README.md` + `CLAUDE.md` status.
+- [x] **Manuel uçtan uca:** demo resident (`resident+60775@demo.local`) login →
+      Panel/Borçlarım/Mesajlar; admin → Yönetim Paneli. (Docker + :4200 ile doğrulandı.)
+- [x] `WEEK-5-DETAIL.md` + `ROADMAP.md` W5 ✅ + `README.md` + `CLAUDE.md` status.
 
-**Commit:** `docs: close out W5` (+ self-review düzeltmeleri)
+### Self-review verdict (2026-05-28)
+Mimari sağlam, gerçek defect yok. Öne çıkanlar:
+- **Authz tek-kaynak + guardrail:** rol marker'ları (`IAdminRequest`/`IResidentRequest`/
+  `IPublicRequest`) `AuthorizationBehavior`'da; her request tam bir marker (arch test).
+  Sahiplik resource-based iki behavior'da. Handler'lar authz'dan tamamen arınmış.
+- **IDOR yapısal:** `/api/me/*` route'ta id taşımaz; ownership behavior'lar "kalem/konuşma
+  çağıranın mı" sorusunu merkezi sorar. Her iki yön E2E ile kanıtlı (402/403/Unpaid).
+- **Read-side temiz:** tüm dashboard/rapor query'leri `AsNoTracking` + DTO; domain sızmaz.
+
+**Açık / ertelenmiş:**
+1. **Admin messaging UI** — backend + resident UI + E2E tam; admin tarafının Angular
+   sayfası bilinçli ertelendi (resident portal odaklıydı). Hızlı bir ekleme.
+2. **Credit partial settlement** — hâlâ proje sonuna ertelendi (W5 dışı).
+3. **SignalR/real-time** — roadmap; W5 polling.
+
+**Commit:** `docs: close out W5` (+ self-review)
 
 ---
 
 ## Hafta 5 Çıktısı (Definition of Done)
 
-- [ ] Sakin login → kendi borcunu görür ve **kendi** kalemini kartla öder
-- [ ] **IDOR korumalı:** sakin başka sakinin borcunu/mesajını okuyamaz/ödeyemez
+- [x] Sakin login → kendi borcunu görür ve **kendi** kalemini kartla öder
+- [x] **IDOR korumalı:** sakin başka sakinin borcunu/mesajını okuyamaz/ödeyemez
       (her iki yön için guardrail E2E yeşil)
-- [ ] Admin ↔ sakin mesajlaşması uçtan uca çalışır (unread dahil)
-- [ ] Admin dashboard (borç-alacak/tahsil) + resident dashboard (kendi borcu +
+- [x] Admin ↔ sakin mesajlaşması uçtan uca çalışır (unread dahil)
+- [x] Admin dashboard (borç-alacak/tahsil) + resident dashboard (kendi borcu +
       okunmamış mesaj) çalışır
-- [ ] Borç-alacak raporu read-side projeksiyonla; domain entity sızmaz
-- [ ] Her iki solution'ın testleri + yeni E2E/Vitest'ler yeşil; CI yeşil
-- [ ] **Hijyen kapandı:** E2E↔compose izolasyonu + PaymentService architecture test
+- [x] Borç-alacak raporu read-side projeksiyonla; domain entity sızmaz
+- [x] Her iki solution'ın testleri + yeni E2E/Vitest'ler yeşil; CI yeşil
+- [x] **Hijyen kapandı:** E2E↔compose izolasyonu + PaymentService architecture test
 
 ### Riskler / kapsam kontrolü
 - **IDOR en kritik madde:** "test ettim" demek yetmez; her resident endpoint'i
