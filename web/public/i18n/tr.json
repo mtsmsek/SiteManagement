@@ -224,5 +224,34 @@
     "generic": "Bir hata oluştu.",
     "network": "Sunucuya ulaşılamıyor.",
     "unauthorized": "Bu işlem için yetkiniz yok."
+  },
+  "resident": {
+    "nav": {
+      "bills": "Borçlarım",
+      "messages": "Mesajlar"
+    },
+    "bills": {
+      "title": "Borçlarım",
+      "outstanding": "Açık borç",
+      "empty": "Borcunuz bulunmuyor.",
+      "month": "Ay",
+      "detail": "Açıklama",
+      "amount": "Tutar",
+      "status": "Durum",
+      "unpaid": "Ödenmedi",
+      "paid": "Ödendi",
+      "pay": "Kartla Öde",
+      "dues": "Aidat"
+    },
+    "messages": {
+      "title": "Mesajlar",
+      "newThread": "Yeni Konu",
+      "subject": "Konu",
+      "body": "Mesaj",
+      "send": "Gönder",
+      "empty": "Henüz mesajınız yok.",
+      "reply": "Yanıt",
+      "selectPrompt": "Görüntülemek için bir konu seçin."
+    }
   }
 }

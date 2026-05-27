@@ -224,5 +224,34 @@
     "generic": "An error occurred.",
     "network": "Cannot reach the server.",
     "unauthorized": "You are not authorized for this action."
+  },
+  "resident": {
+    "nav": {
+      "bills": "My Bills",
+      "messages": "Messages"
+    },
+    "bills": {
+      "title": "My Bills",
+      "outstanding": "Outstanding",
+      "empty": "You have no bills.",
+      "month": "Month",
+      "detail": "Detail",
+      "amount": "Amount",
+      "status": "Status",
+      "unpaid": "Unpaid",
+      "paid": "Paid",
+      "pay": "Pay by card",
+      "dues": "Dues"
+    },
+    "messages": {
+      "title": "Messages",
+      "newThread": "New thread",
+      "subject": "Subject",
+      "body": "Message",
+      "send": "Send",
+      "empty": "You have no messages yet.",
+      "reply": "Reply",
+      "selectPrompt": "Select a thread to view it."
+    }
   }
 }

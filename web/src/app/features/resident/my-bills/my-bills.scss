@@ -1,0 +1,54 @@
+:host {
+  display: block;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin: 0 0 1rem;
+
+  h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+}
+
+.outstanding-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  padding: 0.5rem 1rem;
+  border-radius: 12px;
+  background: var(--mat-sys-error-container);
+  color: var(--mat-sys-on-error-container);
+
+  // No debt: a calm neutral tile instead of the alerting error colour.
+  &.clear {
+    background: var(--mat-sys-surface-container);
+    color: var(--mat-sys-on-surface-variant);
+  }
+
+  .label {
+    font-size: 0.75rem;
+  }
+
+  .value {
+    font-size: 1.25rem;
+    font-weight: 700;
+  }
+}
+
+.status-paid {
+  --mdc-chip-label-text-color: var(--mat-sys-on-tertiary-container);
+  background: var(--mat-sys-tertiary-container);
+}
+
+.status-unpaid {
+  --mdc-chip-label-text-color: var(--mat-sys-on-error-container);
+  background: var(--mat-sys-error-container);
+}

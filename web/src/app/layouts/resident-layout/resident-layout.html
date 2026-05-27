@@ -1,0 +1,44 @@
+<mat-sidenav-container class="resident-shell">
+  <mat-sidenav mode="side" opened class="resident-sidenav">
+    <div class="brand">{{ 'common.appName' | translate }}</div>
+
+    <mat-nav-list>
+      <a mat-list-item routerLink="/resident/bills" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>receipt_long</mat-icon>
+        <span matListItemTitle>{{ 'resident.nav.bills' | translate }}</span>
+      </a>
+      <a mat-list-item routerLink="/resident/messages" routerLinkActive="active-link">
+        <mat-icon matListItemIcon>forum</mat-icon>
+        <span matListItemTitle>{{ 'resident.nav.messages' | translate }}</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content>
+    <mat-toolbar class="resident-toolbar">
+      <span class="spacer"></span>
+
+      <button matIconButton (click)="toggleTheme()" [attr.aria-label]="'common.theme' | translate">
+        <mat-icon>{{ isDark() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+
+      <button matIconButton [matMenuTriggerFor]="langMenu" [attr.aria-label]="'common.language' | translate">
+        <mat-icon>language</mat-icon>
+      </button>
+      <mat-menu #langMenu="matMenu">
+        @for (lang of languages; track lang) {
+          <button mat-menu-item (click)="setLanguage(lang)">{{ lang | uppercase }}</button>
+        }
+      </mat-menu>
+
+      <button matButton (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        {{ 'common.logout' | translate }}
+      </button>
+    </mat-toolbar>
+
+    <main class="resident-content">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>

@@ -73,7 +73,7 @@ export class Login {
 
     try {
       await this.auth.login(this.form.getRawValue());
-      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? '/admin';
+      const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl') ?? this.auth.homeUrl();
       await this.router.navigateByUrl(returnUrl);
     } catch (error) {
       if (error instanceof HttpErrorResponse && error.status === 401) {

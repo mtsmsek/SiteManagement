@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { adminGuard } from './core/auth/auth.guards';
+import { adminGuard, residentGuard } from './core/auth/auth.guards';
 
 export const routes: Routes = [
   {
@@ -30,6 +30,24 @@ export const routes: Routes = [
         path: 'residents/:residentId',
         loadComponent: () =>
           import('./features/residents/resident-detail/resident-detail').then((m) => m.ResidentDetail),
+      },
+    ],
+  },
+  {
+    path: 'resident',
+    canActivate: [residentGuard],
+    loadComponent: () =>
+      import('./layouts/resident-layout/resident-layout').then((m) => m.ResidentLayout),
+    children: [
+      { path: '', redirectTo: 'bills', pathMatch: 'full' },
+      {
+        path: 'bills',
+        loadComponent: () => import('./features/resident/my-bills/my-bills').then((m) => m.MyBills),
+      },
+      {
+        path: 'messages',
+        loadComponent: () =>
+          import('./features/resident/my-messages/my-messages').then((m) => m.MyMessages),
       },
     ],
   },

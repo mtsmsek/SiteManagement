@@ -29,6 +29,12 @@ export class AuthService {
   /** True when the signed-in user is an admin. */
   readonly isAdmin = computed(() => this.currentUserSignal()?.roles.includes(Roles.admin) ?? false);
 
+  /** True when the signed-in user is a resident (drives the resident portal guard). */
+  readonly isResident = computed(() => this.currentUserSignal()?.roles.includes(Roles.resident) ?? false);
+
+  /** Role-based landing route: residents to their portal, everyone else to the admin area. */
+  readonly homeUrl = computed(() => (this.isResident() && !this.isAdmin() ? '/resident' : '/admin'));
+
   /** The current access token, or null. Read by the token interceptor. */
   get accessToken(): string | null {
     return localStorage.getItem(ACCESS_TOKEN_KEY);

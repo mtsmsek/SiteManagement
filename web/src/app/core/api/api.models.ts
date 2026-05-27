@@ -49,8 +49,17 @@ export type PayByCardRequest = Schemas['PayByCardRequest'];
 export type ChangeDuesAmountRequest = Schemas['ChangeDuesAmountRequest'];
 export type ChangeUtilityBillAmountRequest = Schemas['ChangeUtilityBillAmountRequest'];
 
+// Resident self-service (own bills)
+export type ResidentBill = Schemas['ResidentBillDto'];
+
 // Shared
 export type ProblemDetails = Schemas['ProblemDetails'];
+
+/** A resident bill's kind discriminator, as the API serialises it. */
+export const BillKind = {
+  dues: 'Dues',
+  utility: 'Utility',
+} as const;
 
 /**
  * Tenant type as the API binds it on assignment requests — an integer enum
