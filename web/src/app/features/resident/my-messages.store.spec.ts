@@ -1,7 +1,13 @@
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { MyMessagesStore } from './my-messages.store';
 import { ResidentApi } from './resident.api';
+import {
+  ConversationStartedPayload,
+  MessageReadPayload,
+  MessageReceivedPayload,
+  MessagingHubService,
+} from '../../core/realtime/messaging-hub.service';
 import type { ConversationListItem, ConversationMessage } from '../../core/api/api.models';
 
 describe('MyMessagesStore', () => {
@@ -29,6 +35,9 @@ describe('MyMessagesStore', () => {
   >;
   let api: ApiMock;
   let store: MyMessagesStore;
+  let messageReceivedSubject: Subject<MessageReceivedPayload>;
+  let conversationStartedSubject: Subject<ConversationStartedPayload>;
+  let messageReadSubject: Subject<MessageReadPayload>;
 
   beforeEach(() => {
     // arrange
@@ -39,8 +48,20 @@ describe('MyMessagesStore', () => {
       replyToConversation: vi.fn().mockReturnValue(of(void 0)),
       startConversation: vi.fn().mockReturnValue(of({ conversationId: 'conv-1' })),
     };
+    messageReceivedSubject = new Subject<MessageReceivedPayload>();
+    conversationStartedSubject = new Subject<ConversationStartedPayload>();
+    messageReadSubject = new Subject<MessageReadPayload>();
+    const hub: Pick<MessagingHubService, 'messageReceived' | 'conversationStarted' | 'messageRead'> = {
+      messageReceived: messageReceivedSubject.asObservable(),
+      conversationStarted: conversationStartedSubject.asObservable(),
+      messageRead: messageReadSubject.asObservable(),
+    };
     TestBed.configureTestingModule({
-      providers: [MyMessagesStore, { provide: ResidentApi, useValue: api }],
+      providers: [
+        MyMessagesStore,
+        { provide: ResidentApi, useValue: api },
+        { provide: MessagingHubService, useValue: hub },
+      ],
     });
     store = TestBed.inject(MyMessagesStore);
   });
@@ -83,5 +104,18 @@ describe('MyMessagesStore', () => {
     // assert
     expect(api.startConversation).toHaveBeenCalledWith('Yeni', 'Konu metni');
     expect(store.selectedId()).toBe('conv-1');
+  });
+
+  it('refreshes the inbox when the hub pushes ConversationStarted', async () => {
+    // arrange
+    api.myConversations.mockClear();
+
+    // act — admin opened a brand-new thread for this resident
+    conversationStartedSubject.next({ conversationId: 'conv-1', residentId: 'res-1' });
+    await Promise.resolve();
+    await Promise.resolve();
+
+    // assert
+    expect(api.myConversations).toHaveBeenCalled();
   });
 });

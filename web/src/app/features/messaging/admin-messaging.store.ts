@@ -1,17 +1,35 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { firstValueFrom } from 'rxjs';
+import { firstValueFrom, merge } from 'rxjs';
 import { MessagingApi } from './messaging.api';
+import { MessagingHubService } from '../../core/realtime/messaging-hub.service';
 import type { ConversationListItem, ConversationMessage } from '../../core/api/api.models';
 
 /**
  * Signal-based store for the admin messaging inbox. Mirrors
  * <c>MyMessagesStore</c> on the resident side: holds every conversation, the
  * open thread's messages, and refreshes the badge after a read. Opening a
- * thread marks the resident's messages read for the admin.
+ * thread marks the resident's messages read for the admin. SignalR pushes
+ * trigger a server refetch — no payload merging — so the read projection
+ * stays the single source of truth.
  */
 @Injectable({ providedIn: 'root' })
 export class AdminMessagingStore {
   private readonly api = inject(MessagingApi);
+  private readonly hub = inject(MessagingHubService);
+
+  constructor() {
+    merge(this.hub.messageReceived, this.hub.conversationStarted, this.hub.messageRead).subscribe(
+      () => void this.refreshOnPush(),
+    );
+  }
+
+  private async refreshOnPush(): Promise<void> {
+    await this.refreshConversations();
+    const selected = this.selectedIdSignal();
+    if (selected) {
+      this.messagesSignal.set(await firstValueFrom(this.api.messages(selected)));
+    }
+  }
 
   private readonly conversationsSignal = signal<ConversationListItem[]>([]);
   private readonly messagesSignal = signal<ConversationMessage[]>([]);

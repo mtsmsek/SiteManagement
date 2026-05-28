@@ -10,6 +10,15 @@ public static class ApiConstants
     /// <summary>Common route prefix for every controller in the API.</summary>
     public const string RoutePrefix = "api";
 
+    /// <summary>Common route prefix for every SignalR hub mounted by the API.</summary>
+    public const string HubsPrefix = "/hubs";
+
+    /// <summary>The messaging hub endpoint path (resident ↔ admin real-time push).</summary>
+    public const string MessagingHubPath = $"{HubsPrefix}/messaging";
+
+    /// <summary>Query-string key SignalR clients use to pass the JWT over WebSockets.</summary>
+    public const string SignalRAccessTokenQueryKey = "access_token";
+
     /// <summary>Section name in <c>appsettings.json</c> for CORS origins (W2).</summary>
     public const string CorsAllowFrontendPolicy = "AllowFrontend";
 

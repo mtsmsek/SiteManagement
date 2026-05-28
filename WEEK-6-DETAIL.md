@@ -97,40 +97,72 @@ tek FE açığını kapat ki "feature complete" diyebilelim.
 
 ---
 
-## Gün 2 — SignalR (gerçek-zamanlı mesajlaşma)
+## Gün 2 — SignalR (gerçek-zamanlı mesajlaşma) ✅
 
-**Hedef:** Polling kalksın; admin ↔ resident **canlı** mesajlaşsın.
+**Hedef:** Admin ↔ resident **canlı** mesajlaşsın.
 
-### Kararlar (Gün 2 başında prose ile kilitlenecek mini başlıklar)
-- **Auth:** JWT bearer query-string yolu (`?access_token=`) — SignalR'ın WS handshake'ında header taşınmıyor; ASP.NET Core kılavuzu bu yolu öneriyor.
-- **Group stratejisi:** `user:{appUserId}` (kullanıcı başına grup). Conversation başlatınca/cevap gelince ilgili **iki** kullanıcıya push.
-- **Hub yüzeyi:** sadece **server-to-client** event'ler — `MessageReceived(ConversationMessage)`, `ConversationStarted(ConversationListItem)`, `MessageRead(conversationId, readerRole, readAtUtc)`. Client → server method yok (gönderme HTTP'den; SignalR push-only).
+### Kararlar (Gün 2 başında prose ile kilitlenmiş)
+- **Auth:** JWT bearer query-string yolu (`?access_token=`) — WS handshake'inde
+  header taşınmıyor. `ApiConstants.SignalRAccessTokenQueryKey`, sadece
+  `/hubs/*` path'leri için aktif.
+- **Group stratejisi:** `messaging:admins` (tüm admin'ler) + `messaging:resident:{id}`
+  (her sakinin kendi grubu, residentId claim'inden). Hub `OnConnectedAsync`'te
+  role'e göre doğru grupa otomatik ekler — başkasının grubuna eklemek
+  yapısal olarak imkânsız (claim-based).
+- **Hub yüzeyi:** **sadece server-to-client** push event'leri — gönderme HTTP'den
+  (validation + ownership pipeline orada zaten çalışıyor). Üç event:
+  `MessageReceived`, `ConversationStarted`, `MessageRead`.
+- **Payload minimum:** `conversationId` (+ ConversationStarted için `residentId`).
+  Client event geldiğinde **read API'den yeniden çeker** — push payload'ı tek
+  veri kaynağı değil; drift riski sıfır.
 - **Tek instance:** Redis backplane YOK; horizontal scale README'de "future".
-- **Polling kalkar:** resident & admin messaging store'larında interval/refresh kaldırılır.
+- **Polling kaldırma not:** W5'te zaten polling timer YOKTU — sadece "action sonrası
+  manuel refresh" vardı; SignalR onları replace etmiyor, **karşı taraf eylemini
+  de UI'a getiren** otomatik refresh ekledi. Action sonrası refresh çağrıları
+  yerinde kalır (deterministik).
 
 ### Backend
-- [ ] `src/SiteManagement.Api/Messaging/MessagingHub.cs` — boş hub (event'leri client'a push servisi sayesinde alır).
-- [ ] `IMessagingNotifier` (Application) → `MessagingHubNotifier` (Api) — `IHubContext<MessagingHub>` ile push.
-- [ ] Mesaj komut handler'larına bağla:
-  - `PostMessage` (admin reply / resident reply) → her iki taraf grubuna `MessageReceived`.
-  - `StartConversation` / `StartMyConversation` → karşı tarafa `ConversationStarted`.
-  - `MarkConversationRead` / `MarkMyConversationRead` → karşı tarafa `MessageRead`.
-- [ ] JWT bearer SignalR auth (`/hubs/messaging`); `Authorize` filter ile rol kontrolü (Admin **veya** Resident).
-- [ ] `AddSignalR()` + endpoint mapping.
-- [ ] **TDD:** `MessagingHubNotifier` unit testi (`IHubContext` mock; doğru grup, doğru event).
-- [ ] E2E: `SignalRMessagingTests` — admin'in açtığı bir bağlantıda resident mesaj atınca `MessageReceived` event'ı geliyor mu (Testcontainers + `HubConnectionBuilder`).
+- [x] `Application/Messaging/Notifications/IMessagingNotifier.cs` — port +
+      3 payload (`IMessagingNotification` ortak interface'i, `EventName` ile).
+- [x] `Api/Messaging/MessagingGroups.cs` — grup adı naming (Admins + ForResident).
+- [x] `Api/Messaging/MessagingHub.cs` — `[Authorize]`, `OnConnectedAsync`'te role'e
+      göre grup join (`Roles.Admin` → admins; `Roles.Resident` + `resident_id`
+      claim → forResident).
+- [x] `Api/Messaging/MessagingHubNotifier.cs` — `IHubContext<MessagingHub>` ile push.
+- [x] `Api/Messaging/MessagingHubExtensions.cs` — `AddSignalR()` + `IMessagingNotifier`
+      DI + `PostConfigure<JwtBearerOptions>` ile WS query-string token desteği +
+      `MapHub`.
+- [x] `Api/Configuration/ApiConstants.cs` — `HubsPrefix`, `MessagingHubPath`,
+      `SignalRAccessTokenQueryKey` (no magic literals).
+- [x] 6 handler'a `IMessagingNotifier` inject + tek satır push:
+  - admin tarafı (`StartConversation` / `Reply` / `MarkRead`) → `NotifyResident`
+  - resident tarafı (`StartMy` / `ReplyMy` / `MarkMyRead`) → `NotifyAdmins`
+- [x] **Application unit test:** `MessagingHandlerNotifyTests` — 6 handler için
+      her birinin doğru hedefe (admins/resident) doğru notification tipiyle
+      çağrı yaptığını assert eder (NSubstitute, AAA). **App 83 → 89 (+6) yeşil.**
+- [x] **E2E:** `SignalRMessagingTests` — `Microsoft.AspNetCore.SignalR.Client` +
+      `Server.CreateHandler()` üzerinden LongPolling. İki test:
+  - Admin start → resident `ConversationStarted` alıyor (payload.residentId)
+  - Resident reply → admin `MessageReceived` alıyor (payload.conversationId)
+  - **E2E 34 → 36 (+2) yeşil.**
 
 ### Frontend
-- [ ] `@microsoft/signalr` paketi.
-- [ ] `MessagingHubService` (signal-based) — token ile `HubConnection`, otomatik reconnect, `messageReceived$`, `conversationStarted$`, `messageRead$` signal'ları.
-- [ ] `AdminMessagingStore` + `MyMessagesStore` event'leri dinler:
-  - `MessageReceived` → seçili conversation ise mesaj listesine ekle + scroll bottom; değilse unread badge++.
-  - `ConversationStarted` → inbox'a ekle.
-  - `MessageRead` → karşı taraf "okudu" göstergesi (opsiyonel ufak gri tik).
-- [ ] **Polling kaldır:** her iki store'da interval/setInterval/manuel refresh tetiklerini sök.
-- [ ] Vitest: `MessagingHubService` (3 test — bağlanır, event akar, reconnect).
+- [x] `@microsoft/signalr` (v10.0.5) paketi.
+- [x] `core/realtime/messaging-hub.service.ts` — `MessagingHubService`:
+  - `effect()` ile `AuthService.currentUser` değişimini dinler → login'de
+    `ensureConnected()`, logout'ta `disconnect()`. `accessTokenFactory` her
+    (re)connect'te fresh token okur (refresh sonrası temiz reconnect).
+  - `withAutomaticReconnect()`.
+  - Üç event için `Subject` + `asObservable()` (drift'siz pure observer).
+- [x] `AdminMessagingStore` + `MyMessagesStore` event subscribe:
+  - `merge(messageReceived, conversationStarted, messageRead)` → her event'te
+    `refreshOnPush`: inbox + (varsa) seçili thread'in mesajları yenilenir.
+  - Read projection tek source of truth, push sadece tetik.
+- [x] Spec'ler: hub mock (Subject ile) verilip her store için yeni test:
+  "hub event → otomatik refresh". **Web 29 → 31 (+2) yeşil; ng build temiz.**
 
-**Commit:** `feat(messaging): SignalR real-time push (admin + resident)` + `chore(web): drop messaging polling`
+**Tests:** Domain 222, Application 89, Architecture 18, E2E 36, web 31 — yeşil.
+**Commit:** `feat(messaging): SignalR real-time push (admin + resident)`
 
 ---
 

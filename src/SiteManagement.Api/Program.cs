@@ -1,4 +1,5 @@
 using SiteManagement.Api.Configuration;
+using SiteManagement.Api.Messaging;
 using SiteManagement.Application;
 using SiteManagement.Infrastructure;
 using SiteManagement.Infrastructure.Auth;
@@ -19,6 +20,7 @@ builder.Services
     .AddInfrastructure(builder.Configuration)
     .AddJwtAuth(builder.Configuration)
     .AddCurrentUser()
+    .AddMessagingHub()
     .AddSiteManagementCors(builder.Configuration)
     .AddSiteManagementHealthChecks(builder.Configuration)
     .AddSiteManagementLocalization()

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using Microsoft.AspNetCore.Localization;
 using Serilog;
+using SiteManagement.Api.Messaging;
 using SiteManagement.Api.Middleware;
 
 namespace SiteManagement.Api.Configuration;
@@ -41,6 +42,7 @@ public static class PipelineExtensions
         app.MapGet(ApiConstants.HealthLiveEndpoint, () => Results.Ok(new { status = "live" }));
 
         app.MapControllers();
+        app.MapMessagingHub();
 
         return app;
     }
