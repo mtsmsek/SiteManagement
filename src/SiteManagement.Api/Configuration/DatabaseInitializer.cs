@@ -41,6 +41,13 @@ public static class DatabaseInitializer
         var adminOptions = scope.ServiceProvider.GetRequiredService<IOptions<AdminBootstrapOptions>>().Value;
         await IdentitySeeder.SeedBootstrapAdminAsync(userManager, adminOptions, logger, ct);
 
+        var demoOptions = scope.ServiceProvider.GetRequiredService<IOptions<DemoOptions>>().Value;
+        if (demoOptions.SeedOnStartup)
+        {
+            logger.LogInformation("Demo seed flag is on — invoking DemoSeeder.");
+            await new DemoSeeder().SeedAsync(services, logger, ct);
+        }
+
         logger.LogInformation("Database initialization complete.");
     }
 }

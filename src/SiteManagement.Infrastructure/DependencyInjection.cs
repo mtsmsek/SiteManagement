@@ -55,6 +55,9 @@ public static class DependencyInjection
         services.AddOptions<OutboxOptions>()
             .Bind(configuration.GetSection(OutboxOptions.SectionName));
 
+        services.AddOptions<Persistence.Seed.DemoOptions>()
+            .Bind(configuration.GetSection(Persistence.Seed.DemoOptions.SectionName));
+
         services.AddSingleton(TimeProvider.System);
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IUserAuthService, UserAuthService>();

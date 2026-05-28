@@ -209,51 +209,57 @@ Roadmap bantlarını (Domain ≥80, App ≥60) **rahatlıkla geçiyor**. Thresho
 
 ---
 
-## Gün 4 — Demo Seeder + Health Check + PaymentService Admin UI
+## Gün 4 — Demo Seeder + Health Check ✅ (PaymentService admin UI ertelendi)
 
-**Hedef:** Klonla → `docker compose up` → tüm demo verisi hazır, zengin. Bonus:
-PaymentService için minimal admin UI'ı (test kartı/hesap oluşturma).
+**Hedef:** Klonla → `docker compose up` → tüm demo verisi hazır.
+Gün ortasında scope daraltıldı: PaymentService kendi seeder'ı (4242 test kartı +
+100k bakiye) **zaten** var, dolayısıyla admin UI'sının "vitrin için zorunlu"
+değeri düşük; gerekirse ufak follow-up commit olarak eklenir. Bu daraltma Gün 4'ü
+"tek odaklı + ship-ready" tuttu.
 
-### Demo Seeder (ana API)
-- [ ] `Infrastructure/Persistence/Seeding/DemoSeeder.cs` (`IDemoSeeder`) —
-      idempotent. `Demo:SeedOnStartup=true` ENV flag ile aktif.
-- [ ] İçerik:
-  - 2 site (farklı şehir/adres)
-  - Her site için 2 blok, blok başına 3 daire
-  - 5 sakin (TC + telefon + plaka; bilinen şifre — log'a yazılır + welcome mail outbox)
-  - Daire atamaları (3 sahip + 2 kiracı)
-  - 2026-04 dues period **kapalı** + items üretilmiş + bir kısmı **ödenmiş** (kart kullanıp PaymentService stub'a vurmadan — direct status seed)
-  - 2026-05 dues period **açık** + items üretilmiş + 1 kalem ödenmiş, 4 kalem ödenmemiş
-  - 2026-05 utility (elektrik 200 TL) period kapalı + dağıtılmış
-  - 1-2 conversation (admin başlatmış + resident cevap vermiş; biri unread)
-  - 1 resident credit account (overpayment senaryosu — 150 TL kredi)
-- [ ] `Program.cs` startup'ta `IDemoSeeder.SeedAsync()` çağrısı flag açıksa.
-- [ ] **Önemli:** prod'da kapalı kalır; `.env.example`'da default kapalı + demo için
-      `.env`'de açık. README quickstart "demo modu" diye anlatır.
+### Demo Seeder (ana API) ✅
+- [x] `Infrastructure/Persistence/Seed/DemoSeeder.cs` — idempotent ("site var mı?"
+      check'iyle). `Domain` factory'ler + repo'lar + `IUnitOfWork.SaveChangesAsync`;
+      MediatR pipeline bypass (startup'ta `ICurrentUser` yok, AuthorizationBehavior
+      bypass için bilinçli karar). Domain event'ler `EfUnitOfWork`'ün event dispatch
+      loop'undan tetikleniyor (assignment'ın `ResidentAssignedToApartment` event'i
+      apartment'i otomatik occupied yapıyor).
+- [x] **İçerik (vitrin için sade + zengin):**
+  - 1 site "Lavanta Konutları" (Bahçelievler / İstanbul)
+  - 1 blok A, 3 apartment (1+1 / 2+1 / 2+1, floor 1-2)
+  - 3 sakin (TC + email + telefon; gerçek checksum'a uyan TC'ler; her birine
+    welcome mail aynı `IEmailSender` üzerinden — MailHog'da görünür)
+  - 3 ApartmentAssignment (1 owner + 2 tenant)
+  - 2026-05 DuesPeriod açık + dağıtılmış (3 item; ilki paid, kalan 2 unpaid →
+    resident portal pay-by-card flow'u demo data'da hemen kullanılabilir)
+  - 1 admin-açık conversation "Hoş geldiniz" (resident için unread)
+- [x] `DemoOptions` (section `Demo:SeedOnStartup`) + Infrastructure DI binding.
+- [x] `DatabaseInitializer.MigrateAndSeedAsync` flag açık ise `DemoSeeder.SeedAsync`.
+- [x] `.env.example` → `DEMO_SEED_ON_STARTUP=true` (dev default); `docker-compose.yml`
+      → `Demo__SeedOnStartup: ${DEMO_SEED_ON_STARTUP:-false}` (prod'da default kapalı).
+- [x] **E2E güvenliği:** flag default `false`, `CustomWebApplicationFactory` flag'i
+      override etmiyor (zaten kapalı); E2E test'ler etkilenmez (Domain 222,
+      App 89, Arch 18, E2E 36 yeşil).
 
-### PaymentService Admin UI
-- [ ] **PaymentService backend** — yeni admin endpoint'ler (`Admin` API-key korumalı):
-  - `GET /api/bank-accounts` — listele
-  - `POST /api/bank-accounts` — oluştur (holder name, currency, initial balance)
-  - `GET /api/cards` — listele
-  - `POST /api/cards` — oluştur (bank account id, holder name, expiry, cvv; kart no Luhn ile generate)
-- [ ] **PaymentService TDD:** komut handler + endpoint testi (`PaymentService.E2E.Tests`).
-- [ ] **Ana API proxy** — `IPaymentAdminApi` (Refit) + `Api/Controllers/Admin/PaymentAdminController` (`[Authorize(Roles=Admin)]`). FE → ana API → PaymentService.
-- [ ] **Angular:** `/admin/payment-data` sayfası, iki sekme (Hesaplar + Kartlar), liste + dialog'lar.
-- [ ] i18n `admin.paymentData.*`.
+### Health Check ✅
+- [x] `HealthChecks/PaymentServiceHealthCheck.cs` — typed `HttpClient`, downstream
+      `/health` probe; başarısızlık `HealthStatus.Unhealthy` (orkestratör outage'i
+      doğrudan görür, charge fail'ini beklemez).
+- [x] `HealthCheckExtensions` Postgres'in yanına `AddCheck<PaymentServiceHealthCheck>`
+      ekledi + named HttpClient (`PaymentService:BaseUrl` + **2 saniye timeout** →
+      hung downstream readiness probe'unu kilitlemez).
+- [x] PaymentService kendi `/health` endpoint'i zaten var (compose healthcheck
+      onu kullanıyor); ana API probe transitif olarak yansıtıyor.
 
-### Health Check
-- [ ] **Ana API:** `AddHealthChecks().AddNpgSql(connStr).AddMongoDb(...)` —
-      wait, ana API Mongo kullanmıyor, sadece **PaymentService bağlantısını** kontrol et
-      (Refit ile `GET /health`). Endpoint: `GET /health` + JSON çıktı.
-- [ ] **PaymentService:** `AddHealthChecks().AddMongoDb(connStr)`. Endpoint: `GET /health`.
-- [ ] README'de health URL'leri.
+### Ertelendi (W6 sonrası küçük takip)
+- [ ] PaymentService admin UI (bank account + card CRUD'u olan basit Angular sayfa).
+      Demo seeder + PaymentService kendi seeder'ı zaten `4242 4242 4242 4242` test
+      kartını + bakiyeli hesabı veriyor — mülakatta "test verisi nasıl üretiliyor?"
+      sorusunun cevabı zaten "iki idempotent seeder" olarak hazır.
 
-### Demo Seeder Seed üzerinden PaymentService veri
-- [ ] PaymentService için demo seeder de — 1 bank account + 1 test kartı
-      (`4242 4242 4242 4242`, expiry/cvv bilinen; yeterli bakiyeli). README'de açıkça yaz.
-
-**Commit:** `feat(seed): demo seeder + payment admin UI + health checks`
+**Tests:** Domain 222, App 89, Architecture 18, E2E 36, web 31 — yeşil
+(no new tests; seeder canlı doğrulaması `docker compose up` ile manuel).
+**Commit:** `feat(seed,health): demo data seeder + payment-service health probe`
 
 ---
 
