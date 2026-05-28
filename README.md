@@ -1,71 +1,94 @@
 # SiteManagement
 
-> Patika bitirme projesinin **DDD + TDD + Clean Architecture** ile modern bir yorumu. Site (apartman kompleksi) yönetim sistemi: admin daire/blok yönetimi, sakin kaydı, aidat & fatura dağıtımı; resident kendi borçlarını görüp kredi kartıyla öder. Ödeme tarafı ayrı bir microservice.
+> Portfolio project: a modern take on apartment-complex administration built with **DDD + TDD + Clean Architecture**. The admin manages sites, blocks, apartments, and residents and runs monthly dues + utility billing; residents see their own bills and pay them by card. The payment side is an isolated microservice on its own database. Admin ↔ resident chat is real-time over SignalR.
 
 [![CI](https://github.com/mtsmsek/SiteManagement/actions/workflows/ci.yml/badge.svg)](https://github.com/mtsmsek/SiteManagement/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com/)
 
-✅ **Hafta 1-6 tamam — `v1.0.0`.** Foundation & Deploy → Property/Residency → Tenancy & Billing → **Payment microservice (MongoDB)** → **Resident portal + Messaging + Dashboards (IDOR-safe authz pipeline)** → **Polish & Ship (SignalR real-time + demo seeder + security headers + rate-limit + 10 ADR + 90% line coverage).** [ROADMAP.md](ROADMAP.md) 6 haftalık planı; gün gün ilerleme [WEEK-1-2-DETAIL.md](WEEK-1-2-DETAIL.md) · [WEEK-3-DETAIL.md](WEEK-3-DETAIL.md) · [WEEK-4-DETAIL.md](WEEK-4-DETAIL.md) · [WEEK-5-DETAIL.md](WEEK-5-DETAIL.md) · [WEEK-6-DETAIL.md](WEEK-6-DETAIL.md). Mimari kararlar: [docs/adr/](docs/adr/).
+✅ **Weeks 1-6 complete — `v1.0.0`.** Foundation & Deploy → Property / Residency → Tenancy & Billing → **Payment microservice (MongoDB)** → **Resident portal + Messaging + Dashboards (IDOR-safe authorization pipeline)** → **Polish & Ship (real-time SignalR + demo seeder + security headers + rate-limit + 10 ADRs + 90% line coverage).** The six-week plan is in [ROADMAP.md](ROADMAP.md); the day-by-day log lives in the [WEEK-1-2](WEEK-1-2-DETAIL.md) · [WEEK-3](WEEK-3-DETAIL.md) · [WEEK-4](WEEK-4-DETAIL.md) · [WEEK-5](WEEK-5-DETAIL.md) · [WEEK-6](WEEK-6-DETAIL.md) detail files (those are written in Turkish — they were the author's working journal). Architecture decisions: [docs/adr/](docs/adr/).
 
 ---
 
-## ✅ Bugün ne çalışıyor
+## Demo video
 
-- ✅ `docker compose up -d --build` ile postgres + mongo + mailhog + api tek komutta ayağa kalkar
-- ✅ ASP.NET Core Identity + PostgreSQL (EF Core 10 migration'ları startup'ta otomatik uygulanır)
-- ✅ JWT bearer auth — **register / login / refresh** endpoint'leri, refresh token rotation
-- ✅ CQRS-lite (MediatR command/query ayrımı) + FluentValidation + 3 pipeline behavior:
-  - `LoggingBehavior` — her command için structured request/elapsed log
-  - `ValidationBehavior` — handler çalışmadan önce FluentValidation çalıştırır
-  - `ExceptionTranslationBehavior` — Domain → Application exception translation tek noktada
-- ✅ **Üç katmanlı exception architecture** + RFC 7807 ProblemDetails responses
-- ✅ **Backend localization** (tr-TR default + en-US) — `Accept-Language` header'a göre lokalize mesajlar; FluentValidation placeholder'ları doğru substitue olur
+A 2 min 16 s walkthrough of the resident and admin journeys (English narration + on-screen captions, no manual editing — the whole pipeline is in [demo/](demo/), see [demo/README.md](demo/README.md)).
+
+➡️ **[Download `demo-video.mp4` from the v1.0.0 release](https://github.com/mtsmsek/SiteManagement/releases/download/v1.0.0/demo-video.mp4)**
+
+To re-record locally (open-source pipeline: Playwright + piper-tts + ffmpeg-static):
+
+```powershell
+.\scripts\record-demo.ps1
+```
+
+---
+
+## What's working today
+
+**Infrastructure & cross-cutting:**
+
+- ✅ `docker compose up -d --build` brings up postgres + mongo + mailhog + api + payment-api in a single command
+- ✅ ASP.NET Core Identity on PostgreSQL (EF Core 10, migrations auto-applied at startup)
+- ✅ JWT bearer auth — `register` / `login` / `refresh` endpoints, refresh token rotation
+- ✅ **CQRS-lite** over MediatR with FluentValidation + a fixed pipeline of behaviors:
+  - `LoggingBehavior` — structured request/elapsed log per command
+  - `ValidationBehavior` — runs FluentValidation before the handler
+  - `AuthorizationBehavior` — central role check via the request marker
+  - `ResourceOwnershipBehavior` — owner check for `/api/me/*` items
+  - `TransactionBehavior` — wraps every command in a DB transaction
+  - `ExceptionTranslationBehavior` — Domain → Application translation in one place
+- ✅ **Three-tier exception architecture** + RFC 7807 ProblemDetails responses
+- ✅ **Backend localization** (tr-TR default + en-US) — `Accept-Language` chooses the message bundle; FluentValidation placeholders substitute correctly
 - ✅ Serilog + structured request logging
-- ✅ Scalar API docs UI (`/scalar/v1`) — Bearer auth panel ile
-- ✅ Health checks (Postgres probe dahil)
-- ✅ GitHub Actions CI (build + test, Postgres service container)
-- ✅ Railway deploy hazır (PORT + DATABASE_URL platform env'lerini otomatik handle eder)
+- ✅ Scalar API docs UI (`/scalar/v1`) with the Bearer auth panel
+- ✅ Health checks (Postgres probe + Payment service downstream probe)
+- ✅ Security headers + rate limiter (login 5/min IP-keyed, pay-by-card 10/min user-keyed)
+- ✅ GitHub Actions CI (build + test + coverage HTML, Postgres service container)
 
-**Domain & işlevler (W2-W3):**
-- ✅ **Property / Residency / Tenancy / Billing** bounded context'leri — rich aggregate'lar (TDD), private setter'lar, value object'ler (TcNo checksum, Money, BillingMonth…)
-- ✅ Site → Blok → Daire, sakin kaydı, daireye sahip/kiracı ataması (tarihçeli)
-- ✅ **Aidat + fatura dönemleri:** aç → toplu dağıt → öde → kapat; site borç özeti (tahakkuk/tahsil/bakiye)
-- ✅ **Transactional Outbox** — integration event'ler commit sonrası teslim (mail vb.); domain event'ler in-transaction
-- ✅ **Soft delete** (aggregate-root, Site) — archive / restore / permanent purge, global query filter + guardrail test
-- ✅ **Audit** — `Created/Modified By+At`, SaveChanges interceptor + `ICurrentUser`
-- ✅ Angular 21 admin UI (standalone + signals): siteler, sakinler, faturalandırma sayfaları
+**Domain (W2-W3):**
+
+- ✅ **Property / Residency / Tenancy / Billing** bounded contexts — rich aggregates (TDD), private setters, value objects (TcNo with checksum, Money, BillingMonth, …)
+- ✅ Site → Block → Apartment, resident registration, owner/tenant assignment (historised)
+- ✅ **Dues + utility periods:** open → bulk-distribute → pay → close; per-site debt summary (accrued / collected / outstanding)
+- ✅ **Transactional Outbox** — integration events delivered after commit (email etc.); domain events run in-transaction
+- ✅ **Soft delete** on the aggregate root (Site only) — archive / restore / permanent purge, global query filter + guardrail test
+- ✅ **Audit** — `Created/Modified By + At`, SaveChanges interceptor + `ICurrentUser`
+- ✅ Angular 21 admin UI (standalone + signals): sites, residents, billing pages
 
 **Payment microservice (W4):**
-- ✅ **Ayrı solution** (`payment-service/`, `payment-api:8090`) — MongoDB 7, kendi Domain/App/Infra/Api katmanları (polyglot persistence)
-- ✅ **Fake banka:** `BankAccount` + `CreditCard` rich aggregate'lar; Luhn / son-kullanma / bakiye kontrolü; idempotency için Mongo unique index
-- ✅ Ana API → PaymentService **Refit + Polly** (`AddStandardResilienceHandler`) — `IPaymentGateway` port + `PaymentGatewayAdapter` (anti-corruption layer); servis-servis API-key
-- ✅ **Kartla ödeme** (aidat + fatura kalemi): charge first → başarılıysa `Paid`; **red → 402**, kalem `Unpaid` (atomik); deterministik idempotency key ile retry güvenli
-- ✅ **Credit balance (overpayment):** dönem tutarı aşağı düzeltilince fazla ödeyen sakine kredi (`ResidentCreditAccount`); sonraki dağıtımda kalemi **tam karşılıyorsa** otomatik mahsup
-- ✅ Angular kart ödeme dialog'u + belirgin animasyonlu hata snackbar'ı
-- ✅ İki-katmanlı E2E: PaymentService gerçek Mongo+HTTP; ana API pay-by-card WireMock stub (consumer contract)
+
+- ✅ **Separate solution** (`payment-service/`, `payment-api:8090`) — MongoDB 7, its own Domain / Application / Infrastructure / Api layers (polyglot persistence)
+- ✅ **Fake bank:** `BankAccount` + `CreditCard` rich aggregates with Luhn / expiry / balance checks; Mongo unique index for idempotency
+- ✅ Main API → PaymentService via **Refit + Polly** (`AddStandardResilienceHandler`) — `IPaymentGateway` port + `PaymentGatewayAdapter` (anti-corruption layer); service-to-service API key
+- ✅ **Pay-by-card** (dues + utility items): charge first → mark `Paid` on success; **decline → 402**, line stays `Unpaid` (atomic); deterministic idempotency key makes retries safe
+- ✅ **Credit balance (overpayment):** correcting a period's amount down credits the over-paying resident (`ResidentCreditAccount`); the next distribution auto-applies the credit if it fully covers the new item
+- ✅ Angular card-payment dialog + animated error snackbar for declines
+- ✅ Two-layer E2E: PaymentService on real Mongo + HTTP; main API stubs the gateway with WireMock for the consumer-side contract test
 
 **Resident portal + Messaging + Dashboards (W5):**
-- ✅ **Authorization pipeline** — her request tam bir rol marker'ı (`IAdminRequest`/`IResidentRequest`/`IPublicRequest`) deklare eder; `AuthorizationBehavior` merkezi dayatır, **arch test** "authz'u unutmak = build hatası" yapar. Handler'larda authz kodu yok.
-- ✅ **Resident portal** — sakin login → kendi dashboard'ı, "borçlarım", kendi kalemini kartla öder. Token-scoped `/api/me/*` + **resource-ownership pipeline behavior'ları**; **IDOR** her iki yön E2E ile kanıtlı (403/402, kalem `Unpaid` kalır)
-- ✅ **Messaging** — admin ↔ sakin thread'leri (`Conversation` aggregate, TDD), per-side okunmamış sayacı; admin `/api/conversations` + resident `/api/me/conversations`; Angular resident mesajlaşma UI'si
-- ✅ **Dashboard'lar** — admin (site/sakin sayısı, tahakkuk/tahsil, açık bakiye, kredi, tahsilat oranı) + resident (açık borç + kredi + okunmamış mesaj); saf read-side projeksiyon
-- ✅ Angular `/resident/*` alanı (`residentGuard`, rol bazlı login yönlendirme)
+
+- ✅ **Authorization pipeline** — every request declares exactly one role marker (`IAdminRequest` / `IResidentRequest` / `IPublicRequest`); `AuthorizationBehavior` enforces it centrally and an **architecture test** turns "forgot to add a marker" into a build error. Handlers carry zero auth code.
+- ✅ **Resident portal** — resident logs in → own dashboard, "my bills", pays own line by card. Token-scoped `/api/me/*` + **resource-ownership pipeline behaviors**; **IDOR** proven by E2E in both directions (403/402, line stays `Unpaid`)
+- ✅ **Messaging** — admin ↔ resident threads (`Conversation` aggregate, TDD), per-side unread counts; admin `/api/conversations` + resident `/api/me/conversations`; Angular resident messaging UI
+- ✅ **Dashboards** — admin (site / resident counts, accrued / collected, outstanding, credit, collection rate) + resident (outstanding + credit + unread messages); pure read-side projection
+- ✅ Angular `/resident/*` area (`residentGuard`, role-based login redirect)
 
 **Polish & Ship (W6):**
-- ✅ **Admin messaging UI** (W5 borcu kapandı) — iki panel inbox + thread + yeni konu dialog
-- ✅ **SignalR real-time messaging** — `MessagingHub` + role-based group join (`messaging:admins`, `messaging:resident:{N}`); JWT bearer query-string handshake; pushes karşı tarafın eylemini UI'a anında getiriyor. Push-only — gönderme HTTP'den (validation + ownership pipeline'da kalıyor)
-- ✅ **DemoSeeder** — `Demo:SeedOnStartup=true` ile clone→up→1 site + 3 sakin + welcome mail'ler + 1 dönem (1 paid + 2 unpaid) + 1 admin-açık conversation hazır
-- ✅ **Health check** — ana API'nin downstream PaymentService probe'u (typed HttpClient, 2 sn timeout); PaymentService kendi `/health`'ini de export ediyor
-- ✅ **Security headers** (Production) + **rate-limit** (login 5/dk fixed IP-key + pay-by-card 10/dk sliding user-key); E2E ile 429 doğrulandı
-- ✅ **Coverage harness** — Coverlet + ReportGenerator HTML; **Line 90.2% / Branch 82.3% / Method 84.9%**; CI artifact + step summary
-- ✅ **10 ADR** ([docs/adr/](docs/adr/)) — DDD/Clean, Rich Domain, Modular Monolith, Exception-based, CQRS-lite, Authz Pipeline, Outbox, Soft Delete, Token-Scoped Resident Endpoints, Refit+Polly
+
+- ✅ **Admin messaging UI** (the one W5 carry-over) — two-pane inbox + thread + new-conversation dialog
+- ✅ **SignalR real-time messaging** — `MessagingHub` + role-based group join (`messaging:admins`, `messaging:resident:{N}`); JWT bearer query-string handshake; pushes surface the other side's actions in the UI immediately. Push-only — posts still go over HTTP (validation + ownership pipeline stay in the same place)
+- ✅ **DemoSeeder** — `Demo:SeedOnStartup=true` populates the DB on first boot with 1 site + 3 residents + welcome emails in MailHog + 1 open dues period (1 paid + 2 unpaid) + 1 admin-opened conversation
+- ✅ **Downstream health probe** — main API typed-HttpClient probe on the PaymentService `/health` (2-second timeout); PaymentService exposes its own `/health` too
+- ✅ **Security headers** (Production profile) + **rate limit** (login fixed 5/min IP-keyed + pay-by-card sliding 10/min user-keyed); E2E verifies the 429
+- ✅ **Coverage harness** — Coverlet + ReportGenerator HTML; **Line 90.2% / Branch 82.3% / Method 84.9%**; CI uploads the report as an artefact + posts the summary to the run page
+- ✅ **10 ADRs** ([docs/adr/](docs/adr/)) — DDD/Clean, Rich Domain, Modular Monolith + Payment, Exception-based, CQRS-lite, Authorization Pipeline, Outbox, Soft Delete, Token-Scoped Resident Endpoints, Refit + Polly
 
 ---
 
-## Tech Stack
+## Tech stack
 
-| Katman | Seçim |
+| Layer | Choice |
 |---|---|
 | Runtime | .NET 10 |
 | Web framework | ASP.NET Core 10 (controllers, OpenAPI v2) |
@@ -75,43 +98,43 @@
 | Auth | ASP.NET Core Identity + JWT bearer |
 | CQRS bus | MediatR 14 |
 | Validation | FluentValidation 12 |
-| Logging | Serilog (structured, request logging) |
-| API docs | Scalar UI (Swashbuckle yerine — .NET 10 / OpenApi 2.0 uyumlu) |
+| Logging | Serilog (structured + request logging) |
+| API docs | Scalar UI (replaces Swashbuckle — compatible with .NET 10 / OpenAPI v2) |
 | HTTP client | Refit + Polly _(W4)_ |
 | Real-time | ASP.NET Core SignalR _(W6, messaging)_ |
 | Localization | `IStringLocalizer` + .resx (tr-TR, en-US) |
 | Rate limiting | .NET 10 built-in `AddRateLimiter` _(W6)_ |
 | Frontend | Angular 21 (standalone, signals) _(W2)_ |
-| UI lib | Angular Material 3 _(W2)_ |
-| i18n (frontend) | ngx-translate _(W2)_ + i18n parity guardrail _(W6)_ |
+| UI library | Angular Material 3 _(W2)_ |
+| Frontend i18n | ngx-translate _(W2)_ + key-parity guardrail _(W6)_ |
 | Coverage | Coverlet + ReportGenerator _(W6)_ |
-| Test | xUnit, FluentAssertions, NSubstitute, Testcontainers |
+| Test | xUnit, FluentAssertions, NSubstitute, Testcontainers, WireMock |
 | Container | Docker + Compose v2 |
 | CI | GitHub Actions |
-| Deploy | Railway |
+| Deploy | None on purpose (demo-only) — see [Demo mode](#demo-mode) |
 
 ---
 
-## Mimari özeti
+## Architecture overview
 
 ```
-SiteManagement.Domain        ← framework-free; aggregate'lar, value object'ler, domain event'ler
+SiteManagement.Domain         ← framework-free; aggregates, value objects, domain events
        ▲
-SiteManagement.Application   ← MediatR command/query handler'ları, FluentValidation, port'lar (interface'ler)
+SiteManagement.Application    ← MediatR command/query handlers, FluentValidation, ports (interfaces)
        ▲
 SiteManagement.Infrastructure ← EF Core, Identity, JWT token service, repository implementations
        ▲
-SiteManagement.Api           ← Controller'lar, middleware, OpenAPI/Scalar, Serilog wireup, Program.cs
+SiteManagement.Api            ← controllers, middleware, OpenAPI / Scalar, Serilog, Program.cs
 ```
 
-- **Domain** sıfır external bağımlılık. Sadece BCL. Aggregate root'lar invariant'larını kendi içlerinde tutar; setter'lar private.
-- **Application** sadece port'ları (`ITokenService`, `IUserAuthService`, `IRefreshTokenStore`) bilir — Identity / JWT / EF Core referansı yok. CQRS-lite ile her use case bir command/query + handler + validator.
-- **Infrastructure** port'ların concrete implementation'larını + EF Core mapping + Identity setup'ını barındırır.
-- **Api** thin — controller'lar `ISender.Send(command)` çağırır, business logic yoktur.
+- **Domain** has zero external dependencies. BCL only. Aggregate roots own their invariants; setters are `private`.
+- **Application** sees only the ports it needs (`ITokenService`, `IUserAuthService`, `IRefreshTokenStore`, `IPaymentGateway`, …) — no Identity / JWT / EF Core references. Every use case is a command/query + handler + validator.
+- **Infrastructure** holds the concrete port implementations + EF Core mappings + Identity wiring.
+- **Api** is thin — controllers call `ISender.Send(command)`; no business logic.
 
-Detaylı kararlar (rich domain prensipleri, exception translation kuralı, test stratejisi): [ROADMAP.md](ROADMAP.md). Tek tek mimari kararlar: [docs/adr/](docs/adr/).
+The rationale behind each decision lives next door in [docs/adr/](docs/adr/) (MADR format).
 
-### Bounded context haritası
+### Bounded context map
 
 ```mermaid
 flowchart LR
@@ -191,30 +214,30 @@ sequenceDiagram
     end
 ```
 
-> SignalR push'ları **bu akışın dışında**: real-time UI bildirimleri ephemeral (bağlantı yoksa kaybolur), Outbox durable (kayıpsız teslim). İkisi farklı garanti seviyeleri — [ADR 0007](docs/adr/0007-outbox-pattern-for-integration-events.md) ayrımı açıklıyor.
+> SignalR pushes are **outside this flow**: real-time UI notifications are ephemeral (lost when the client is disconnected), while the Outbox is durable (delivered eventually, exactly-once-ish). Two different guarantee tiers — [ADR 0007](docs/adr/0007-outbox-pattern-for-integration-events.md) walks through the split.
 
 ---
 
-## Local Setup
+## Local setup
 
-> Sıfırdan kurulum (yeni makinede): **[docs/SETUP-MACHINE.md](docs/SETUP-MACHINE.md)** — .NET SDK, Docker Desktop, WSL2, git/gh, opsiyonel araçlar dahil.
+> First time on a new machine: **[docs/SETUP-MACHINE.md](docs/SETUP-MACHINE.md)** — .NET SDK, Docker Desktop, WSL2, git/gh, optional tooling.
 
-### Gereksinimler
+### Prerequisites
 
 - [.NET 10 SDK](https://dotnet.microsoft.com/download)
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Compose v2) + WSL2 (Windows)
-- _Önerilen:_ JetBrains Rider / Visual Studio 2022 17.13+ / VS Code + C# Dev Kit
+- _Recommended editor:_ JetBrains Rider / Visual Studio 2022 17.13+ / VS Code + C# Dev Kit
 
-### Hızlı başlangıç
+### Quickstart
 
 ```powershell
 git clone https://github.com/mtsmsek/SiteManagement.git
 cd SiteManagement
 
-# 1) Env dosyasını oluştur (varsayılan dev credential'larıyla yeterli)
+# 1) Create the env file (the defaults are fine for local dev)
 Copy-Item .env.example .env
 
-# 2) Tüm stack'i ayağa kaldır (postgres + mongo + mailhog + api)
+# 2) Bring the whole stack up (postgres + mongo + mailhog + api + payment-api)
 docker compose up -d --build
 
 # 3) Health endpoint
@@ -224,12 +247,12 @@ curl http://localhost:8080/health
 
 ### Auth smoke
 
-> Güvenlik: **public register endpoint'i yoktur.** İlk admin, startup'ta `.env`'deki `ADMIN_BOOTSTRAP_*` değerlerinden seed edilir. Sonraki kullanıcılar authenticated admin endpoint'leri üzerinden yaratılır.
+> Security: **there is no public register endpoint.** The first admin is seeded at startup from the `ADMIN_BOOTSTRAP_*` values in `.env`. Every subsequent user is created through authenticated admin endpoints.
 
 ```powershell
 $base = "http://localhost:8080"
 
-# Login as the bootstrap admin (.env'deki ADMIN_BOOTSTRAP_EMAIL/PASSWORD)
+# Log in as the bootstrap admin (ADMIN_BOOTSTRAP_EMAIL / PASSWORD in .env)
 $body = @{ email = "admin@sitemanagement.local"; password = "Str0ng-P@ss-Dev" } | ConvertTo-Json
 $tokens = Invoke-RestMethod -Uri "$base/api/auth/login" -Method Post -Body $body -ContentType "application/json"
 $headers = @{ Authorization = "Bearer $($tokens.accessToken)" }
@@ -238,40 +261,40 @@ $headers = @{ Authorization = "Bearer $($tokens.accessToken)" }
 $site = @{ name = "Lavender Heights"; address = "Cumhuriyet Mah." } | ConvertTo-Json
 Invoke-RestMethod -Uri "$base/api/sites" -Method Post -Body $site -ContentType "application/json" -Headers $headers
 
-# Localization: en-US header => İngilizce hata mesajı
+# Localization: an en-US header returns the English message bundle
 Invoke-WebRequest -Uri "$base/api/auth/login" -Method Post `
     -Body (@{ email = ""; password = "" } | ConvertTo-Json) -ContentType "application/json" `
     -Headers @{ "Accept-Language" = "en-US" } -SkipHttpErrorCheck | Select-Object -ExpandProperty Content
 ```
 
-### Frontend (Angular admin UI)
+### Frontend (Angular admin + resident UI)
 
 ```powershell
 cd web
-npm install          # ilk sefer
+npm install          # one-off
 npm start            # ng serve -> http://localhost:4200
 ```
 
-- **Stack:** Angular 21 (standalone, signals, zoneless), Angular Material 3, ngx-translate (tr/en)
-- **Mimari:** feature-based + `core/` (auth service, guards, interceptors) + `shared/` + `layouts/`
-- **Auth:** JWT localStorage, functional token interceptor (Bearer + 401 refresh), `adminGuard`
-- Login: bootstrap admin credential'larıyla gir → `/admin/sites`
+- **Stack:** Angular 21 (standalone, signals, zoneless), Angular Material 3, ngx-translate (tr / en)
+- **Layout:** feature-based + `core/` (auth service, guards, interceptors) + `shared/` + `layouts/`
+- **Auth:** JWT in localStorage, functional token interceptor (Bearer + 401 refresh), `adminGuard` / `residentGuard`
+- Login: bootstrap admin credentials → `/admin/dashboard`
 - API base URL: `web/src/environments/environment.ts` (`http://localhost:8080`)
-- Backend CORS dev policy `http://localhost:4200`'e açık
+- Backend CORS dev policy is open to `http://localhost:4200`
 
-### Çalışan servisler
+### Running services
 
-| Servis | URL / Port | Not |
+| Service | URL / Port | Notes |
 |---|---|---|
-| API | http://localhost:8080 | `/health` (Postgres probe dahil) |
-| Payment API | http://localhost:8090 | Ayrı microservice (Mongo); `/health` (Mongo ping) |
-| Scalar API docs | http://localhost:8080/scalar/v1 | OpenAPI tabanlı interaktif UI (dev only) |
-| OpenAPI JSON | http://localhost:8080/openapi/v1.json | Postman/Insomnia/Bruno import için |
+| Main API | http://localhost:8080 | `/health` includes Postgres + Payment downstream probes |
+| Payment API | http://localhost:8090 | Separate microservice on Mongo; `/health` (Mongo ping) |
+| Scalar API docs | http://localhost:8080/scalar/v1 | Interactive UI over OpenAPI (dev only) |
+| OpenAPI JSON | http://localhost:8080/openapi/v1.json | Import into Postman / Insomnia / Bruno |
 | MailHog UI | http://localhost:8025 | Dev SMTP catcher |
-| PostgreSQL | `localhost:5432` | Ana DB — DBeaver/pgAdmin ile bağlan |
-| MongoDB | `localhost:27017` | PaymentService DB _(W4'ten beri aktif)_ |
+| PostgreSQL | `localhost:5432` | Main DB — DBeaver / pgAdmin friendly |
+| MongoDB | `localhost:27017` | PaymentService DB _(active since W4)_ |
 
-### Sadece DB'leri çalıştır, API'yi local'den koş
+### Run the databases in Docker but the API locally
 
 ```powershell
 docker compose up -d postgres mongo mailhog
@@ -279,91 +302,104 @@ dotnet run --project src/SiteManagement.Api
 # -> http://localhost:5200
 ```
 
-### Test
+### Tests
 
-İki ayrı solution olduğu için `dotnet test`'i **argümansız çağırma** (iki `.slnx` bulur, hata verir) — solution'ı belirt:
+There are two solutions, so plain `dotnet test` fails ("two `.slnx` files found"); always pass one explicitly:
 
 ```powershell
-dotnet test SiteManagement.slnx -m:1                       # ana API (Domain/App/Arch/E2E)
-dotnet test payment-service/PaymentService.slnx -m:1       # payment microservice (Domain/E2E)
+dotnet test SiteManagement.slnx -m:1                       # main API (Domain / App / Arch / E2E)
+dotnet test payment-service/PaymentService.slnx -m:1       # payment microservice (Domain / Arch / E2E)
 
 cd web; npm test                                           # Angular (Vitest)
 ```
 
-> **E2E Docker ister** (Testcontainers). **Uyarı:** lokal `docker compose` stack ayaktayken E2E koşmak compose veritabanını sıfırlayabilir (bootstrap admin + domain verisi); sonrasında `docker compose restart api` admin'i yeniden seed eder.
+> **E2E needs Docker** (Testcontainers). **Warning:** running E2E while the local `docker compose` stack is up can truncate the compose database (including the bootstrap admin + seeded data); `docker compose restart api` re-seeds the admin afterwards.
 
-### Stack'i kapat
+### Coverage report
 
 ```powershell
-docker compose down              # container'ları kapat, volume'ler durur
-docker compose down --volumes    # volume'leri de sil (DB sıfırlanır)
+.\scripts\coverage.ps1
+# -> coverage/index.html (Coverlet + ReportGenerator HTML)
+```
+
+### Bring the stack down
+
+```powershell
+docker compose down              # stop containers, keep volumes
+docker compose down --volumes    # stop + wipe volumes (DB reset)
 ```
 
 ---
 
-## Demo modu
+## Demo mode
 
-Tek komut ile demo veriyle dolu bir kurulum:
+A single command brings the stack up populated with demo data:
 
 ```powershell
-Copy-Item .env.example .env   # DEMO_SEED_ON_STARTUP=true zaten açık
+Copy-Item .env.example .env   # DEMO_SEED_ON_STARTUP=true is already on
 docker compose up -d --build
 ```
 
-Bootstrap admin (`admin@sitemanagement.local` / `Str0ng-P@ss-Dev`) + 1 site + 3 sakin + 1 açık aidat dönemi (1 paid + 2 unpaid) + 1 admin-açık conversation + welcome mail'ler MailHog'a düşmüş gelir. Mail'deki şifre ile sakin login olunabilir; pay-by-card için PaymentService kendi seeder'ı `4242 4242 4242 4242` Luhn-geçerli test kartı + 100.000 ₺ bakiyeyi hazırlamıştır.
+You get the bootstrap admin (`admin@sitemanagement.local` / `Str0ng-P@ss-Dev`) + 1 site + 3 residents + 1 open dues period (1 paid + 2 unpaid lines) + 1 admin-opened conversation, with the welcome emails sitting in MailHog. Use the password from the welcome email to log in as a resident. The PaymentService seeder ships the Luhn-valid test card `4242 4242 4242 4242` (CVV `123`, expiry `12/2030`) with a funded fake bank account, so pay-by-card just works.
 
-### Production deploy (yapılmadı — bilinçli karar)
+### Production deploy
 
-Bu proje **vitrin / portfolio** projesidir; live URL yerine **self-hosted demo + video** tercih edildi (ücret + maintenance overhead'i değer/maliyet oranını bozuyor). Kod tarafında deploy yardımcıları (`PortBindingExtensions.UsePlatformPort`, `DatabaseUrlExtensions.UsePlatformDatabaseUrl`) yerinde — gerçek bir host'a alınmak istenirse Railway / Render / Fly.io ile sorunsuz çalışacak şekilde tasarlandı. Adım adım rehber: **[docs/DEPLOY-RAILWAY.md](docs/DEPLOY-RAILWAY.md)**.
+There is **no live URL** — that's a deliberate scope decision (the cost + maintenance overhead of hosting beat the portfolio payoff for a single-developer showcase). The platform helpers (`PortBindingExtensions.UsePlatformPort`, `DatabaseUrlExtensions.UsePlatformDatabaseUrl`) are in place, so swapping in Railway / Render / Fly.io would be a configuration change, not a rewrite. Step-by-step guide: **[docs/DEPLOY-RAILWAY.md](docs/DEPLOY-RAILWAY.md)**.
 
----
+### Showing this to someone live
 
-## Known limitations (dürüst vitrin)
-
-Vitrin projesinin dürüstçe kapsam dışı bıraktığı parçalar — hiçbiri "unutuldu" değil, hepsi bilinçli scope kararı:
-
-- **Resident self-registration yok** — sakin hesabı yalnız authenticated admin'in `POST /api/residents` çağrısıyla doğar. Public register endpoint'i bilinçli olarak yoktur (güvenlik duruşu).
-- **Refresh token in-memory + family invalidation yok** — `InMemoryRefreshTokenStore` restart'ta token'leri kaybeder. Rotation + reuse-detection var, ama compromise → "tüm family revoke" tier'ı yok. Production move: EF-backed store + family kolonu.
-- **JWT lifetime 60 dk** — silent refresh devrede; 15 dk'ya darıltma refresh hacmini artırırdı, dev UX'i bozardı. Production'da config bir satır.
-- **Credit balance partial settlement yok** — overpayment kredisi sonraki kalemi **tam karşılarsa** otomatik mahsup ediliyor; kısmen karşılarsa kalem `Unpaid` kalıyor (kullanıcı bunu bilinçli ertelendi olarak işaretledi).
-- **Mesajda dosya/resim ekleme yok** — text-only thread + per-side unread. Storage (S3 / disk / blob) ayrı bir karar; vitrin akışı için marjinal değer.
-- **In-app bildirim merkezi yok** — bildirim Outbox üzerinden email; in-app çan + history yok.
-- **Audit log UI yok** — `AuditableEntity` veri tutuyor, admin sayfası eksik.
-- **API versiyonlama yok** — `/api/` versiyonsuz.
-- **SignalR tek instance** — Redis backplane yok; horizontal scale için backplane (Redis / Azure SignalR) eklenmesi gerekir.
-- **CSP header yok** — Angular ayrı origin'den serve ediliyor ve Scalar Dev'de inline scripts kullanıyor; prod host gerçekten bundle'ı sunduğunda yazılır.
-- **Mobile responsive smoke geçti, mobile-first UX değil** — `BreakpointObserver` ile sidenav `over` mode + hamburger var; production mobile-app deneyimi yerine "tablet+ optimize" hedefi.
+Walking a hiring manager / interviewer / friend through the project? Use the **[Live Demo Runbook](docs/LIVE-DEMO-RUNBOOK.md)** — pre-flight, copy-paste credentials, scene-by-scene script with the one or two sentences to say on each page, a Q&A table mapping technical questions straight to the ADR that answers them, fallback if something breaks live, and a one-page cheat sheet.
 
 ---
 
-## CI & Test stratejisi
+## Known limitations (honest portfolio)
+
+Things this project deliberately leaves out of scope — none of these are forgotten, they were all conscious calls:
+
+- **No resident self-registration** — a resident account can only be created by an authenticated admin calling `POST /api/residents`. The lack of a public register endpoint is the security posture, not an oversight.
+- **In-memory refresh tokens, no family invalidation** — `InMemoryRefreshTokenStore` drops tokens on restart. Rotation + reuse-detection are in place, but a "blow up the whole family on any reuse" tier is not. Production move: EF-backed store + family column.
+- **JWT lifetime is 60 min** — silent refresh works; tightening to 15 min would inflate refresh traffic and worsen the dev loop with no measurable defence gain. Production tweak is one config line.
+- **Credit balance partial settlement is off** — overpayment credit auto-applies only when it fully covers the next line; partial application (e.g. 300 of a 400 line) needs a `creditApplied` state on the line item (domain + migration + UI). Consciously deferred.
+- **No file attachments in messaging** — text-only threads with per-side unread. Storage strategy (S3 / disk / blob) is its own decision; marginal value for the showcase flow.
+- **No in-app notification centre** — notification today is the welcome email through the Outbox; no in-app bell + history.
+- **No audit-log UI** — `AuditableEntity` records the data, the admin page does not exist yet.
+- **No API versioning** — the route prefix is plain `/api/`.
+- **SignalR single-instance** — no Redis backplane; horizontal scale would need one (Redis / Azure SignalR).
+- **No CSP header** — Angular ships from a separate origin and Scalar uses inline scripts in dev; CSP belongs to the production host that serves the bundle.
+- **Mobile responsive sweep, not mobile-first** — `BreakpointObserver` flips the sidenav to `over` mode with a hamburger on phones, but the experience is tuned for tablet-and-up rather than a native-feeling phone app.
+
+---
+
+## CI & test strategy
 
 GitHub Actions ([`.github/workflows/ci.yml`](.github/workflows/ci.yml)):
 
-- Her `main` push'unda ve PR'da koşar
-- .NET 10 SDK kurar, Postgres 16 service container'ı ayağa kaldırır
-- `dotnet restore` → `dotnet build --configuration Release` (warnings = errors, csproj'da aktif) → `dotnet test`
-- Test sonuçları artifact olarak yüklenir
+- Runs on every push to `main` and every PR
+- Sets up .NET 10 SDK, starts a Postgres 16 service container
+- `dotnet restore` → `dotnet build --configuration Release` (warnings = errors, enforced in the csproj) → `dotnet test` with `coverlet.runsettings`
+- Renders the HTML coverage report through ReportGenerator and uploads it as the `coverage-html` artefact; posts the text summary to the workflow run page
 
-Test projeleri:
+Test projects:
 
-| Proje | Amaç |
+| Project | Purpose |
 |---|---|
-| `SiteManagement.Domain.Tests` | Domain unit testleri — aggregate invariant'ları, value object'ler (TDD) |
-| `SiteManagement.Application.Tests` | Handler / pipeline behavior unit testleri (repo mock'lı, NSubstitute) |
-| `SiteManagement.E2E.Tests` | Testcontainers + WebApplicationFactory — full HTTP akışları; pay-by-card WireMock stub ile |
-| **`SiteManagement.ArchitectureTests`** | NetArchTest ile katman bağımlılık koruması + CQRS naming + soft-delete/integration-event guardrail'ları + resource key bütünlüğü |
-| `PaymentService.Domain.Tests` | PaymentService domain unit testleri (banka/kart/transaction, Money rounding) |
-| `PaymentService.E2E.Tests` | PaymentService'i gerçek Mongo (Testcontainer) + HTTP üzerinde uçtan uca |
-| `web` (Vitest) | Angular store / interceptor / component unit testleri |
+| `SiteManagement.Domain.Tests` | Domain unit tests — aggregate invariants, value objects (TDD) |
+| `SiteManagement.Application.Tests` | Handler + pipeline-behavior unit tests (repos mocked with NSubstitute) |
+| `SiteManagement.E2E.Tests` | Testcontainers + WebApplicationFactory — full HTTP flows; pay-by-card uses a WireMock stub |
+| **`SiteManagement.ArchitectureTests`** | NetArchTest enforces layer dependency direction + CQRS naming conventions + soft-delete / integration-event guardrails + resource-key parity |
+| `PaymentService.Domain.Tests` | PaymentService domain unit tests (bank / card / transaction, money rounding) |
+| `PaymentService.E2E.Tests` | PaymentService end-to-end over real Mongo (Testcontainer) + HTTP |
+| `web` (Vitest) | Angular store / interceptor / component unit tests |
 
-Architecture testleri proje sağlığının uzun vadeli garantörü:
-- **Layer dependency:** Domain BCL-only, Application no-EF / no-ASP.NET, Infrastructure → Api referans yok
-- **CQRS naming:** Her `IRequest<>` ya `Command` ya `Query` ile bitiyor; her command için handler **ve** validator var; handler'lar `sealed`
-- **Resource integrity:** Her `ErrorMessageKeys` / `ValidationMessages` const'unun **hem tr hem en resx**'te karşılığı var; iki resx **drift yok**
+The architecture tests are the long-term guarantor of the codebase's health:
+
+- **Layer dependency:** Domain is BCL-only, Application has no EF / no ASP.NET, Infrastructure has no Api reference.
+- **CQRS naming:** every `IRequest<>` ends in `Command` or `Query`; every command has both a handler **and** a validator; handlers are `sealed`.
+- **Authorization conventions:** every request implements exactly one of `IAdminRequest` / `IResidentRequest` / `IPublicRequest` — forgetting fails the build.
+- **Resource integrity:** every `ErrorMessageKeys` / `ValidationMessages` constant has a matching entry in **both** the tr and en `.resx` files; the two files cannot drift.
 
 ---
 
-## Lisans
+## License
 
-MIT — bkz. [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
