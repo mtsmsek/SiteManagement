@@ -104,7 +104,18 @@ public sealed class DemoSeeder
         await SeedDuesPeriodAsync(duesRepo, unitOfWork, site.Id, apartmentIds, residents, ct);
 
         var adminUserId = await ResolveBootstrapAdminUserIdAsync(sp, ct);
-        await SeedConversationAsync(conversationRepo, unitOfWork, residents[0].ResidentId, adminUserId, timeProvider, ct);
+        // Two seeded threads: the first resident (whose item is already paid) gets the
+        // welcome thread, the second resident (with the unpaid line) gets a chase-up
+        // thread, so the demo recorder finds both an unpaid item AND a conversation on
+        // the same login.
+        await SeedConversationAsync(
+            conversationRepo, unitOfWork, residents[0].ResidentId, adminUserId,
+            "Welcome", "Welcome to Lavanta Konutları! Reach out here whenever you have a question.",
+            timeProvider, ct);
+        await SeedConversationAsync(
+            conversationRepo, unitOfWork, residents[1].ResidentId, adminUserId,
+            "Dues reminder", "Just a friendly reminder that your May dues are still open.",
+            timeProvider, ct);
 
         logger.LogInformation("Demo seed complete.");
     }
@@ -228,15 +239,17 @@ public sealed class DemoSeeder
         IUnitOfWork unitOfWork,
         Guid residentId,
         Guid adminUserId,
+        string subject,
+        string body,
         TimeProvider timeProvider,
         CancellationToken ct)
     {
         var conversation = Conversation.Start(
             residentId,
-            subject: "Hoş geldiniz",
+            subject: subject,
             openerRole: MessageSenderRole.Admin,
             openerUserId: adminUserId,
-            body: "Lavanta Konutları'na hoş geldiniz! Sorularınız için bu kanaldan iletişime geçebilirsiniz.",
+            body: body,
             sentAtUtc: timeProvider.GetUtcNow().UtcDateTime);
 
         await conversationRepo.AddAsync(conversation, ct);

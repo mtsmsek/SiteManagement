@@ -1,0 +1,19 @@
+{
+  "name": "sitemanagement-demo-recorder",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Automated demo-video recorder for the SiteManagement showcase. Plays a scripted scenario through Playwright on top of the DemoSeeder-populated stack, narrates it with piper-tts (open-source, offline), and merges to MP4 with ffmpeg-static.",
+  "scripts": {
+    "record": "playwright test",
+    "narrate": "tsx lib/narrate.ts",
+    "merge": "tsx lib/merge.ts",
+    "all": "tsx lib/run-all.ts"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.50.0",
+    "@types/node": "^22.0.0",
+    "ffmpeg-static": "^5.2.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0"
+  }
+}
