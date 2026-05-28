@@ -70,9 +70,34 @@ jobs:
           dotnet test
           --no-build
           --configuration Release
+          --settings coverlet.runsettings
           --logger "trx;LogFileName=test-results.trx"
-          --collect "XPlat Code Coverage"
           --results-directory ${{ runner.temp }}/test-results
+
+      - name: Render coverage HTML
+        if: always()
+        shell: bash
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator \
+            "-reports:${{ runner.temp }}/test-results/**/coverage.cobertura.xml" \
+            "-targetdir:${{ runner.temp }}/coverage-html" \
+            "-reporttypes:Html;TextSummary;Badges"
+
+      - name: Summarise coverage
+        if: always()
+        shell: bash
+        run: |
+          summary="${{ runner.temp }}/coverage-html/Summary.txt"
+          if [[ -f "$summary" ]]; then
+            {
+              echo "## Coverage"
+              echo
+              echo '```'
+              head -n 20 "$summary"
+              echo '```'
+            } >> "$GITHUB_STEP_SUMMARY"
+          fi
 
       - name: Upload test results
         if: always()
@@ -80,4 +105,12 @@ jobs:
         with:
           name: test-results
           path: ${{ runner.temp }}/test-results
+          if-no-files-found: ignore
+
+      - name: Upload coverage HTML
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-html
+          path: ${{ runner.temp }}/coverage-html
           if-no-files-found: ignore
