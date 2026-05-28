@@ -9,6 +9,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import { MyBillsStore } from '../my-bills.store';
 import {
   CardPaymentDialog,
@@ -33,6 +34,7 @@ import { BillingItemStatus, BillKind, type PayByCardRequest, type ResidentBill }
     MatProgressBarModule,
     DecimalPipe,
     TranslatePipe,
+    EmptyState,
   ],
   templateUrl: './my-bills.html',
   styleUrl: './my-bills.scss',

@@ -11,7 +11,7 @@
 }
 
 @if (isEmpty()) {
-  <p class="empty-state">{{ 'sites.empty' | translate }}</p>
+  <app-empty-state icon="apartment" messageKey="sites.empty" />
 } @else {
   <div class="card-grid">
     @for (site of sites(); track site.id) {

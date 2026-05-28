@@ -11,6 +11,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AdminMessagingStore } from '../admin-messaging.store';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import { MessageSenderRole } from '../../../core/api/api.models';
 import {
   StartConversationDialog,
@@ -37,6 +38,7 @@ import {
     MatBadgeModule,
     MatProgressBarModule,
     TranslatePipe,
+    EmptyState,
   ],
   templateUrl: './admin-messaging.html',
   styleUrl: './admin-messaging.scss',

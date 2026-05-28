@@ -8,6 +8,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ResidentsStore } from '../residents.store';
 import { ResidentFormDialog } from '../resident-form-dialog/resident-form-dialog';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import type { ResidentListItem } from '../../../core/api/api.models';
 
 /**
@@ -24,6 +25,7 @@ import type { ResidentListItem } from '../../../core/api/api.models';
     MatIconModule,
     MatProgressBarModule,
     TranslatePipe,
+    EmptyState,
   ],
   templateUrl: './resident-list.html',
   styleUrl: './resident-list.scss',

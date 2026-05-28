@@ -12,7 +12,8 @@
     "loading": "Yükleniyor...",
     "logout": "Çıkış Yap",
     "language": "Dil",
-    "theme": "Tema"
+    "theme": "Tema",
+    "menu": "Menü"
   },
   "auth": {
     "login": {

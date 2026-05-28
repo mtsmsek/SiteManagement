@@ -10,6 +10,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslatePipe } from '@ngx-translate/core';
 import { MyMessagesStore } from '../my-messages.store';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import { MessageSenderRole } from '../../../core/api/api.models';
 
 /**
@@ -31,6 +32,7 @@ import { MessageSenderRole } from '../../../core/api/api.models';
     MatBadgeModule,
     MatProgressBarModule,
     TranslatePipe,
+    EmptyState,
   ],
   templateUrl: './my-messages.html',
   styleUrl: './my-messages.scss',

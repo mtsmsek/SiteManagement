@@ -10,6 +10,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { SitesStore } from '../sites.store';
 import { SiteFormDialog } from '../site-form-dialog/site-form-dialog';
 import { ConfirmDialog, ConfirmDialogData } from '../../../shared/confirm-dialog/confirm-dialog';
+import { EmptyState } from '../../../shared/empty-state/empty-state';
 import type { SiteListItem } from '../../../core/api/api.models';
 
 /**
@@ -25,6 +26,7 @@ import type { SiteListItem } from '../../../core/api/api.models';
     MatIconModule,
     MatProgressBarModule,
     TranslatePipe,
+    EmptyState,
   ],
   templateUrl: './site-list.html',
   styleUrl: './site-list.scss',

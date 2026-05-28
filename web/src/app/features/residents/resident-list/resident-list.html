@@ -11,7 +11,7 @@
 }
 
 @if (isEmpty()) {
-  <p class="empty-state">{{ 'residents.empty' | translate }}</p>
+  <app-empty-state icon="people" messageKey="residents.empty" />
 } @else {
   <table mat-table [dataSource]="residents()" class="data-table">
     <ng-container matColumnDef="tcNo">

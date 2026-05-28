@@ -13,7 +13,7 @@
 <div class="messaging">
   <mat-card class="thread-list">
     @if (conversations().length === 0 && !loading()) {
-      <div class="empty-state">{{ 'admin.messaging.empty' | translate }}</div>
+      <app-empty-state icon="forum" messageKey="admin.messaging.empty" />
     } @else {
       @for (c of conversations(); track c.id) {
         <button class="thread-item" [class.active]="c.id === selectedId()" (click)="select(c.id)">
@@ -49,7 +49,7 @@
         </button>
       </div>
     } @else {
-      <div class="empty-state">{{ 'admin.messaging.selectPrompt' | translate }}</div>
+      <app-empty-state icon="chat" messageKey="admin.messaging.selectPrompt" />
     }
   </mat-card>
 </div>

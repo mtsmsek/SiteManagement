@@ -1,5 +1,5 @@
 <mat-sidenav-container class="admin-shell">
-  <mat-sidenav mode="side" opened class="admin-sidenav">
+  <mat-sidenav [mode]="sidenavMode()" [opened]="sidenavOpened()" class="admin-sidenav">
     <div class="brand">{{ 'common.appName' | translate }}</div>
 
     <mat-nav-list>
@@ -24,6 +24,11 @@
 
   <mat-sidenav-content>
     <mat-toolbar class="admin-toolbar">
+      @if (isMobile()) {
+        <button matIconButton (click)="toggleSidenav()" [attr.aria-label]="'common.menu' | translate">
+          <mat-icon>menu</mat-icon>
+        </button>
+      }
       <span class="spacer"></span>
 
       <button matIconButton (click)="toggleTheme()" [attr.aria-label]="'common.theme' | translate">

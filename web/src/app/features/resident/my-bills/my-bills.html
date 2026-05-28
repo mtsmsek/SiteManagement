@@ -12,7 +12,7 @@
 
 <mat-card>
   @if (bills().length === 0 && !loading()) {
-    <div class="empty-state">{{ 'resident.bills.empty' | translate }}</div>
+    <app-empty-state icon="receipt_long" messageKey="resident.bills.empty" />
   } @else {
     <table mat-table [dataSource]="bills()" class="data-table">
       <ng-container matColumnDef="month">

@@ -29,7 +29,7 @@
     }
 
     @if (conversations().length === 0 && !loading()) {
-      <div class="empty-state">{{ 'resident.messages.empty' | translate }}</div>
+      <app-empty-state icon="forum" messageKey="resident.messages.empty" />
     } @else {
       @for (c of conversations(); track c.id) {
         <button class="thread-item" [class.active]="c.id === selectedId()" (click)="select(c.id)">
@@ -64,7 +64,7 @@
         </button>
       </div>
     } @else {
-      <div class="empty-state">{{ 'resident.messages.selectPrompt' | translate }}</div>
+      <app-empty-state icon="chat" messageKey="resident.messages.selectPrompt" />
     }
   </mat-card>
 </div>

@@ -12,7 +12,8 @@
     "loading": "Loading...",
     "logout": "Log out",
     "language": "Language",
-    "theme": "Theme"
+    "theme": "Theme",
+    "menu": "Menu"
   },
   "auth": {
     "login": {
