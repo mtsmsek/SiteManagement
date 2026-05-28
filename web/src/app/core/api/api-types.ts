@@ -3065,6 +3065,7 @@ export interface components {
             id: string;
             /** Format: uuid */
             residentId: string;
+            residentName: string;
             subject: string;
             /** Format: int32 */
             messageCount: number | string;

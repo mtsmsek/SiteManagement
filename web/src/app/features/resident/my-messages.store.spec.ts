@@ -8,6 +8,7 @@ describe('MyMessagesStore', () => {
   const conversation: ConversationListItem = {
     id: 'conv-1',
     residentId: 'res-1',
+    residentName: 'Ada Lovelace',
     subject: 'Su kaçağı',
     messageCount: 1,
     lastMessageAtUtc: '2026-01-01T09:00:00Z',

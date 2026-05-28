@@ -34,8 +34,8 @@ public class GetMyDashboardQueryHandlerTests
         _billingQueries.GetResidentCreditAsync(residentId, Arg.Any<CancellationToken>()).Returns(75m);
         IReadOnlyList<ConversationListItemDto> conversations = new List<ConversationListItemDto>
         {
-            new(Guid.NewGuid(), residentId, "A", 2, DateTime.UtcNow, 0, 2),
-            new(Guid.NewGuid(), residentId, "B", 1, DateTime.UtcNow, 0, 1),
+            new(Guid.NewGuid(), residentId, "Ada Lovelace", "A", 2, DateTime.UtcNow, 0, 2),
+            new(Guid.NewGuid(), residentId, "Ada Lovelace", "B", 1, DateTime.UtcNow, 0, 1),
         };
         _messagingQueries.ListForResidentAsync(residentId, Arg.Any<CancellationToken>()).Returns(conversations);
         var sut = new GetMyDashboardQueryHandler(_currentUser, _billingQueries, _messagingQueries);

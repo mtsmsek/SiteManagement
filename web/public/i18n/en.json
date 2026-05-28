@@ -30,6 +30,7 @@
   "nav": {
     "sites": "Sites",
     "residents": "Residents",
+    "messaging": "Messages",
     "dashboard": "Dashboard"
   },
   "sites": {
@@ -274,6 +275,17 @@
       "outstanding": "Outstanding",
       "credit": "Resident credit",
       "collectionRate": "Collection rate"
+    },
+    "messaging": {
+      "title": "Messages",
+      "newThread": "New thread",
+      "resident": "Resident",
+      "subject": "Subject",
+      "body": "Message",
+      "send": "Send",
+      "reply": "Reply",
+      "empty": "No conversations yet.",
+      "selectPrompt": "Select a thread to view it."
     }
   }
 }

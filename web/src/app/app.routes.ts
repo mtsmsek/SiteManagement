@@ -36,6 +36,11 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./features/residents/resident-detail/resident-detail').then((m) => m.ResidentDetail),
       },
+      {
+        path: 'messaging',
+        loadComponent: () =>
+          import('./features/messaging/admin-messaging/admin-messaging').then((m) => m.AdminMessaging),
+      },
     ],
   },
   {

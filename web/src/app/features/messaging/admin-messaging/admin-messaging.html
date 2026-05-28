@@ -1,0 +1,55 @@
+<div class="page-header">
+  <h1>{{ 'admin.messaging.title' | translate }}</h1>
+  <button matButton="filled" (click)="openStartDialog()">
+    <mat-icon>add</mat-icon>
+    {{ 'admin.messaging.newThread' | translate }}
+  </button>
+</div>
+
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate" />
+}
+
+<div class="messaging">
+  <mat-card class="thread-list">
+    @if (conversations().length === 0 && !loading()) {
+      <div class="empty-state">{{ 'admin.messaging.empty' | translate }}</div>
+    } @else {
+      @for (c of conversations(); track c.id) {
+        <button class="thread-item" [class.active]="c.id === selectedId()" (click)="select(c.id)">
+          <span class="resident" [matBadge]="c.unreadForAdmin" [matBadgeHidden]="c.unreadForAdmin === 0">
+            {{ c.residentName }}
+          </span>
+          <span class="subject">{{ c.subject }}</span>
+          <span class="when">{{ c.lastMessageAtUtc | date: 'short' }}</span>
+        </button>
+      }
+    }
+  </mat-card>
+
+  <mat-card class="thread-view">
+    @if (selectedId()) {
+      <div class="messages">
+        @for (m of messages(); track m.id) {
+          <div class="bubble" [class.own]="m.senderRole === adminRole">
+            <div class="bubble-body">{{ m.body }}</div>
+            <div class="bubble-meta">{{ m.sentAtUtc | date: 'short' }}</div>
+          </div>
+        }
+      </div>
+
+      <div class="reply">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'admin.messaging.reply' | translate }}</mat-label>
+          <textarea matInput rows="2" [ngModel]="replyBody()" (ngModelChange)="replyBody.set($event)"></textarea>
+        </mat-form-field>
+        <button matButton="filled" [disabled]="replyBody().trim().length === 0" (click)="sendReply()">
+          <mat-icon>send</mat-icon>
+          {{ 'admin.messaging.send' | translate }}
+        </button>
+      </div>
+    } @else {
+      <div class="empty-state">{{ 'admin.messaging.selectPrompt' | translate }}</div>
+    }
+  </mat-card>
+</div>

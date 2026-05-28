@@ -30,6 +30,7 @@
   "nav": {
     "sites": "Siteler",
     "residents": "Sakinler",
+    "messaging": "Mesajlar",
     "dashboard": "Panel"
   },
   "sites": {
@@ -274,6 +275,17 @@
       "outstanding": "Açık bakiye",
       "credit": "Sakin kredisi",
       "collectionRate": "Tahsilat oranı"
+    },
+    "messaging": {
+      "title": "Mesajlar",
+      "newThread": "Yeni Konu",
+      "resident": "Sakin",
+      "subject": "Konu",
+      "body": "Mesaj",
+      "send": "Gönder",
+      "reply": "Yanıt",
+      "empty": "Henüz konuşma yok.",
+      "selectPrompt": "Görüntülemek için bir konu seçin."
     }
   }
 }

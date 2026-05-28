@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>{{ 'admin.messaging.newThread' | translate }}</h2>
+
+<mat-dialog-content class="dialog-body">
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>{{ 'admin.messaging.resident' | translate }}</mat-label>
+    <mat-select [ngModel]="residentId()" (ngModelChange)="residentId.set($event)">
+      @for (r of residents(); track r.id) {
+        <mat-option [value]="r.id">{{ r.firstName }} {{ r.lastName }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>{{ 'admin.messaging.subject' | translate }}</mat-label>
+    <input matInput [ngModel]="subject()" (ngModelChange)="subject.set($event)" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>{{ 'admin.messaging.body' | translate }}</mat-label>
+    <textarea matInput rows="4" [ngModel]="body()" (ngModelChange)="body.set($event)"></textarea>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button matButton (click)="cancel()">{{ 'common.cancel' | translate }}</button>
+  <button matButton="filled" [disabled]="!canSubmit()" (click)="submit()">
+    {{ 'admin.messaging.send' | translate }}
+  </button>
+</mat-dialog-actions>

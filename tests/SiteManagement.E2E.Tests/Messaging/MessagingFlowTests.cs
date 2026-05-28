@@ -54,6 +54,10 @@ public sealed class MessagingFlowTests(PostgresFixture postgres) : IAsyncLifetim
         var row = inbox!.Single(c => c.Id == conversationId);
         row.UnreadForResident.Should().Be(1);
 
+        // assert — admin inbox carries the resident's display name for the row
+        var adminInboxFirst = await admin.GetFromJsonAsync<List<ConversationRow>>("/api/conversations", AuthFlow.Json);
+        adminInboxFirst!.Single(c => c.Id == conversationId).ResidentName.Should().Be("Ada Lovelace");
+
         // act — resident reads + replies
         (await residentA.PostAsync($"/api/me/conversations/{conversationId}/read", content: null)).EnsureSuccessStatusCode();
         (await residentA.PostAsJsonAsync($"/api/me/conversations/{conversationId}/messages", new { body = "Teşekkürler, hallediyorum." }))
@@ -124,7 +128,7 @@ public sealed class MessagingFlowTests(PostgresFixture postgres) : IAsyncLifetim
         return document.RootElement.EnumerateObject().First().Value.GetGuid();
     }
 
-    private sealed record ConversationRow(Guid Id, int UnreadForAdmin, int UnreadForResident);
+    private sealed record ConversationRow(Guid Id, string ResidentName, int UnreadForAdmin, int UnreadForResident);
 
     private sealed record MessageRow(Guid Id, string SenderRole, string Body);
 
