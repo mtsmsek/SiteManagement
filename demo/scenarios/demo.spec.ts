@@ -1,8 +1,46 @@
 import { Page, test, expect } from '@playwright/test';
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { readWelcomePasswordFor } from '../lib/mailhog.js';
 import { demoCard, recordingAdmin, recordingResident, scenes } from '../lib/scenes.js';
+
+/**
+ * Inter-scene buffer: the silence between one scene's narration ending and
+ * the next one's starting. Keeps the cut from feeling abrupt.
+ */
+const POST_NARRATION_BUFFER_MS = 700;
+
+/**
+ * Pulls narration durations the narrate step measured from the piper output
+ * and bumps each scene's minDurationMs up to "narration + buffer" if the
+ * voice-over is longer than the original floor. Without this, a long scene
+ * narration (12-outro is the worst offender) would still be cut off because
+ * the recorder advances to the next scene before the audio finishes.
+ */
+function applyNarrationDurations(): void {
+  // Playwright runs the spec with cwd == demo/, so the narration sidecar
+  // lives at out/audio/durations.json relative to it. import.meta.dirname
+  // is avoided here because Playwright's CommonJS-style TS loader rewrites
+  // it into a require() call that ESM mode then refuses.
+  const durationsPath = resolve(process.cwd(), 'out', 'audio', 'durations.json');
+  if (!existsSync(durationsPath)) {
+    console.warn(
+      `durations.json missing at ${durationsPath}; falling back to the static minDurationMs floors.`,
+    );
+    return;
+  }
+  const durations = JSON.parse(readFileSync(durationsPath, 'utf-8')) as Record<string, number>;
+  for (const scene of scenes) {
+    const narration = durations[scene.id];
+    if (typeof narration === 'number') {
+      const needed = narration + POST_NARRATION_BUFFER_MS;
+      if (needed > scene.minDurationMs) {
+        scene.minDurationMs = needed;
+      }
+    }
+  }
+}
+applyNarrationDurations();
 
 /**
  * The one scenario the demo recorder runs. Each scene drives the UI through

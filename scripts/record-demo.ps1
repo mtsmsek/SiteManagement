@@ -92,8 +92,25 @@ if (-not $SkipSeed) {
 
 Wait-Http -Url 'http://localhost:4200' -TimeoutSec 90 -Label 'Angular dev server (npm start in web/)'
 
-Write-Host "=== recording with Playwright ===" -ForegroundColor Yellow
 $demoDir = Join-Path $repoRoot 'demo'
+
+# Narrate first so the recorder can read each scene's measured WAV duration
+# and bump the on-screen hold up to "narration + buffer" -- that's what
+# stops scene N+1's voice-over from starting before scene N's has finished.
+if (-not $RecordOnly) {
+    Write-Host "=== narrating scenes with piper-tts ===" -ForegroundColor Yellow
+    Set-Location $demoDir
+    try {
+        npm run narrate
+        if ($LASTEXITCODE -ne 0) {
+            throw "Narration failed with exit code $LASTEXITCODE."
+        }
+    } finally {
+        Set-Location $repoRoot
+    }
+}
+
+Write-Host "=== recording with Playwright ===" -ForegroundColor Yellow
 Set-Location $demoDir
 try {
     npm run record
@@ -107,17 +124,6 @@ try {
 if ($RecordOnly) {
     Write-Host "RecordOnly mode: skipping TTS + merge." -ForegroundColor DarkGray
     return
-}
-
-Write-Host "=== narrating scenes with piper-tts ===" -ForegroundColor Yellow
-Set-Location $demoDir
-try {
-    npm run narrate
-    if ($LASTEXITCODE -ne 0) {
-        throw "Narration failed with exit code $LASTEXITCODE."
-    }
-} finally {
-    Set-Location $repoRoot
 }
 
 Write-Host "=== merging with ffmpeg ===" -ForegroundColor Yellow
