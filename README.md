@@ -14,7 +14,7 @@
 
 A 2 min 16 s walkthrough of the resident and admin journeys (English narration + on-screen captions, no manual editing — the whole pipeline is in [demo/](demo/), see [demo/README.md](demo/README.md)).
 
-➡️ **[Download `demo-video.mp4` from the v1.0.0 release](https://github.com/mtsmsek/SiteManagement/releases/download/v1.0.0/demo-video.mp4)**
+➡️ https://github.com/user-attachments/assets/6a4adbc5-53c5-41fe-b5c0-894ec37e2c01
 
 To re-record locally (open-source pipeline: Playwright + piper-tts + ffmpeg-static):
 
