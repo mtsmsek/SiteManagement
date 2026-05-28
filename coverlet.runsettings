@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Coverlet config used by `dotnet test`; excludes test assemblies, EF Core migration scaffolding, and generated code so the report reflects real production logic only. -->
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat code coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <Exclude>[*.Tests]*,[*.Tests.*]*,[*]*Migrations.*,[*]*.Migrations.*</Exclude>
+          <ExcludeByAttribute>GeneratedCodeAttribute,CompilerGeneratedAttribute</ExcludeByAttribute>
+          <DeterministicReport>false</DeterministicReport>
+          <SkipAutoProps>true</SkipAutoProps>
+          <UseSourceLink>true</UseSourceLink>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

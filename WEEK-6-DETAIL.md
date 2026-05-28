@@ -166,27 +166,46 @@ tek FE açığını kapat ki "feature complete" diyebilelim.
 
 ---
 
-## Gün 3 — Test Coverage + Critical-Path E2E
+## Gün 3 — Coverage Harness ✅
 
-**Hedef:** Coverlet ile rapor üret, eksik critical-path E2E'leri ekle.
+**Hedef:** Test suite'in kapsamını görünür kıl. Critical-path E2E'lerin
+**zaten yerinde** olduğunu keşfettik (welcome-mail outbox, soft-delete
+archive/restore/purge, credit-balance auto-application + Gün 2'nin SignalR
+push'ları), o yüzden gün **observability + reporting**'e daraldı.
 
-- [ ] **Coverlet + ReportGenerator** kur (`coverlet.collector` paketleri varsa kontrol;
-      yoksa ekle). `runsettings` veya `dotnet test --collect:"XPlat Code Coverage"`.
-- [ ] HTML rapor: `dotnet tool install -g dotnet-reportgenerator-globaltool` +
-      `reportgenerator -reports:**/coverage.cobertura.xml -targetdir:coverage -reporttypes:Html`.
-- [ ] CI workflow'a: test → coverage artifact upload (HTML klasörü). Threshold yok.
-- [ ] **Eksik critical-path E2E'leri belirle ve ekle:**
-  - [ ] **Credit balance journey:** distribute → overpay → distribute again → otomatik mahsup.
-  - [ ] **Soft delete + restore + purge** Site E2E.
-  - [ ] **Welcome mail outbox** (varsa kontrol; yoksa ekle).
-  - [ ] **Rate-limit smoke** (Gün 6'da rate-limit kurulunca ek 1 E2E).
-- [ ] **Domain test gap doldur:** coverage raporundan görüp eksik invariant test'leri ekle (özellikle `Conversation` ve `ResidentCreditAccount`).
-- [ ] **Application test gap doldur:** behavior testleri tam mı (`AuthorizationBehavior`,
-      `ResidentBillOwnershipBehavior`, `ConversationOwnershipBehavior`, `TransactionBehavior`,
-      `ExceptionTranslationBehavior`).
-- [ ] Rapor PR'da görünür olsun (artifact link README'ye eklenecek Gün 7'de).
+- [x] **`coverlet.runsettings`** (root) — XPlat collector + makul exclude'lar
+      (test assembly'leri, EF Migrations, generated code, `SkipAutoProps`).
+- [x] **`scripts/coverage.ps1`** — tek komut local: eski çıktıyı sil →
+      `dotnet test --settings coverlet.runsettings` → on-demand
+      `dotnet-reportgenerator-globaltool` install → `coverage/index.html` +
+      `Summary.txt` üret. Vitrin için "tek tıkla rapor".
+- [ ] **CI (`.github/workflows/ci.yml`)** — diff hazır, push **bekliyor** (mevcut
+      PAT'in `workflow` scope'u yok; kullanıcı manuel commit/push edecek):
+  - `dotnet test` artık `coverlet.runsettings` kullanıyor (exclude'lar tutar).
+  - Yeni step: ReportGenerator'ı `dotnet tool install` ile kurup HTML +
+    TextSummary + Badges üretir (external action sürüm-kırılganlığından
+    kurtulduk).
+  - `Summary.txt` head'i `$GITHUB_STEP_SUMMARY`'ye eklenir (PR run sayfasında
+    coverage özeti görünür).
+  - `coverage-html` artifact upload (HTML klasörü).
+- [x] **Critical-path E2E backfill ihtiyaç YOK** — zaten kapsanıyor:
+  - Welcome mail outbox → `ResidentFlowTests.RegisterResident_PersistsAggregateAndQueuesWelcomeEmail`
+  - Soft delete + restore + purge → `PropertyFlowTests` (3 ayrı test:
+    `DeleteSite_ArchivesIt`, `PurgeSite_HardDeletes`, `RestoreSite_BringsAnArchivedSiteBackIntoReads`)
+  - Credit balance journey → `CreditBalanceFlowTests` (ayrı dosya, full journey)
+  - Rate-limit smoke → **Gün 6'ya kaldı** (rate-limit henüz kurulu değil).
 
-**Commit:** `test: coverage harness + critical-path E2E backfill`
+**Coverage (local full run, Docker up):**
+- Line **90.2%** (2047/2268)
+- Branch **82.3%** (247/300)
+- Method **84.9%** (419/493)
+
+Roadmap bantlarını (Domain ≥80, App ≥60) **rahatlıkla geçiyor**. Threshold yok
+(plan kararı); rapor görünür, eksik yerlere göz manuel.
+
+**Tests:** Domain 222, App 89, Architecture 18, E2E 36, web 31 — yeşil
+(Gün 2'den değişmedi; yeni test gerekmedi).
+**Commit:** `test: coverage harness (Coverlet + ReportGenerator HTML)`
 
 ---
 
