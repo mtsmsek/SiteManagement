@@ -19,11 +19,11 @@ ADRs are immutable once accepted. To revise a choice, write a new ADR that
 | [0003](0003-modular-monolith-and-payment-microservice.md) | Modular monolith + one external Payment microservice | Accepted |
 | [0004](0004-exception-based-error-handling.md) | Exception-based error handling (no `Result<T>`) | Accepted |
 | [0005](0005-cqrs-lite-with-mediatr.md) | CQRS-lite via MediatR (no event sourcing, no read DB) | Accepted |
-| 0006 | Authorization pipeline with request markers | Day 7 |
-| 0007 | Outbox pattern for integration events | Day 7 |
-| 0008 | Soft delete only on aggregate roots | Day 7 |
-| 0009 | Token-scoped resident endpoints | Day 7 |
-| 0010 | Refit + Polly for the payment integration | Day 7 |
+| [0006](0006-authorization-pipeline-and-request-markers.md) | Authorization pipeline + single-marker request types | Accepted |
+| [0007](0007-outbox-pattern-for-integration-events.md) | Outbox pattern for integration events | Accepted |
+| [0008](0008-soft-delete-aggregate-root-only.md) | Soft delete only on aggregate roots (Site) | Accepted |
+| [0009](0009-token-scoped-resident-endpoints.md) | Token-scoped resident endpoints (`/api/me/*`) — structural IDOR fix | Accepted |
+| [0010](0010-refit-polly-for-payment-integration.md) | Refit + Polly (HttpResilience) for the payment integration | Accepted |
 
 ## Template
 

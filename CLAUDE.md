@@ -155,7 +155,86 @@ fine: migrations + bootstrap-admin seed run automatically on `docker compose up`
   if `:4200` or `:8080` is down, restart them; it's environmental.
 
 ## Current status (updated 2026-05-28)
-**Done:** **W1–W5 complete.**
+**Done:** **W1–W6 complete — `v1.0.0` shipped.**
+
+**W6 — Polish & Ship (closed out, Day 7 done):**
+- **Admin messaging UI** (W5 borcu): `features/messaging/` — `MessagingApi` (admin
+  `/api/conversations*`), `AdminMessagingStore` (signal-based, `MyMessagesStore`
+  aynası), `AdminMessaging` component (iki panel inbox/thread + unread badge
+  admin tarafı), `StartConversationDialog` (resident `MatSelect` picker + subject
+  + body). Backend: `ConversationListItemDto`'ya `ResidentName` join + admin
+  inbox satırlarının ismi DTO'dan alır.
+- **SignalR real-time messaging**: `MessagingHub` (`[Authorize]`, OnConnectedAsync
+  → role-based group join: `messaging:admins` ya da `messaging:resident:{N}`
+  resident_id claim'inden), `MessagingHubNotifier` (`IHubContext`). JWT bearer
+  WS query-string handshake (`PostConfigure<JwtBearerOptions>` + `?access_token=`).
+  Application port: `IMessagingNotifier` + 3 payload (`MessageReceived`,
+  `ConversationStarted`, `MessageRead`); 6 handler tek satır push. **Push-only**
+  (sadece server→client); gönderme HTTP'den. **Tek instance** — Redis backplane
+  YOK ("future"). FE: `@microsoft/signalr` + `MessagingHubService` (auth effect
+  ile auto connect/disconnect, `accessTokenFactory`, withAutomaticReconnect);
+  stores `merge(...)` ile her event'te `refreshOnPush`.
+- **Coverage harness**: `coverlet.runsettings` + `scripts/coverage.ps1`
+  (Coverlet + ReportGenerator HTML local one-shot). CI workflow: `dotnet test
+  --settings coverlet.runsettings` + reportgenerator step + summary →
+  `$GITHUB_STEP_SUMMARY` + `coverage-html` artifact. **Line 90.2% / Branch
+  82.3% / Method 84.9%** — roadmap bantlarının üzerinde, threshold yok.
+- **DemoSeeder** (`Infrastructure/Persistence/Seed/DemoSeeder.cs`, idempotent):
+  domain factory + repo + `IUnitOfWork.SaveChangesAsync` (MediatR pipeline
+  bypass — startup'ta `ICurrentUser` yok; `EfUnitOfWork`'ün event dispatch
+  loop'u assignment'tan apartment'i Occupied yapar). 1 site + 3 daire + 3
+  sakin (welcome mail outbox üzerinden) + 2026-05 dues period (1 paid + 2
+  unpaid) + 1 admin-açık conversation. `Demo:SeedOnStartup=true` flag ile
+  açılır; `.env.example` + `docker-compose.yml` propagate.
+- **PaymentService downstream health probe** (`PaymentServiceHealthCheck`):
+  typed HttpClient + 2 sn timeout; failure `Unhealthy` (orchestrator outage'i
+  charge fail beklemeden görür). Postgres'in yanına eklendi.
+- **UI polish:** ortak `<app-empty-state>` component (`shared/empty-state/`) —
+  5 sayfaya uygulandı (site-list, resident-list, my-bills, my-messages,
+  admin-messaging; 7 boş-veri noktası). Mobile responsive: admin & resident
+  layout'ta CDK `BreakpointObserver` → `sidenavMode "over"` + hamburger butonu
+  (`aria-label="common.menu"`). A11y sweep: tüm `matIconButton` zaten
+  `aria-label`'lı, gap yok.
+- **i18n parity guardrail** (`core/i18n/i18n-parity.spec.ts`): tr/en anahtar
+  setlerini düzleştirip eşitler; eksik anahtar → build red. **Web 32 (+1).**
+- **Dep sweep:** Angular 21.2.13→.15, CDK/Material 21.2.11→.13, .NET 10.0.5→
+  .0.8, Serilog.Sinks.Console 6.0→6.1.1 (patch). **Defer (major):** jsdom 28→29,
+  TS 5.9→6.0, Serilog.AspNetCore 9→10 — README "future".
+- **Security headers** (`SecurityHeadersMiddleware` — Production only):
+  X-Content-Type-Options nosniff, X-Frame-Options DENY, Referrer-Policy
+  no-referrer + `UseHsts()`. CSP YOK (Angular ayrı origin + Scalar inline scripts).
+- **Rate-limit** (.NET 10 built-in `AddRateLimiter`): `login-policy` fixed
+  5/dk per-IP, `pay-by-card-policy` sliding 10/dk per-user (6 segment).
+  5 endpoint'e `[EnableRateLimiting(...)]`: AuthController.Login + 2 admin
+  pay-by-card + 2 resident pay-by-card. **E2E:** `LoginRateLimitTests` — 7
+  ardışık bad-cred → 429 (fresh factory per test → izole limiter state).
+- **Refresh token audit:** rotation ✅ (`InMemoryRefreshTokenStore.ConsumeAsync`
+  TryRemove + handler-side StoreAsync), reuse-detection ✅ (consumed token →
+  null → 401), FE silent refresh ✅ (`AuthService.tryRefresh`). **Defer
+  ("future"):** family invalidation, EF-backed persistent store, JWT 60→15dk
+  darıltma.
+- **10 ADR** (`docs/adr/`): 0001 DDD/Clean, 0002 Rich Domain, 0003 Modular
+  Monolith + Payment, 0004 Exception-based (no `Result<T>`), 0005 CQRS-lite,
+  0006 Authz Pipeline + Markers, 0007 Outbox, 0008 Soft Delete root-only,
+  0009 Token-Scoped `/api/me/*` (IDOR yapısal), 0010 Refit + Polly. MADR
+  şablonu (`0000-template.md`) + index.
+- **README v2**: pitch + 3 mermaid (bounded context + pay-by-card sequence
+  + outbox sequence) + Demo mode bölümü + Known limitations (refresh in-memory,
+  family invalidation yok, credit partial settlement yok, file attach yok,
+  in-app notification yok, audit UI yok, API versioning yok, SignalR scale-out yok,
+  CSP yok, mobile-first değil) + ADR linkleri.
+- **Demo video script** (`docs/DEMO-VIDEO-SCRIPT.md`, TR 2-3 dk: hazırlık +
+  sahne planı + anahtar mesajlar). **LinkedIn post** taslağı
+  (`docs/LINKEDIN-POST.md`, 3 versiyon: kısa/orta/uzun + görsel hazırlık).
+- **Deploy YOK** — bilinçli karar. Vitrin için demo-only + video; live URL
+  ücret + maintenance overhead değer/maliyet oranını bozuyor. Kod tarafında
+  deploy helper'lar (`PortBindingExtensions`, `DatabaseUrlExtensions`) yerinde,
+  Railway/Render/Fly.io ile uyumlu — sonradan istenirse aktive edilebilir.
+
+**Tests (W6 final, 2026-05-28):** Domain 222, Application 89, Architecture 18,
+E2E 37; PaymentService Domain 46, Architecture 4, E2E 4; web (Vitest) 32.
+
+
 
 **W5 — Resident portal + Messaging + Dashboards (closed out, Day 7 done):**
 - **Authorization pipeline (new backbone).** Every MediatR request declares
@@ -203,17 +282,27 @@ no longer drives the surface; custom `ErrorSnackbar` via `openFromComponent`).
 Architecture 18, E2E 34; PaymentService Domain 46, Architecture 4, E2E 4;
 web (Vitest) 25.
 
-**Pending / next (W6 — Polish & Ship):**
-- **Admin messaging UI (Angular):** backend (`/api/conversations`) + resident UI +
-  E2E are done; the admin-side messaging *page* was deferred (W5 focus was the
-  resident portal). Quick add — mirror the resident `my-messages` page against
-  `/api/conversations` (route carries `residentId`, show resident name per thread).
-- **Credit partial settlement (deferred to project end):** when credit < the new
-  item (e.g. 300 credit vs 400 bill) it is currently **left untouched** (item stays
-  Unpaid). Author expects partial consume (apply 300, owe 100) — needs a partial/
-  `creditApplied` state on the item (domain + migration + UI). Decided to defer.
-- **SignalR / real-time messaging** (roadmap; W5 uses polling).
-- W6: test-coverage fill, README v2 + ADRs, UI polish, final deploy + smoke, demo.
+**Project complete (`v1.0.0` shipped). Known limitations / future work** (all
+documented in the README "Known limitations" section):
+
+- **Refresh token in-memory + no family invalidation** — `InMemoryRefreshTokenStore`
+  loses tokens on restart; reuse-detection 401s but doesn't "blow up the family."
+  Production move: EF-backed store + family column.
+- **JWT lifetime 60 min** — silent refresh works; 15-min tightening was rejected
+  (inflates refresh traffic + hurts dev UX for no measurable defence gain).
+- **Credit partial settlement** — overpayment credit auto-applies only when it
+  fully covers the next item; partial application (apply 300, owe 100) needs a
+  `creditApplied` state on the item (domain + migration + UI). Bilinçli defer.
+- **Mesajda dosya ekleme yok** — storage strategy (S3/disk/blob) ayrı karar.
+- **In-app notification hub yok** — Outbox-driven email var, in-app bildirim çanı
+  + history yok.
+- **Audit log UI yok** — `AuditableEntity` veri tutuyor, admin sayfası eksik.
+- **API versiyonlama yok** — `/api/` versiyonsuz.
+- **SignalR tek instance** — Redis backplane yok; horizontal scale için backplane
+  şart.
+- **CSP header yok** — Angular ayrı origin + Scalar inline scripts (Dev). Prod
+  host gerçekten bundle'ı sunduğunda yazılır.
+- **No live deployment** — bilinçli karar (vitrin için demo + video).
 - Optional UI polish (flow hints on the billing "Distribute/Close" actions).
 
 ## Collaboration style (author preferences)

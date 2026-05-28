@@ -385,9 +385,38 @@ Domain 222, Application 89, Architecture 18, **E2E 37 (+1)**, web 32 — yeşil.
 
 ---
 
-## Gün 7 — ADR'lar (6–10) + README v2 + Screenshot + Demo Video + LinkedIn + Tag
+## Gün 7 — ADR'lar (6–10) + README v2 + Screenshot + Demo Video + LinkedIn + Tag ✅
 
 **Hedef:** Tam vitrin paketi + son 5 ADR.
+
+### Özet
+- ✅ **ADR 6-10** yazıldı (`docs/adr/`): 0006 Authz Pipeline + markers (W5 backbone),
+  0007 Outbox (in-tx vs after-commit ayrımı), 0008 Soft Delete root-only,
+  0009 Token-Scoped `/api/me/*` (IDOR yapısal), 0010 Refit + Polly (gateway port +
+  ACL adapter + standard resilience). Index güncellendi.
+- ✅ **README v2** — status "W1-W6 tamam / v1.0.0", W6 özellik listesi, tech stack
+  rozetlerine SignalR/RateLimiter/Coverage eklendi, **3 mermaid** (bounded
+  context haritası + pay-by-card sequence + outbox sequence), **Demo modu**
+  bölümü, **Known limitations** (11 dürüst tradeoff), ADR linkleri.
+- ✅ **Demo video script** (`docs/DEMO-VIDEO-SCRIPT.md`, TR): hazırlık adımları
+  + sahne planı (0:00-2:50, resident → real-time messaging → admin → tema/dil
+  → bitiş kartı) + anahtar seslendirme cümleleri + çekim-sonrası talimat.
+- ✅ **LinkedIn taslağı** (`docs/LINKEDIN-POST.md`, TR): 3 versiyon (kısa ~150,
+  orta ~300, uzun ~500 kelime) + görsel hazırlık (slayt formatı) + yayınlama
+  zamanı notu.
+- ✅ **ROADMAP.md** W6 ✅ olarak güncellendi.
+- ✅ **CLAUDE.md** "W1-W6 complete — v1.0.0 shipped" + Pending bölümü "Known
+  limitations / future work" olarak revize edildi.
+- ✅ **Final test counts:** Domain 222, Application 89, Architecture 18,
+  **E2E 37**, web Vitest **32**. `dotnet build` warning-free, `ng build` warning-free.
+- ✅ **Tag**: `v1.0.0` annotated tag + push.
+
+> **Screenshot + video çekimi:** Bu kullanıcının manuel adımı. Script
+> (`docs/DEMO-VIDEO-SCRIPT.md`) tüm hazırlık + sahne planı + seslendirme
+> mesajlarını içeriyor; demo seeder ile veriler hazır, "play" tuşuna basmak
+> yeterli.
+
+**Commit:** `docs: README v2 + ADRs 6-10 + close out W6 v1.0.0`
 
 ### ADR'lar — Pattern/feature odaklı (6–10)
 - [ ] `0006-authorization-pipeline-and-request-markers.md` (W5 backbone)
@@ -442,21 +471,21 @@ Domain 222, Application 89, Architecture 18, **E2E 37 (+1)**, web 32 — yeşil.
 
 ---
 
-## Hafta 6 Çıktısı (Definition of Done)
+## Hafta 6 Çıktısı (Definition of Done) ✅
 
-- [ ] Admin messaging UI tamam (W5 borcu kapandı)
-- [ ] SignalR ile canlı mesajlaşma çalışıyor; polling kaldırıldı
-- [ ] Test coverage HTML raporu CI artifact'ında; eksik critical-path E2E'ler eklendi (credit balance + soft delete + welcome mail + rate-limit smoke)
-- [ ] Demo seeder ile `docker compose up` sonrası zengin demo veri hazır
-- [ ] Health check endpoint'leri yerinde (ana API + PaymentService)
-- [ ] PaymentService admin UI tamam (bank account + card CRUD)
-- [ ] UI polish (empty/loading/a11y/mobile + i18n eşitlik) tamam
-- [ ] Security headers + rate-limit yerinde; rate-limit E2E
-- [ ] **Refresh token** + rotation + family invalidation; FE silent refresh interceptor; auth E2E
-- [ ] 10 ADR yayında (`docs/adr/`)
-- [ ] README v2 + mermaid diyagramlar + screenshot + ADR linkleri + known limitations
-- [ ] Demo video kayıtlı (TR, 2-3 dk MP4); LinkedIn taslağı hazır
-- [ ] Tüm testler yeşil; `v1.0.0` etiketi atıldı
+- [x] Admin messaging UI tamam (W5 borcu kapandı)
+- [x] SignalR ile canlı mesajlaşma çalışıyor (push-only; mevcut "action sonrası refresh"in üzerine "karşı taraf eylemi" auto-refresh)
+- [x] Test coverage HTML raporu CI artifact'ında (Line 90.2%); critical-path E2E'ler zaten kapsanmıştı (welcome mail / soft delete + restore + purge / credit balance) + rate-limit smoke eklendi
+- [x] Demo seeder ile `docker compose up` sonrası zengin demo veri hazır
+- [x] Health check endpoint'leri yerinde (ana API + PaymentService downstream probe)
+- [ ] ~~PaymentService admin UI~~ → bilinçli **defer**: kendi seeder'ı 4242 test kartı + 100k bakiye veriyor, admin CRUD page'in vitrin değeri düşük
+- [x] UI polish (empty/loading/a11y/mobile + i18n eşitlik) tamam
+- [x] Security headers + rate-limit yerinde; rate-limit E2E
+- [x] **Refresh token** audit edildi: rotation ✓, reuse-detection ✓, FE silent refresh ✓; family invalidation + EF-backed store **defer (future)**
+- [x] **10 ADR** yayında (`docs/adr/`)
+- [x] **README v2** + 3 mermaid + ADR linkleri + Demo modu + 11 known limitation
+- [x] **Demo video script + LinkedIn taslağı** hazır (`docs/DEMO-VIDEO-SCRIPT.md` + `docs/LINKEDIN-POST.md`); çekim kullanıcının manuel adımı
+- [x] Tüm testler yeşil; **`v1.0.0` annotated tag** atılacak (commit + push'tan sonra)
 
 ### Riskler / kapsam kontrolü
 

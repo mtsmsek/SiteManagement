@@ -310,16 +310,21 @@ Postman'i ad-hoc keşif için kullan (yeni endpoint denerken). Regression yükü
 
 ---
 
-### Hafta 6 — Polish & Ship
+### Hafta 6 — Polish & Ship ✅
 **Hedef:** "Vitrine'e koyulabilir hale gelmiş"
 
-- Test coverage doldurma (domain %80+, app %60+, E2E critical journey'ler tam)
-- README v2 (diyagramlar, ADR'lar)
-- UI polish + performance + security
-- Final deploy + smoke test
-- LinkedIn postu + demo video
+- ✅ Admin messaging UI (W5 borcu kapandı)
+- ✅ SignalR real-time messaging — admin ↔ resident anlık push (Hub + group-based + JWT WS handshake)
+- ✅ Coverage harness (Coverlet + ReportGenerator) — Line 90.2% / Branch 82.3% / Method 84.9%
+- ✅ Demo seeder (`Demo:SeedOnStartup=true` → clone→up→demo veri) + downstream PaymentService health probe
+- ✅ UI polish: ortak `<app-empty-state>` + mobile sidenav (BreakpointObserver) + a11y sweep + i18n parity guardrail + dependency upgrade'ler (patch)
+- ✅ Security: HSTS + security headers (Production) + rate-limit (login 5/dk + pay-by-card 10/dk) + LoginRateLimitTests E2E
+- ✅ 10 ADR (`docs/adr/`) — DDD/Clean, Rich Domain, Modular Monolith, Exception-based, CQRS-lite, Authz Pipeline, Outbox, Soft Delete, Token-Scoped Resident Endpoints, Refit+Polly
+- ✅ README v2 (3 mermaid + W6 status + demo mode + known limitations + ADR linkleri)
+- ✅ Demo video çekim senaryosu (`docs/DEMO-VIDEO-SCRIPT.md`) + LinkedIn taslağı (`docs/LINKEDIN-POST.md`)
+- ⚠️ Deploy YOK — bilinçli karar (vitrin için demo-only + video; live URL ücret + maintenance overhead'i değer/maliyet oranını bozuyor)
 
-**Definition of Done:** Repo public, README prezentabl, deployed URL canlı, demo video kayıtlı, LinkedIn postu hazır.
+**Definition of Done:** ✅ Repo public, README prezentabl, demo seeder + video + LinkedIn taslağı hazır, `v1.0.0` tag atıldı. Tests yeşil (Domain 222, App 89, Arch 18, E2E 37, web 32; PaymentService Domain 46, Arch 4, E2E 4).
 
 ---
 

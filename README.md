@@ -6,7 +6,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4)](https://dotnet.microsoft.com/)
 
-🚧 **Work in progress** — **Hafta 1-5 tamam.** Foundation & Deploy → Property/Residency → Tenancy & Billing → **Payment microservice (MongoDB)** → **Resident portal + Messaging + Dashboards (IDOR-safe authz pipeline)**. Sırada: W6 (polish & ship). [ROADMAP.md](ROADMAP.md) 6 haftalık planı; gün gün ilerleme [WEEK-1-2-DETAIL.md](WEEK-1-2-DETAIL.md) · [WEEK-3-DETAIL.md](WEEK-3-DETAIL.md) · [WEEK-4-DETAIL.md](WEEK-4-DETAIL.md) · [WEEK-5-DETAIL.md](WEEK-5-DETAIL.md).
+✅ **Hafta 1-6 tamam — `v1.0.0`.** Foundation & Deploy → Property/Residency → Tenancy & Billing → **Payment microservice (MongoDB)** → **Resident portal + Messaging + Dashboards (IDOR-safe authz pipeline)** → **Polish & Ship (SignalR real-time + demo seeder + security headers + rate-limit + 10 ADR + 90% line coverage).** [ROADMAP.md](ROADMAP.md) 6 haftalık planı; gün gün ilerleme [WEEK-1-2-DETAIL.md](WEEK-1-2-DETAIL.md) · [WEEK-3-DETAIL.md](WEEK-3-DETAIL.md) · [WEEK-4-DETAIL.md](WEEK-4-DETAIL.md) · [WEEK-5-DETAIL.md](WEEK-5-DETAIL.md) · [WEEK-6-DETAIL.md](WEEK-6-DETAIL.md). Mimari kararlar: [docs/adr/](docs/adr/).
 
 ---
 
@@ -52,7 +52,14 @@
 - ✅ **Dashboard'lar** — admin (site/sakin sayısı, tahakkuk/tahsil, açık bakiye, kredi, tahsilat oranı) + resident (açık borç + kredi + okunmamış mesaj); saf read-side projeksiyon
 - ✅ Angular `/resident/*` alanı (`residentGuard`, rol bazlı login yönlendirme)
 
-🔜 **Hafta 6:** polish & ship — admin messaging UI, test coverage, deploy, demo.
+**Polish & Ship (W6):**
+- ✅ **Admin messaging UI** (W5 borcu kapandı) — iki panel inbox + thread + yeni konu dialog
+- ✅ **SignalR real-time messaging** — `MessagingHub` + role-based group join (`messaging:admins`, `messaging:resident:{N}`); JWT bearer query-string handshake; pushes karşı tarafın eylemini UI'a anında getiriyor. Push-only — gönderme HTTP'den (validation + ownership pipeline'da kalıyor)
+- ✅ **DemoSeeder** — `Demo:SeedOnStartup=true` ile clone→up→1 site + 3 sakin + welcome mail'ler + 1 dönem (1 paid + 2 unpaid) + 1 admin-açık conversation hazır
+- ✅ **Health check** — ana API'nin downstream PaymentService probe'u (typed HttpClient, 2 sn timeout); PaymentService kendi `/health`'ini de export ediyor
+- ✅ **Security headers** (Production) + **rate-limit** (login 5/dk fixed IP-key + pay-by-card 10/dk sliding user-key); E2E ile 429 doğrulandı
+- ✅ **Coverage harness** — Coverlet + ReportGenerator HTML; **Line 90.2% / Branch 82.3% / Method 84.9%**; CI artifact + step summary
+- ✅ **10 ADR** ([docs/adr/](docs/adr/)) — DDD/Clean, Rich Domain, Modular Monolith, Exception-based, CQRS-lite, Authz Pipeline, Outbox, Soft Delete, Token-Scoped Resident Endpoints, Refit+Polly
 
 ---
 
@@ -71,10 +78,13 @@
 | Logging | Serilog (structured, request logging) |
 | API docs | Scalar UI (Swashbuckle yerine — .NET 10 / OpenApi 2.0 uyumlu) |
 | HTTP client | Refit + Polly _(W4)_ |
+| Real-time | ASP.NET Core SignalR _(W6, messaging)_ |
 | Localization | `IStringLocalizer` + .resx (tr-TR, en-US) |
+| Rate limiting | .NET 10 built-in `AddRateLimiter` _(W6)_ |
 | Frontend | Angular 21 (standalone, signals) _(W2)_ |
 | UI lib | Angular Material 3 _(W2)_ |
-| i18n (frontend) | ngx-translate _(W2)_ |
+| i18n (frontend) | ngx-translate _(W2)_ + i18n parity guardrail _(W6)_ |
+| Coverage | Coverlet + ReportGenerator _(W6)_ |
 | Test | xUnit, FluentAssertions, NSubstitute, Testcontainers |
 | Container | Docker + Compose v2 |
 | CI | GitHub Actions |
@@ -99,7 +109,89 @@ SiteManagement.Api           ← Controller'lar, middleware, OpenAPI/Scalar, Ser
 - **Infrastructure** port'ların concrete implementation'larını + EF Core mapping + Identity setup'ını barındırır.
 - **Api** thin — controller'lar `ISender.Send(command)` çağırır, business logic yoktur.
 
-Detaylı kararlar (rich domain prensipleri, exception translation kuralı, test stratejisi): [ROADMAP.md](ROADMAP.md).
+Detaylı kararlar (rich domain prensipleri, exception translation kuralı, test stratejisi): [ROADMAP.md](ROADMAP.md). Tek tek mimari kararlar: [docs/adr/](docs/adr/).
+
+### Bounded context haritası
+
+```mermaid
+flowchart LR
+    subgraph Main["Main API (single deployment, modular monolith)"]
+        Identity[Identity]
+        Property[Property<br/>Site/Block/Apartment]
+        Residency[Residency<br/>Resident]
+        Tenancy[Tenancy<br/>ApartmentAssignment]
+        Billing[Billing<br/>DuesPeriod/UtilityBillPeriod/Credit]
+        Messaging[Messaging<br/>Conversation]
+    end
+    subgraph External["Separate service (Mongo)"]
+        Payment[PaymentService<br/>BankAccount/CreditCard/Tx]
+    end
+    Identity -. resident_id .-> Residency
+    Tenancy -. domain event .-> Property
+    Tenancy -. references .-> Residency
+    Billing -. references .-> Tenancy
+    Billing -. references .-> Property
+    Messaging -. references .-> Residency
+    Billing -- "Refit + Polly (HTTP)" --> Payment
+```
+
+### Sequence: pay-by-card (FE → API → PaymentService)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant FE as Angular (resident)
+    participant API as Main API
+    participant Gw as IPaymentGateway<br/>(adapter + Refit + Polly)
+    participant PS as PaymentService
+    participant Mongo
+
+    FE->>API: POST /api/me/dues/{periodId}/items/{itemId}/pay-by-card
+    API->>API: AuthorizationBehavior (IResidentRequest)<br/>+ ResidentBillOwnershipBehavior (IOwnedBillItemRequest)
+    API->>Gw: ChargeAsync(idempotencyKey="dues-item:{itemId}", amount, card)
+    Gw->>PS: POST /api/payments (API-key + idempotency key)
+    PS->>Mongo: upsert PaymentTransaction (unique index)
+    alt success
+        Mongo-->>PS: ok
+        PS-->>Gw: 200 { status: Paid, transactionId }
+        Gw-->>API: ok
+        API->>API: item.MarkPaid()  (in-tx)
+        API-->>FE: 204 No Content
+    else decline (insufficient balance / rejected card)
+        PS-->>Gw: 200 { status: Failed, reason }
+        Gw-->>API: throw PaymentRejectedException(messageKey)
+        API-->>FE: 402 Payment Required (ProblemDetails)<br/>item stays Unpaid
+    end
+```
+
+### Sequence: outbox after-commit delivery
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Admin as Admin (HTTP)
+    participant API as Main API
+    participant DB as Postgres
+    participant Out as OutboxBackgroundService
+    participant SMTP as MailHog (dev)
+
+    Admin->>API: POST /api/dues/{periodId}/close
+    API->>API: handler: period.Close() raises DuesPeriodClosed
+    API->>DB: TX: UPDATE DuesPeriod + INSERT OutboxMessage
+    DB-->>API: commit
+    API-->>Admin: 204 No Content
+    Note over API,DB: state + side-effect intent commit atomically
+
+    loop poll interval
+        Out->>DB: SELECT FROM OutboxMessages WHERE ProcessedAtUtc IS NULL
+        DB-->>Out: rows
+        Out->>Out: dispatch via MediatR (DuesPeriodClosedHandler)
+        Out->>SMTP: send emails to residents
+        Out->>DB: UPDATE row SET ProcessedAtUtc = now()
+    end
+```
+
+> SignalR push'ları **bu akışın dışında**: real-time UI bildirimleri ephemeral (bağlantı yoksa kaybolur), Outbox durable (kayıpsız teslim). İkisi farklı garanti seviyeleri — [ADR 0007](docs/adr/0007-outbox-pattern-for-integration-events.md) ayrımı açıklıyor.
 
 ---
 
@@ -209,17 +301,38 @@ docker compose down --volumes    # volume'leri de sil (DB sıfırlanır)
 
 ---
 
-## Production Deploy
+## Demo modu
 
-> _Live URL **W6**'da eklenecek_ — kod ve dokümantasyon hazır, deploy tarafı vitrin polish'iyle (W6) birlikte yapılacak.
+Tek komut ile demo veriyle dolu bir kurulum:
 
-Adım adım Railway talimatı: **[docs/DEPLOY-RAILWAY.md](docs/DEPLOY-RAILWAY.md)**.
+```powershell
+Copy-Item .env.example .env   # DEMO_SEED_ON_STARTUP=true zaten açık
+docker compose up -d --build
+```
 
-API kodunda iki platform helper var (Railway / Render / Heroku / Fly.io ile uyumlu):
-- `PortBindingExtensions.UsePlatformPort()` — host'un inject ettiği `$PORT`'a otomatik bind
-- `DatabaseUrlExtensions.UsePlatformDatabaseUrl()` — `postgresql://user:pass@host:port/db` formatlı `DATABASE_URL`'yi Npgsql syntax'ına otomatik çevirir
+Bootstrap admin (`admin@sitemanagement.local` / `Str0ng-P@ss-Dev`) + 1 site + 3 sakin + 1 açık aidat dönemi (1 paid + 2 unpaid) + 1 admin-açık conversation + welcome mail'ler MailHog'a düşmüş gelir. Mail'deki şifre ile sakin login olunabilir; pay-by-card için PaymentService kendi seeder'ı `4242 4242 4242 4242` Luhn-geçerli test kartı + 100.000 ₺ bakiyeyi hazırlamıştır.
 
-Local docker-compose'da bu env'ler set olmadığı için bu helper'lar no-op.
+### Production deploy (yapılmadı — bilinçli karar)
+
+Bu proje **vitrin / portfolio** projesidir; live URL yerine **self-hosted demo + video** tercih edildi (ücret + maintenance overhead'i değer/maliyet oranını bozuyor). Kod tarafında deploy yardımcıları (`PortBindingExtensions.UsePlatformPort`, `DatabaseUrlExtensions.UsePlatformDatabaseUrl`) yerinde — gerçek bir host'a alınmak istenirse Railway / Render / Fly.io ile sorunsuz çalışacak şekilde tasarlandı. Adım adım rehber: **[docs/DEPLOY-RAILWAY.md](docs/DEPLOY-RAILWAY.md)**.
+
+---
+
+## Known limitations (dürüst vitrin)
+
+Vitrin projesinin dürüstçe kapsam dışı bıraktığı parçalar — hiçbiri "unutuldu" değil, hepsi bilinçli scope kararı:
+
+- **Resident self-registration yok** — sakin hesabı yalnız authenticated admin'in `POST /api/residents` çağrısıyla doğar. Public register endpoint'i bilinçli olarak yoktur (güvenlik duruşu).
+- **Refresh token in-memory + family invalidation yok** — `InMemoryRefreshTokenStore` restart'ta token'leri kaybeder. Rotation + reuse-detection var, ama compromise → "tüm family revoke" tier'ı yok. Production move: EF-backed store + family kolonu.
+- **JWT lifetime 60 dk** — silent refresh devrede; 15 dk'ya darıltma refresh hacmini artırırdı, dev UX'i bozardı. Production'da config bir satır.
+- **Credit balance partial settlement yok** — overpayment kredisi sonraki kalemi **tam karşılarsa** otomatik mahsup ediliyor; kısmen karşılarsa kalem `Unpaid` kalıyor (kullanıcı bunu bilinçli ertelendi olarak işaretledi).
+- **Mesajda dosya/resim ekleme yok** — text-only thread + per-side unread. Storage (S3 / disk / blob) ayrı bir karar; vitrin akışı için marjinal değer.
+- **In-app bildirim merkezi yok** — bildirim Outbox üzerinden email; in-app çan + history yok.
+- **Audit log UI yok** — `AuditableEntity` veri tutuyor, admin sayfası eksik.
+- **API versiyonlama yok** — `/api/` versiyonsuz.
+- **SignalR tek instance** — Redis backplane yok; horizontal scale için backplane (Redis / Azure SignalR) eklenmesi gerekir.
+- **CSP header yok** — Angular ayrı origin'den serve ediliyor ve Scalar Dev'de inline scripts kullanıyor; prod host gerçekten bundle'ı sunduğunda yazılır.
+- **Mobile responsive smoke geçti, mobile-first UX değil** — `BreakpointObserver` ile sidenav `over` mode + hamburger var; production mobile-app deneyimi yerine "tablet+ optimize" hedefi.
 
 ---
 
