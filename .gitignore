@@ -137,6 +137,7 @@ demo/models/*.onnx
 demo/models/*.onnx.json
 docs/demo-video.mp4
 docs/demo-video.webm
+docs/demo-video.*.srt
 
 # ---------------------------------------------------------------------------
 # OS

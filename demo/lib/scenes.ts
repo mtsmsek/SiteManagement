@@ -1,9 +1,11 @@
 /**
  * Single source of truth for the demo scenario: the ordered list of scenes
  * the recorder walks through. Each scene's <c>narration</c> is fed to
- * piper-tts to produce the matching audio clip; the recording stage holds
- * the UI on each scene for at least <c>minDurationMs</c>, which keeps the
- * narration audio and the video frames lined up after the merge.
+ * piper-tts to produce the matching audio clip; the merge step splits the
+ * same narration into short chunks (see <c>lib/split.ts</c>) so the on-screen
+ * subtitles flow with the voice-over instead of dumping the whole sentence
+ * at once. The recording stage holds the UI on each scene for at least
+ * <c>minDurationMs</c>, which keeps audio and frames lined up after merge.
  */
 export interface Scene {
   /** Stable id, used as the audio filename and as the recorder-stage hook. */
