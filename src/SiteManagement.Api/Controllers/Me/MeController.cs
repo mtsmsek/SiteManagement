@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SiteManagement.Api.Configuration;
 using SiteManagement.Api.Controllers.Billing;
 using SiteManagement.Api.Controllers.Messaging;
@@ -57,10 +58,12 @@ public class MeController(ISender sender) : ControllerBase
 
     /// <summary>Pays one of the resident's own dues items by credit card.</summary>
     [HttpPost(PayDuesRoute)]
+    [EnableRateLimiting(RateLimitingExtensions.PayByCardPolicy)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status402PaymentRequired)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> PayDuesItem(
         Guid duesPeriodId,
         Guid itemId,
@@ -76,10 +79,12 @@ public class MeController(ISender sender) : ControllerBase
 
     /// <summary>Pays one of the resident's own utility bill items by credit card.</summary>
     [HttpPost(PayUtilityRoute)]
+    [EnableRateLimiting(RateLimitingExtensions.PayByCardPolicy)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status402PaymentRequired)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> PayUtilityItem(
         Guid utilityBillPeriodId,
         Guid itemId,

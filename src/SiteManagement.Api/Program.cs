@@ -21,6 +21,7 @@ builder.Services
     .AddJwtAuth(builder.Configuration)
     .AddCurrentUser()
     .AddMessagingHub()
+    .AddSiteManagementRateLimiter()
     .AddSiteManagementCors(builder.Configuration)
     .AddSiteManagementHealthChecks(builder.Configuration)
     .AddSiteManagementLocalization()

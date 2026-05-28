@@ -20,6 +20,16 @@ public static class PipelineExtensions
         var localizationOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>().Value;
         app.UseRequestLocalization(localizationOptions);
 
+        // Production-only hardening: HSTS teaches browsers to upgrade to HTTPS,
+        // SecurityHeadersMiddleware stamps nosniff / DENY / no-referrer on every
+        // response. Both are off in Development so Scalar's inline scripts work
+        // and HSTS doesn't poison the developer's loopback.
+        if (!app.Environment.IsDevelopment())
+        {
+            app.UseHsts();
+            app.UseMiddleware<SecurityHeadersMiddleware>();
+        }
+
         app.UseMiddleware<GlobalExceptionMiddleware>();
         app.UseSerilogRequestLogging();
 
@@ -37,6 +47,11 @@ public static class PipelineExtensions
 
         app.UseAuthentication();
         app.UseAuthorization();
+
+        // Sits after auth so the per-user partition key on the pay policy can
+        // read User.Identity.Name; sits before MapControllers so the policy
+        // attributes on endpoints are honoured.
+        app.UseRateLimiter();
 
         app.MapHealthChecks(ApiConstants.HealthEndpoint);
         app.MapGet(ApiConstants.HealthLiveEndpoint, () => Results.Ok(new { status = "live" }));

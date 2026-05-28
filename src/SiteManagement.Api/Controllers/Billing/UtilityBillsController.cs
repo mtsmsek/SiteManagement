@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SiteManagement.Api.Configuration;
 using SiteManagement.Application.Billing.Commands.ChangeUtilityBillAmount;
 using SiteManagement.Application.Billing.Commands.CloseUtilityBillPeriod;
@@ -100,9 +101,11 @@ public class UtilityBillsController(ISender sender) : ControllerBase
 
     /// <summary>Pays one utility bill item by credit card via the payment gateway.</summary>
     [HttpPost(PayItemByCardRoute)]
+    [EnableRateLimiting(RateLimitingExtensions.PayByCardPolicy)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status402PaymentRequired)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> PayItemByCard(
         Guid utilityBillPeriodId,
         Guid itemId,

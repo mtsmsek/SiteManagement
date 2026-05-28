@@ -1,6 +1,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SiteManagement.Api.Configuration;
 using SiteManagement.Application.Billing.Commands.ChangeDuesAmount;
 using SiteManagement.Application.Billing.Commands.CloseDuesPeriod;
@@ -108,9 +109,11 @@ public class DuesController(ISender sender) : ControllerBase
 
     /// <summary>Pays one dues item by credit card via the payment gateway.</summary>
     [HttpPost(PayItemByCardRoute)]
+    [EnableRateLimiting(RateLimitingExtensions.PayByCardPolicy)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status402PaymentRequired)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<IActionResult> PayItemByCard(
         Guid duesPeriodId,
         Guid itemId,

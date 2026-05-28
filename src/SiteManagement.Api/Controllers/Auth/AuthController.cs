@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using SiteManagement.Api.Configuration;
 using SiteManagement.Application.Auth.Commands.Login;
 using SiteManagement.Application.Auth.Commands.Refresh;
@@ -27,9 +28,11 @@ public class AuthController(ISender sender) : ControllerBase
 
     /// <summary>Authenticates an existing user and returns an access + refresh token pair.</summary>
     [HttpPost(LoginRoute)]
+    [EnableRateLimiting(RateLimitingExtensions.LoginPolicy)]
     [ProducesResponseType<TokensResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)]
     public async Task<ActionResult<TokensResponse>> Login(
         [FromBody] LoginRequest request,
         CancellationToken ct)

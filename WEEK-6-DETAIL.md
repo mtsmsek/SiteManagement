@@ -328,52 +328,60 @@ MADR şablonu, her dosya 1 sayfa: Bağlam / Karar / Alternatifler / Sonuçlar.
 
 ---
 
-## Gün 6 — Security Pass (headers + rate-limit + refresh token)
+## Gün 6 — Security Pass (headers + rate-limit + refresh-token audit) ✅
 
-**Hedef:** Alt-sınır güvenlik hijyeni + refresh token ile temiz auth UX.
+**Hedef:** Alt-sınır güvenlik hijyeni. Refresh token'ı sıfırdan kurmaya gerek
+yoktu — yapı zaten mevcuttu (audit + bilinen sınırlar), Gün 6 onun üzerine
+**security headers + rate-limit** ekledi.
 
-### Security headers
-- [ ] **Middleware** (`Production` profile için):
-  - `Strict-Transport-Security` (HSTS)
-  - `X-Content-Type-Options: nosniff`
-  - `X-Frame-Options: DENY`
-  - `Referrer-Policy: no-referrer`
+### Refresh token — audit + decision
+Mevcut implementation (W1-W2'den, `InMemoryRefreshTokenStore` + `RefreshTokenCommandHandler`):
+- ✅ **Rotation:** `ConsumeAsync` token'i `TryRemove`'la kaldırır; handler hemen
+  yeni token üretip `StoreAsync` ile saklar → her refresh tek-kullanımlık.
+- ✅ **Reuse-detection:** tüketilmiş token tekrar gelirse `ConsumeAsync` null
+  döner → handler `AuthenticationException` → **401**. Attacker önce kullanırsa
+  meşru kullanıcı 401 alıp login'e atılır (etkin güvenlik korunmuş, "tüm
+  session kapalı" yerine "yeniden login").
+- ✅ **FE silent refresh:** `AuthService.tryRefresh()` zaten yerinde,
+  `localStorage` ile `accessToken` + `refreshToken` + `accessTokenExpiresAt`.
+- ❌ **Family invalidation:** ek "compromise → tüm family revoke" yok. Tradeoff
+  kabul; "future" maddesi.
+- ❌ **Persistent store:** `InMemoryRefreshTokenStore` restart'ta token'leri kaybeder.
+  Single-instance dev demosu için OK; production / horizontal scale için
+  EF-backed store gerekir. "future" maddesi.
+- ❌ **JWT 60 dk → 15 dk darıltma:** şimdi yapılmadı — pratikte FE silent
+  refresh devrede; süreyi düşürmek refresh hacmini artırır + dev UX'i bozar.
+  README'de "kısa access ile defense-in-depth" maddesine kalır.
 
-### Rate-limit
-- [ ] **.NET 10 built-in `AddRateLimiter`:**
-  - `login` endpoint → fixed window, 5/dk (IP key).
-  - `pay-by-card` endpoint'leri (admin + resident) → sliding window, 10/dk (user key).
-- [ ] E2E: login spam → 429.
+### Security headers ✅
+- [x] `Api/Middleware/SecurityHeadersMiddleware.cs` — `X-Content-Type-Options: nosniff`,
+      `X-Frame-Options: DENY`, `Referrer-Policy: no-referrer`. CSP bilinçli
+      olarak dışarıda (Angular ayrı origin'den, Scalar Dev'de inline script
+      kullanıyor; prod host gerçekten bundle'ı sunduğunda yazılır).
+- [x] `PipelineExtensions` `Production` profile için `UseHsts()` + middleware'i
+      sıraya ekledi (Dev'de ikisi de no-op; HSTS loopback'i zehirlemez).
 
-### Refresh token (yeni)
-**Kararlar (Gün 6 başında kilitlenecek mini başlıklar):**
-- **Access lifetime:** 15 dk (kısa, sızıntı riski düşer).
-- **Refresh lifetime:** 7 gün (sliding window).
-- **Storage:** `RefreshToken` tablo (Identity DbContext) — `{ Id, UserId, TokenHash (SHA-256), ExpiresAt, RevokedAt?, ReplacedByTokenHash?, FamilyId }`. Plain token client'a; **hash** sunucuda.
-- **Rotation:** her refresh → eski revoke + yeni üret (aynı family). Reuse detection: revoked bir token tekrar gelirse → **tüm family invalidate** (compromise sinyali).
-- **Logout:** refresh token revoke (family kapat).
-- **FE storage:** `localStorage` (httpOnly cookie alternatifini değerlendirme: SPA + Scalar için karmaşık; localStorage + kısa access kabul edilebilir vitrin için — README'de "tradeoff" diye yaz).
+### Rate-limit ✅
+- [x] `Api/Configuration/RateLimitingExtensions.cs` — .NET 10 built-in
+      `AddRateLimiter` üzerinden iki named policy:
+  - **`login-policy`**: fixed window **5/dk**, partition key = remote IP
+    (credential-stuffing defansı).
+  - **`pay-by-card-policy`**: sliding window **10/dk** (6 segment), partition
+    key = `User.Identity.Name` (auth sonrası user-keyed; auth öncesi IP).
+- [x] Pipeline: `app.UseRateLimiter()` auth + authorization **sonrasında**,
+      controller mapping **öncesinde** (user-key partition key auth'tan sonra
+      okunsun diye).
+- [x] `[EnableRateLimiting(...)]` uygulandı: `AuthController.Login` +
+      `MeController.PayDuesItem` + `MeController.PayUtilityItem` +
+      `DuesController.PayItemByCard` + `UtilityBillsController.PayItemByCard`
+      (5 endpoint). Hepsinin `[ProducesResponseType(429)]` OpenAPI shape'i de
+      eklendi.
+- [x] **E2E (`LoginRateLimitTests`):** 7 ardışık yanlış-parola login →
+      sonuncu 429. Her test fresh factory → fresh limiter, suite-içi yan etki yok.
 
-**Backend:**
-- [ ] `Domain/Identity/RefreshToken.cs` (entity, aggregate root değil — Identity'nin altı).
-- [ ] EF config + migration (`AddRefreshTokens`).
-- [ ] `IRefreshTokenService` (Application): `IssueAsync(userId)`, `RotateAsync(plainToken)` (reuse → family revoke), `RevokeAsync(plainToken)`.
-- [ ] `POST /api/auth/refresh` — body `{ refreshToken }`; başarı: yeni `{ accessToken, refreshToken, accessTokenExpiresAt }`; başarısızlık (expired/revoked/family compromise) → **401**.
-- [ ] `POST /api/auth/logout` — `[Authorize]`, refresh token revoke.
-- [ ] `LoginCommand` response'una `refreshToken` + `accessTokenExpiresAt` ekle.
-- [ ] **TDD:** `RefreshTokenServiceTests` (issue, rotate happy, reuse → family revoke, expired → 401).
-- [ ] **E2E:** `AuthRefreshTests` — login → access expire simüle → refresh → yeni token ile request 200; revoked token tekrar → 401 + family invalidate.
-
-**Frontend:**
-- [ ] `auth.service` → `accessToken`, `refreshToken`, `accessTokenExpiresAt` storage.
-- [ ] HTTP interceptor — 401 yakala → **tek refresh promise** (race koruması) → yeni access ile orijinal request retry. Refresh de 401 alırsa → logout + login redirect.
-- [ ] Logout: `POST /api/auth/logout` + clear storage.
-- [ ] Vitest: interceptor (3 test — happy refresh, refresh 401 → logout, eşzamanlı 401 tek refresh).
-
-### JWT lifetime config
-- [ ] `Jwt:AccessTokenLifetimeMinutes=15`, `Jwt:RefreshTokenLifetimeDays=7` (`appsettings` + `.env.example`).
-
-**Commit:** `feat(security): headers + rate-limit` + `feat(auth): refresh token with rotation + family invalidation`
+### Tests
+Domain 222, Application 89, Architecture 18, **E2E 37 (+1)**, web 32 — yeşil.
+**Commit:** `feat(security): headers + rate-limit (login + pay-by-card)`
 
 ---
 
